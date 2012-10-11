@@ -1,0 +1,22 @@
+Collection of PKGBUILDs for building mingw-64 packages
+for archlinux. Think of it as an extension to the AUR.
+
+I needed a mingw environment to cross compile my GTK+3
+applications for win32 and win64, but the default
+PKGBUILDs provided by AUR were a mess. I decided to
+build my own basing the scripts on the Fedora packages:
+
+http://pkgs.fedoraproject.org/cgit/
+
+The following dependencies have been compiled directly
+from AUR:
+
+mingw-w64-binutils
+mingw-w64-crt
+mingw-w64-gcc
+mingw-w64-gcc-base
+mingw-w64-headers
+mingw-w64-headers-bootstrap
+mingw-w64-pkg-config
+mingw-w64-winpthreads
+mingw-w64-zlib
