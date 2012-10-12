@@ -1,0 +1,90 @@
+# Maintainer: Nicola Fontana <ntd@entidi.it>
+#
+# Port of the Fedora package found at
+# http://pkgs.fedoraproject.org/cgit/mingw-termcap.git/
+#
+# Note: Termcap was deprecated and removed from Fedora after F-8.  It
+# has been replaced by ncurses.  However ncurses cannot be compiled on
+# Windows so we have to supply termcap.  In addition, the last stand-
+# alone Fedora termcap package was actually just /etc/termcap from
+# ncurses.  So here we are using the GNU termcap library which is
+# regretably GPL'd.
+
+pkgname=fedora-mingw-w64-termcap
+pkgver=1.3.1
+pkgrel=1
+pkgdesc='MinGW terminal feature database (mingw-w64)'
+arch=(any)
+url='ftp://ftp.gnu.org/gnu/termcap/'
+license=(GPL)
+groups=(fedora-mingw)
+depends=(mingw-w64-crt)
+makedepends=('mingw-w64-gcc>=4.7.0' autoconf)
+provides=("mingw-w64-termcap=$pkgver")
+conflicts=(mingw-w64-termcap)
+options=(!strip !buildflags !libtool)
+source=("ftp://ftp.gnu.org/gnu/termcap/termcap-$pkgver.tar.gz")
+md5sums=('ffe6f86e63a3a29fa53ac645faaabdfa')
+
+_architectures=(i686-w64-mingw32
+                x86_64-w64-mingw32)
+
+build() {
+  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
+  local builddir
+  local arch
+
+  for arch in ${_architectures[@]}; do
+    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    mkdir -p "$builddir"
+    cd "$builddir"
+
+    # This old configure script needs some help to understand what is needed.
+    ac_cv_c_cross=1 "$tardir/configure" \
+      --prefix="/usr/$arch" \
+      --host="$arch"
+    make \
+      CFLAGS='-O2 -pipe' \
+      CXXFLAGS="$CFLAGS" \
+      LDFLAGS='' \
+      CC="$arch-gcc" \
+      AR="$arch-ar" \
+      RANLIB="$arch-ranlib"
+
+    # Manually build the shared library. No need for -fPIC on Windows.
+    $arch-gcc -shared \
+      -Wl,--out-implib,libtermcap.dll.a \
+      -o libtermcap-0.dll \
+      termcap.o tparam.o version.o
+  done
+}
+
+package() {
+  local arch
+  local builddir
+  local prefix
+
+  for arch in ${_architectures[@]}; do
+    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    prefix="$pkgdir/usr/$arch"
+
+    # make DESTDIR=... is not supported.
+    make install -C "$builddir" \
+      prefix="$prefix" \
+      exec_prefix="$prefix" \
+      infodir="$prefix/share/info" \
+      oldincludedir=
+
+    mkdir -p "$prefix/bin"
+    mkdir -p "$prefix/lib"
+    install -m 0755 "$builddir/libtermcap-0.dll" "$prefix/bin"
+    install -m 0755 "$builddir/libtermcap.dll.a" "$prefix/lib"
+
+    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+    rm -fr "$prefix/share"
+  done
+}
+
+# vim:set ts=2 sw=2 et:
