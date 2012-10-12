@@ -32,10 +32,9 @@ build() {
   local builddir
   local arch
 
-  # Not sure these can be passed to CMake on the command line, so setting them here.
   export CFLAGS='-O2 -pipe'
   export CXXFLAGS="$CFLAGS"
-  unset LDFLAGS
+  unset  LDFLAGS
 
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
