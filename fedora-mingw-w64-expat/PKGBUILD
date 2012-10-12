@@ -44,14 +44,18 @@ build() {
 
 package() {
   local arch
+  local prefix
+
   for arch in ${_architectures[@]}; do
+    prefix="$pkgdir/usr/$arch"
+
     cd "$srcdir/$pkgname-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
 
-    find "$pkgdir/usr/$arch" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
-    find "$pkgdir/usr/$arch" -name '*.dll' -exec $arch-strip -xg {} +
-    find "$pkgdir/usr/$arch" -name '*.a' -exec $arch-strip -g {} +
-    rm -fr "$pkgdir/usr/$arch/share"
+    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+    rm -fr "$prefix/share"
   done
 }
 
