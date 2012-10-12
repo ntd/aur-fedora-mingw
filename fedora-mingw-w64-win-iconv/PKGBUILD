@@ -1,0 +1,72 @@
+# Maintainer: Nicola Fontana <ntd@entidi.it>
+#
+# Port of the Fedora package found at
+# http://pkgs.fedoraproject.org/cgit/mingw-win-iconv.git/
+
+pkgname=fedora-mingw-w64-win-iconv
+pkgver=0.0.4
+pkgrel=1
+pkgdesc='Iconv implementation using Win32 API (mingw-w64)'
+arch=(any)
+url='http://code.google.com/p/win-iconv/'
+license=(BSD)
+groups=(fedora-mingw)
+depends=(mingw-w64-crt)
+makedepends=('mingw-w64-gcc>=4.7.0' 'cmake>=2.8.0')
+provides=("mingw-w64-win-iconv=$pkgver")
+conflicts=(mingw-w64-win-iconv mingw-w64-libiconv)
+options=(!strip !buildflags !libtool)
+source=("http://win-iconv.googlecode.com/files/win-iconv-$pkgver.tar.bz2"
+        "Toolchain-i686-w64-mingw32.cmake"
+        "Toolchain-x86_64-w64-mingw32.cmake")
+md5sums=('7618f4a80dd4b32dd7141fbe026991d9'
+         '93f31089ff2069c9ac1eddd387d79616'
+         'd618536e69bcbff2daab3897014a5eeb')
+
+
+_architectures=(i686-w64-mingw32
+                x86_64-w64-mingw32)
+
+build() {
+  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
+  local builddir
+  local arch
+
+  # Not sure these can be passed to CMake on the command line, so setting them here.
+  export CFLAGS='-O2 -pipe'
+  export CXXFLAGS="$CFLAGS"
+  unset LDFLAGS
+
+  for arch in ${_architectures[@]}; do
+    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    mkdir -p "$builddir"
+    cd "$builddir"
+    PATH="/usr/$arch/bin:$PATH" cmake "$tardir" \
+      -DCMAKE_VERBOSE_MAKEFILE=ON \
+      -DCMAKE_INSTALL_PREFIX:PATH="/usr/$arch" \
+      -DCMAKE_INSTALL_LIBDIR:PATH="/usr/$arch/lib" \
+      -DINCLUDE_INSTALL_DIR:PATH="/usr/$arch/include" \
+      -DLIB_INSTALL_DIR:PATH="/usr/$arch/lib" \
+      -DSYSCONF_INSTALL_DIR:PATH="/usr/$arch/etc" \
+      -DSHARE_INSTALL_PREFIX:PATH="/usr/$arch/share" \
+      -DBUILD_SHARED_LIBS:BOOL=ON \
+      -DCMAKE_TOOLCHAIN_FILE="$srcdir/Toolchain-$arch.cmake" \
+      -DBUILD_STATIC=1
+    make
+  done
+}
+
+package() {
+  local arch
+  for arch in ${_architectures[@]}; do
+    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    make DESTDIR="$pkgdir" install
+
+    find "$pkgdir/usr/$arch" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
+    find "$pkgdir/usr/$arch" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$pkgdir/usr/$arch" -name '*.a' -exec $arch-strip -g {} +
+    rm -fr "$pkgdir/usr/$arch/share"
+  done
+}
+
+# vim:set ts=2 sw=2 et:
