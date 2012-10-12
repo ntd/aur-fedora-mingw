@@ -17,6 +17,7 @@ mingw-w64-gcc
 mingw-w64-gcc-base
 mingw-w64-headers
 mingw-w64-headers-bootstrap
+mingw-w64-libpng
 mingw-w64-pkg-config
 mingw-w64-winpthreads
 mingw-w64-zlib
