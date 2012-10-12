@@ -1,0 +1,98 @@
+# Maintainer: Nicola Fontana <ntd@entidi.it>
+#
+# Port of the Fedora package found at
+# http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/
+
+pkgname=fedora-mingw-w64-glib2
+pkgver=2.34.0
+pkgrel=1
+pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
+arch=(any)
+url='http://www.gtk.org/'
+license=(LGPL)
+groups=(fedora-mingw)
+depends=(mingw-w64-crt mingw-w64-gettext mingw-w64-libffi)
+makedepends=('mingw-w64-gcc>=4.7.0' mingw-w64-pkg-config 'glib2>=2.31.20'
+             autoconf automake libtool)
+provides=("mingw-w64-glib2=$pkgver")
+conflicts=(mingw-w64-glib2)
+options=(!strip !buildflags !libtool)
+source=("http://ftp.gnome.org/pub/GNOME/sources/glib/${pkgver%.*}/glib-$pkgver.tar.xz"
+        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/0001-Don-t-start-a-DBus-server-when-built-as-static-lib.patch?h=f18"
+        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch?h=f18"
+        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-build-dbus-proxy-testcase-only-on-unix.patch?h=f18")
+md5sums=('d80aef668f981b5dcf157633d13081c0'
+         '82c31506c6f8d22296a86a6ad7511063'
+         'c08c41118f5318d10f326c7c30e1a33a'
+         '4b4e57380c27422e44d538a509925833')
+
+_architectures=(i686-w64-mingw32
+                x86_64-w64-mingw32)
+
+build() {
+  # glib2 != glib, so hardcoding it in $tardir
+  local tardir="$srcdir/glib-$pkgver"
+  local builddir
+  local arch
+
+  # Apply patches from fedora repository
+  cd "$tardir"
+  patch -p1 < '../0001-Don-t-start-a-DBus-server-when-built-as-static-lib.patch?h=f18'
+  patch -p1 < '../0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch?h=f18'
+  patch -p1 < '../glib-build-dbus-proxy-testcase-only-on-unix.patch?h=f18'
+
+  # Required by the dbus-proxy patch
+  autoreconf -if
+
+  export CFLAGS='-O2 -pipe'
+  export CXXFLAGS="$CFLAGS"
+  unset  LDFLAGS
+
+  for arch in ${_architectures[@]}; do
+    #GLib can't build static and shared libraries in one go, so we build GLib twice
+    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    mkdir -p "$builddir-static"
+    cd "$builddir-static"
+    "$tardir/configure" \
+      --prefix="/usr/$arch" \
+      --disable-shared \
+      --enable-static
+    make
+    mkdir -p "$builddir-shared"
+    cd "$builddir-shared"
+    "$tardir/configure" \
+      --prefix="/usr/$arch" \
+      --disable-shared \
+      --enable-static
+    make
+  done
+}
+
+package() {
+  local arch
+  local builddir
+  local prefix
+
+  # The shared version is the last installed so its glibconfig.h is the default one.
+  # Developers using the static build of GLib need to add -DGLIB_STATIC_COMPILATION
+  # and -DGOBJECT_STATIC_COMPILATION to their CFLAGS to avoid compile failures.
+  for arch in ${_architectures[@]}; do
+    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    prefix="$pkgdir/usr/$arch"
+    cd "$builddir-static"
+    make DESTDIR="$pkgdir" install
+    cd "$builddir-shared"
+    make DESTDIR="$pkgdir" install
+
+    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+    rm -fr "$prefix/share/bash-completion"
+    rm -fr "$prefix/share/gdb"
+    rm -fr "$prefix/share/man"
+    rm -f  "$prefix/bin/gdbus-codegen"
+    rm -fr "$prefix/lib/gdbus-2.0"
+  done
+}
+
+# vim:set ts=2 sw=2 et:
