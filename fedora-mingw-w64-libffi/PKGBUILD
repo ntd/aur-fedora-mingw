@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-libffi
 pkgver=3.0.11
-pkgrel=1
+pkgrel=2
 pkgdesc='A portable, high level programming interface to various calling conventions (mingw-w64)'
 arch=(any)
 url='http://sourceware.org/libffi/'
@@ -33,12 +33,15 @@ build() {
   cd "$tardir"
   patch -p0 < '../libffi-mingw-w64-compatibility.patch?h=f18'
 
+  export CFLAGS='-O2 -pipe'
+  export CXXFLAGS="$CFLAGS"
+  unset  LDFLAGS
+
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
     "$tardir/configure" \
-      CFLAGS='-O2 -pipe' CXXFLAGS="$CFLAGS" LDFLAGS='' \
       --prefix="/usr/$arch" \
       --host="$arch" \
       --enable-shared
