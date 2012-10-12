@@ -45,7 +45,6 @@ build() {
       --host="$arch"
     make \
       CFLAGS='-O2 -pipe' \
-      CXXFLAGS="$CFLAGS" \
       LDFLAGS='' \
       CC="$arch-gcc" \
       AR="$arch-ar" \
