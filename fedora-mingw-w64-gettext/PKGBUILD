@@ -31,7 +31,7 @@ build() {
 
   # Apply patches from fedora repository
   cd "$tardir"
-  patch -p0 < '../gettext-0.18.1.1-tml.patch?h=f18'
+  patch -Np0 < '../gettext-0.18.1.1-tml.patch?h=f18'
 
   # The libtool bundled with this package is too old for win64 support
   autoreconf -if

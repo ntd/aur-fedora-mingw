@@ -37,9 +37,9 @@ build() {
 
   # Apply patches from fedora repository
   cd "$tardir"
-  patch -p1 < '../0001-Don-t-start-a-DBus-server-when-built-as-static-lib.patch?h=f18'
-  patch -p1 < '../0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch?h=f18'
-  patch -p1 < '../glib-build-dbus-proxy-testcase-only-on-unix.patch?h=f18'
+  patch -Np1 < '../0001-Don-t-start-a-DBus-server-when-built-as-static-lib.patch?h=f18'
+  patch -Np1 < '../0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch?h=f18'
+  patch -Np1 < '../glib-build-dbus-proxy-testcase-only-on-unix.patch?h=f18'
 
   # Required by the dbus-proxy patch
   autoreconf -if
