@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-freetype
 pkgver=2.4.10
-pkgrel=1
+pkgrel=2
 pkgdesc='TrueType font rendering library (mingw-w64)'
 arch=(any)
 url='http://freetype.sourceforge.net/'
@@ -51,7 +51,8 @@ build() {
     "$tardir/configure" \
       --prefix="/usr/$arch" \
       --host="$arch" \
-      --disable-static
+      --enable-static \
+      --enable-shared
     make
   done
 }
