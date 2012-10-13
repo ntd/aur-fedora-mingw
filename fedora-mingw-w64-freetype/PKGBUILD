@@ -11,7 +11,7 @@ arch=(any)
 url='http://freetype.sourceforge.net/'
 license=(GPL)
 groups=(fedora-mingw)
-depends=(mingw-w64-crt mingw-w64-zlib mingw-w64-bzip2)
+depends=(mingw-w64-crt mingw-w64-zlib fedora-mingw-w64-bzip2)
 makedepends=('mingw-w64-gcc>=4.7.0')
 provides=("mingw-w64-freetype2=$pkgver")
 conflicts=(mingw-w64-freetype2)
