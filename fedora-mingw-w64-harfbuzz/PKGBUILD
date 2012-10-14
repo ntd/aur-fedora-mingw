@@ -1,0 +1,70 @@
+# Maintainer: Nicola Fontana <ntd@entidi.it>
+#
+# Port of the Fedora package found at
+# http://pkgs.fedoraproject.org/cgit/mingw-harfbuzz.git/
+
+pkgname=harfbuzz
+pkgver=0.9.3
+pkgrel=1
+pkgdesc='OpenType text shaping engine (mingw-w64)'
+arch=(any)
+url='http://www.harfbuzz.org/'
+license=(LGPL MPL)
+groups=(MIT)
+depends=(mingw-w64-crt fedora-mingw-w64-glib2 fedora-mingw-w64-freetype
+         fedora-mingw-w64-cairo mingw-w64-icu)
+makedepends=('mingw-w64-gcc>=4.7.0' mingw-w64-pkg-config autoconf automake libtool)
+provides=("mingw-w64-harfbuzz=$pkgver")
+conflicts=(mingw-w64-harfbuzz)
+options=(!strip !buildflags !libtool)
+source=("http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-$pkgver.tar.bz2")
+md5sums=('883a40644d3b120b7013e11876ea5af3')
+
+_architectures=(i686-w64-mingw32
+                x86_64-w64-mingw32)
+
+build() {
+  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
+  local builddir
+  local arch
+
+  # The libtool bundled with the tarball is too old for win64 support
+  cd "$tardir"
+  autoreconf -if
+  libtoolize -cf
+
+  export CFLAGS='-O2 -pipe'
+  export CXXFLAGS="$CFLAGS"
+  unset  LDFLAGS
+
+  for arch in ${_architectures[@]}; do
+    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    mkdir -p "$builddir"
+    cd "$builddir"
+    "$tardir/configure" \
+      --prefix="/usr/$arch" \
+      --host="$arch" \
+      --enable-static \
+      --enable-shared
+    make
+  done
+}
+
+package() {
+  local arch
+  local prefix
+
+  for arch in ${_architectures[@]}; do
+    prefix="$pkgdir/usr/$arch"
+
+    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    make DESTDIR="$pkgdir" install
+
+    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+    rm -fr "$prefix/share"
+  done
+}
+
+# vim:set ts=2 sw=2 et:
