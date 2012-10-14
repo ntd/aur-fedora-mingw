@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-cairo
 pkgver=1.10.2
-pkgrel=1
+pkgrel=2
 pkgdesc='Cairo vector graphics library (mingw-w64)'
 arch=(any)
 url='http://cairographics.org/'
@@ -14,7 +14,8 @@ groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-fontconfig fedora-mingw-w64-freetype
          mingw-w64-libxml2 fedora-mingw-w64-pixman mingw-w64-libpng
          fedora-mingw-w64-win-iconv mingw-w64-zlib fedora-mingw-w64-glib2)
-makedepends=('mingw-w64-gcc>=4.7.0' mingw-w64-pkg-config autoconf automake libtool)
+makedepends=('mingw-w64-gcc>=4.7.0' mingw-w64-tools mingw-w64-pkg-config
+             autoconf automake libtool)
 provides=("mingw-w64-cairo=$pkgver")
 conflicts=(mingw-w64-cairo)
 options=(!strip !buildflags !libtool)
@@ -35,6 +36,16 @@ build() {
   local builddir
   local arch
 
+  # Function to generate an import library for delay-loading
+  gen_delay_lib() {
+    local DLL="$1"
+    local OUT_IMPLIB="$2"
+
+    gendef - "$DLL" > delay_load.def
+    $arch-dlltool --def delay_load.def --kill-at --output-delaylib "$OUT_IMPLIB"
+    rm -f delay_load.def
+  }
+
   # Apply patches from fedora repository
   cd "$tardir"
   patch -Np0 < '../mingw32-cairo-fix-ffs-declaration.patch?h=f18'
@@ -52,6 +63,11 @@ build() {
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
+
+    # Generate import libs for delay-loading fontconfig and freetype
+    gen_delay_lib "/usr/$arch/bin/libfontconfig-1.dll" libfontconfig-delayed.dll.a
+    gen_delay_lib "/usr/$arch/bin/libfreetype-6.dll" libfreetype-delayed.dll.a
+
     "$tardir/configure" \
       --prefix="/usr/$arch" \
       --host="$arch" \
@@ -64,7 +80,9 @@ build() {
       --enable-png \
       --enable-static \
       --enable-gobject \
-      --enable-tee
+      --enable-tee \
+      FONTCONFIG_LIBS="-L$builddir -lfontconfig-delayed" \
+      FREETYPE_LIBS="-L$builddir -lfreetype-delayed"
     make
   done
 }
