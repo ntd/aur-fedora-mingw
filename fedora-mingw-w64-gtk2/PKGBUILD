@@ -1,0 +1,92 @@
+# Maintainer: Nicola Fontana <ntd@entidi.it>
+#
+# Port of the Fedora package found at
+# http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/
+
+pkgname=fedora-mingw-w64-gtk2
+pkgver=2.24.13
+pkgrel=1
+pkgdesc='GTK+2 is a multi-platform toolkit (mingw-w64)'
+arch=(any)
+url='http://www.gtk.org/'
+license=(LGPL)
+groups=(fedora-mingw)
+depends=(mingw-w64-crt fedora-mingw-w64-atk fedora-mingw-w64-cairo
+         fedora-mingw-w64-gettext fedora-mingw-w64-glib2
+         fedora-mingw-w64-win-iconv fedora-mingw-w64-pango
+         fedora-mingw-w64-gdk-pixbuf fedora-mingw-w64-pixman mingw-w64-zlib)
+makedepends=('mingw-w64-gcc>=4.7.0' mingw-w64-pkg-config autoconf automake libtool)
+provides=("mingw-w64-gtk2=$pkgver")
+conflicts=(mingw-w64-gtk2)
+options=(!strip !buildflags !libtool)
+source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.tar.xz"
+        "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/mingw32-gtk2-2.15.0-xbuttons.patch?h=f18"
+        "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/gtk2-fix-gmodule-linking.patch?h=f18"
+        "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/mingw32-gtk2-enable_static_build.patch?h=f18"
+        "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/gtk-fix-out-of-source-build.patch?h=f18"
+        "gtk.immodules")
+md5sums=('e949406751df51e1e40e85628005a069'
+         '44ca5d1ce91f5364182c6ea2614c7688'
+         '79bffd98464d9a62ecc5533d157b3f87'
+         '396835720e308acaa0372e5a45c463d4'
+         '8231dd2b7484574968d5faa57262af2a'
+         '9967ded27c0eb3b615acae7539621607')
+
+_architectures=(i686-w64-mingw32
+                x86_64-w64-mingw32)
+
+build() {
+  # gtk2 != gtk+, so hardcoding it in $tardir
+  local tardir="$srcdir/gtk+-$pkgver"
+  local builddir
+  local arch
+
+  # Apply patches from fedora repository
+  cd "$tardir"
+  patch -Np1 < '../mingw32-gtk2-2.15.0-xbuttons.patch?h=f18'
+  patch -Np0 < '../gtk2-fix-gmodule-linking.patch?h=f18'
+  autoreconf -if
+  patch -Np0 < '../mingw32-gtk2-enable_static_build.patch?h=f18'
+  patch -Np0 < '../gtk-fix-out-of-source-build.patch?h=f18'
+
+  # The pre-generated gtk.def file can't be used for MinGW-W64
+  # Force a regeneration of this file by removing the bundled copy
+  rm -f gtk/gtk.def
+
+  export CFLAGS='-O2 -pipe'
+  export CXXFLAGS="$CFLAGS"
+  unset  LDFLAGS
+
+  for arch in ${_architectures[@]}; do
+    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    mkdir -p "$builddir"
+    cd "$builddir"
+    "$tardir/configure" \
+      --prefix="/usr/$arch" \
+      --host="$arch" \
+      --disable-cups \
+      --enable-static \
+      --disable-gtk-doc
+    make
+  done
+}
+
+package() {
+  local arch
+  local prefix
+
+  for arch in ${_architectures[@]}; do
+    prefix="$pkgdir/usr/$arch"
+
+    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    make DESTDIR="$pkgdir" install
+
+    # Do not remove exe files (leave gtk2-demo.exe for testing purpose)
+    find "$prefix" -regex '.*\.\(bat\|def\|exp\)' -exec rm -f {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+    #rm -fr "$prefix/share"
+  done
+}
+
+# vim:set ts=2 sw=2 et:
