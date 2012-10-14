@@ -1,0 +1,89 @@
+# Maintainer: Nicola Fontana <ntd@entidi.it>
+#
+# Port of the Fedora package found at
+# http://pkgs.fedoraproject.org/cgit/mingw-cairo.git/
+
+pkgname=fedora-mingw-w64-cairo
+pkgver=1.10.2
+pkgrel=1
+pkgdesc='Cairo vector graphics library (mingw-w64)'
+arch=(any)
+url='http://cairographics.org/'
+license=(LGPL MPL)
+groups=(fedora-mingw)
+depends=(mingw-w64-crt fedora-mingw-w64-fontconfig fedora-mingw-w64-freetype
+         mingw-w64-libxml2 fedora-mingw-w64-pixman mingw-w64-libpng
+         fedora-mingw-w64-win-iconv mingw-w64-zlib fedora-mingw-w64-glib2)
+makedepends=('mingw-w64-gcc>=4.7.0' mingw-w64-pkg-config autoconf automake libtool)
+provides=("mingw-w64-cairo=$pkgver")
+conflicts=(mingw-w64-cairo)
+options=(!strip !buildflags !libtool)
+source=("http://cairographics.org/releases/cairo-$pkgver.tar.gz"
+        "http://pkgs.fedoraproject.org/cgit/mingw-cairo.git/plain/mingw32-cairo-fix-ffs-declaration.patch?h=f18"
+        "http://pkgs.fedoraproject.org/cgit/mingw-cairo.git/plain/mingw32-cairo-A1_surfaces.patch?h=f18"
+        "http://pkgs.fedoraproject.org/cgit/mingw-cairo.git/plain/mingw32-cairo-reset_clip.patch?h=f18")
+md5sums=('f101a9e88b783337b20b2e26dfd26d5f'
+         'ab9be7532af22d092b79a9659e650727'
+         '197e184a45b039338af30b50c873e399'
+         '7613b505f1350a8780d516a1b1b02bef')
+
+_architectures=(i686-w64-mingw32
+                x86_64-w64-mingw32)
+
+build() {
+  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
+  local builddir
+  local arch
+
+  # Apply patches from fedora repository
+  cd "$tardir"
+  patch -Np0 < '../mingw32-cairo-fix-ffs-declaration.patch?h=f18'
+  patch -Np1 < '../mingw32-cairo-A1_surfaces.patch?h=f18'
+  patch -Np1 < '../mingw32-cairo-reset_clip.patch?h=f18'
+
+  # The libtool bundled with this package is too old for win64 support
+  NOCONFIGURE=1 ./autogen.sh
+
+  export CFLAGS='-O2 -pipe'
+  export CXXFLAGS="$CFLAGS"
+  unset  LDFLAGS
+
+  for arch in ${_architectures[@]}; do
+    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    mkdir -p "$builddir"
+    cd "$builddir"
+    "$tardir/configure" \
+      --prefix="/usr/$arch" \
+      --host="$arch" \
+      --disable-pthread \
+      --disable-xlib \
+      --disable-xcb \
+      --enable-win32 \
+      --enable-fc \
+      --enable-ft \
+      --enable-png \
+      --enable-static \
+      --enable-gobject \
+      --enable-tee
+    make
+  done
+}
+
+package() {
+  local arch
+  local prefix
+
+  for arch in ${_architectures[@]}; do
+    prefix="$pkgdir/usr/$arch"
+
+    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    make DESTDIR="$pkgdir" install
+
+    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+    rm -fr "$prefix/share"
+  done
+}
+
+# vim:set ts=2 sw=2 et:
