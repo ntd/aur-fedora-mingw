@@ -1,0 +1,96 @@
+# Maintainer: Nicola Fontana <ntd@entidi.it>
+#
+# Port of the Fedora package found at
+# http://pkgs.fedoraproject.org/cgit/mingw-icu.git/
+
+pkgname=fedora-mingw-w64-icu
+pkgver=4.8.1.1
+pkgrel=1
+pkgdesc='International Components for Unicode library (mingw-w64)'
+arch=(any)
+url='http://www.icu-project.org/'
+license=(custom:"icu")
+groups=(fedora-mingw)
+depends=(mingw-w64-crt fedora-mingw-w64-fontconfig fedora-mingw-w64-freetype
+         mingw-w64-libxml2 fedora-mingw-w64-pixman mingw-w64-libpng
+         fedora-mingw-w64-win-iconv mingw-w64-zlib fedora-mingw-w64-glib2)
+makedepends=('mingw-w64-gcc>=4.7.0')
+provides=("mingw-w64-icu=$pkgver")
+conflicts=(mingw-w64-icu)
+options=(!strip !buildflags !libtool)
+source=("http://download.icu-project.org/files/icu4c/$pkgver/icu4c-${pkgver//./_}-src.tgz"
+        "http://pkgs.fedoraproject.org/cgit/mingw-icu.git/plain/icu4c-4_6_1-crossbuild.patch?h=f18"
+        "http://pkgs.fedoraproject.org/cgit/mingw-icu.git/plain/icu4c-4_6_1-use-correct-genccode-assembly-on-win32-and-win64.patch?h=f18"
+        "http://pkgs.fedoraproject.org/cgit/mingw-icu.git/plain/icu4c-4_6_1-mingw-w64-mkdir-compatibility.patch?h=f18")
+md5sums=('ea93970a0275be6b42f56953cd332c17'
+         '13c1483f76ad85a1e52b0d0644328e12'
+         'c480877485438a1f677ca23f7d915692'
+         '156a8f5d2c54952c0b4e7e71dbad8693')
+
+
+_architectures=(i686-w64-mingw32
+                x86_64-w64-mingw32)
+
+build() {
+  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}"
+  local builddir
+  local arch
+
+  # Apply patches from fedora repository
+  cd "$tardir"
+  patch -Np1 < '../icu4c-4_6_1-crossbuild.patch?h=f18'
+  patch -Np1 < '../icu4c-4_6_1-use-correct-genccode-assembly-on-win32-and-win64.patch?h=f18'
+  patch -Np1 < '../icu4c-4_6_1-mingw-w64-mkdir-compatibility.patch?h=f18'
+
+  # Needed by genccode patch
+  tardir="$tardir/source"
+  cd $tardir
+  autoconf -f
+
+  export CFLAGS='-O2 -pipe'
+  export CXXFLAGS="$CFLAGS"
+  unset  LDFLAGS
+
+  for arch in ${_architectures[@]}; do
+    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    mkdir -p "$builddir-native"
+    cd "$builddir-native"
+    "$tardir/configure" \
+      --disable-shared \
+      --enable-static
+    make
+    mkdir -p "$builddir"
+    cd "$builddir"
+    "$tardir/configure" \
+      --prefix="/usr/$arch" \
+      --host="$arch" \
+      --enable-shared \
+      --disable-static \
+      --with-cross-build="$builddir-native" \
+      --with-data-packaging=library
+    make
+  done
+}
+
+package() {
+  local arch
+  local prefix
+
+  for arch in ${_architectures[@]}; do
+    prefix="$pkgdir/usr/$arch"
+
+    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    make DESTDIR="$pkgdir" install
+
+    sed -i -e 's,default_ENABLE_RPATH=.*,default_ENABLE_RPATH="N",' -e 's,^SO=.*$,SO="dll",' $prefix/bin/icu-config
+    find "$pkgdir" -name '*.dll' -type l -delete
+    mv -f "$prefix/lib/libicudata48.1.1.dll" "$prefix/lib/icudata48.dll"
+    mv "$prefix"/lib/*.dll "$prefix/bin/"
+    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+    rm -fr "$prefix/share"
+  done
+}
+
+# vim:set ts=2 sw=2 et:
