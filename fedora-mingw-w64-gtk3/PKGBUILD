@@ -1,0 +1,78 @@
+# Maintainer: Nicola Fontana <ntd@entidi.it>
+#
+# Port of the Fedora package found at
+# http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/
+
+pkgname=fedora-mingw-w64-gtk3
+pkgver=3.6.0
+pkgrel=1
+pkgdesc='GTK+3 is a multi-platform toolkit (mingw-w64)'
+arch=(any)
+url='http://www.gtk.org/'
+license=(LGPL)
+groups=(fedora-mingw)
+depends=(mingw-w64-crt fedora-mingw-w64-atk fedora-mingw-w64-cairo
+         fedora-mingw-w64-gdk-pixbuf fedora-mingw-w64-gettext
+         fedora-mingw-w64-glib2 fedora-mingw-w64-win-iconv
+         fedora-mingw-w64-pango fedora-mingw-w64-pixman mingw-w64-zlib)
+makedepends=('mingw-w64-gcc>=4.7.0' mingw-w64-pkg-config autoconf automake libtool)
+provides=("mingw-w64-gtk3=$pkgver")
+conflicts=(mingw-w64-gtk3)
+options=(!strip !buildflags !libtool)
+source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.tar.xz"
+        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/0001-Don-t-build-gtk-launch-on-Win32-environments.patch?h=f18"
+        "gtk.immodules")
+md5sums=('6f7ef4679f7e3622894c3f57045a1188'
+         'ef4c302e15d9dd9b20899346f18032fc'
+         '34cff3de6f72b1e7d81ffe772463d32d')
+
+_architectures=(i686-w64-mingw32
+                x86_64-w64-mingw32)
+
+build() {
+  # gtk3 != gtk+, so hardcoding it in $tardir
+  local tardir="$srcdir/gtk+-$pkgver"
+  local builddir
+  local arch
+
+  # Apply patches from fedora repository
+  cd "$tardir"
+  patch -Np1 < '../0001-Don-t-build-gtk-launch-on-Win32-environments.patch?h=f18'
+  autoreconf -if
+
+  export CFLAGS='-O2 -pipe'
+  export CXXFLAGS="$CFLAGS"
+  unset  LDFLAGS
+
+  for arch in ${_architectures[@]}; do
+    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    mkdir -p "$builddir"
+    cd "$builddir"
+    "$tardir/configure" \
+      --prefix="/usr/$arch" \
+      --host="$arch" \
+      --enable-gtk2-dependency \
+      --disable-cups
+    make
+  done
+}
+
+package() {
+  local arch
+  local prefix
+
+  for arch in ${_architectures[@]}; do
+    prefix="$pkgdir/usr/$arch"
+
+    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    make DESTDIR="$pkgdir" install
+
+    # Do not remove exe files (leave gtk3-demo.exe for testing purpose)
+    find "$prefix" -regex '.*\.\(bat\|def\|exp\)' -exec rm -f {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+    #rm -fr "$prefix/share"
+  done
+}
+
+# vim:set ts=2 sw=2 et:
