@@ -1,0 +1,56 @@
+# Maintainer: Nicola Fontana <ntd@entidi.it>
+#
+# Port of the Fedora package found at
+# http://pkgs.fedoraproject.org/cgit/mingw-binutils.git/
+
+pkgname=fedora-mingw-w64-binutils
+pkgver=2.22.52.0.4
+pkgrel=1
+pkgdesc='A set of programs to assemble and manipulate binary and object files (mingw-w64)'
+arch=(any)
+url='http://www.gnu.org/software/binutils/'
+license=(GPL)
+groups=(fedora-mingw)
+depends=()
+makedepends=()
+provides=("mingw-w64-binutils=$pkgver")
+conflicts=(mingw-w64-binutils)
+options=(!libtool)
+source=("http://www.kernel.org/pub/linux/devel/binutils/binutils-$pkgver.tar.bz2")
+md5sums=('2a5beea06d6f3e21107365b91184e11c')
+
+_architectures=(i686-w64-mingw32
+                x86_64-w64-mingw32)
+
+build() {
+  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
+  local builddir
+  local arch
+
+  for arch in ${_architectures[@]}; do
+    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    mkdir -p "$builddir"
+    cd "$builddir"
+    "$tardir/configure" \
+      --prefix=/usr \
+      --infodir="/usr/share/info/$arch" \
+      --target="$arch" \
+      --disable-nls
+    make
+  done
+}
+
+package() {
+  local arch
+  local prefix
+
+  for arch in ${_architectures[@]}; do
+    prefix="$pkgdir/usr/$arch"
+    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    make DESTDIR="$pkgdir" install
+  done
+
+  rm -fr "$pkgdir/usr/lib"
+}
+
+# vim:set ts=2 sw=2 et:
