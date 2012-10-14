@@ -16,7 +16,7 @@ makedepends=('mingw-w64-gcc>=4.7.0' mingw-w64-pkg-config)
 provides=("mingw-w64-atk=$pkgver")
 conflicts=(mingw-w64-atk)
 options=(!strip !buildflags !libtool)
-source=("http://ftp.gnome.org/pub/gnome/sources/atk/${pkgver%.*}/atk-$pkgver.tar.xz")
+source=("http://ftp.gnome.org/pub/GNOME/sources/atk/${pkgver%.*}/atk-$pkgver.tar.xz")
 md5sums=('6b34e2a63dda4429b5692be7ca3aa5bf')
 
 _architectures=(i686-w64-mingw32
