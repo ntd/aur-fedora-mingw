@@ -48,7 +48,7 @@ build() {
   unset  LDFLAGS
 
   for arch in ${_architectures[@]}; do
-    #GLib can't build static and shared libraries in one go, so we build GLib twice
+    # GLib can't build static and shared libraries in one go, so we build GLib twice
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
     mkdir -p "$builddir-static"
     cd "$builddir-static"
