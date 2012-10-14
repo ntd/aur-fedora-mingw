@@ -3,14 +3,14 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-harfbuzz.git/
 
-pkgname=harfbuzz
+pkgname=fedora-mingw-w64-harfbuzz
 pkgver=0.9.3
 pkgrel=1
 pkgdesc='OpenType text shaping engine (mingw-w64)'
 arch=(any)
 url='http://www.harfbuzz.org/'
-license=(LGPL MPL)
-groups=(MIT)
+license=(MIT)
+groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-glib2 fedora-mingw-w64-freetype
          fedora-mingw-w64-cairo mingw-w64-icu)
 makedepends=('mingw-w64-gcc>=4.7.0' mingw-w64-pkg-config autoconf automake libtool)
