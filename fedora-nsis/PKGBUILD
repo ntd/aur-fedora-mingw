@@ -1,0 +1,55 @@
+# Maintainer: Nicola Fontana <ntd@entidi.it>
+#
+# Port of the Fedora package found at
+# http://pkgs.fedoraproject.org/cgit/mingw-nsis.git/
+
+pkgname=fedora-nsis
+pkgver=2.46
+pkgrel=1
+pkgdesc='A professional open source system to create Windows installers'
+arch=(i686 x86_64)
+url='http://nsis.sourceforge.net/'
+license=(custom:zlib)
+depends=(mingw-w64-crt)
+makedepends=('mingw-w64-gcc>=4.7.0' fedora-mingw-w64-binutils scons)
+provides=("nsis=$pkgver")
+conflicts=(nsis)
+options=(!strip !buildflags !libtool)
+source=("http://sourceforge.net/projects/nsis/files/NSIS%202/$pkgver/nsis-$pkgver-src.tar.bz2/download"
+        "http://pkgs.fedoraproject.org/cgit/mingw-nsis.git/plain/nsis-2.43-64bit-fixes.patch?h=f18"
+        "http://pkgs.fedoraproject.org/cgit/mingw-nsis.git/plain/nsis-2.43-rpm-opt.patch?h=f18"
+        "http://pkgs.fedoraproject.org/cgit/mingw-nsis.git/plain/nsis-2.45-static-libgcc.patch?h=f18"
+        "http://pkgs.fedoraproject.org/cgit/mingw-nsis.git/plain/nsis-2.46-static-libstdc++.patch?h=f18"
+        "http://pkgs.fedoraproject.org/cgit/mingw-nsis.git/plain/nsis-2.46-missing-unistd-include.patch?h=f18"
+        "http://pkgs.fedoraproject.org/cgit/mingw-nsis.git/plain/nsis-add-mingw-w64-support.patch?h=f18")
+md5sums=('61c2e81739436b06d7cf7bcce1d533ac'
+         '9eead3b78da54e3afda8f6a5b663aea9'
+         'aa4a4a17a946ef3bc09dcf9a64fc8201'
+         '28f1002dd3c6a57cd3e1f8bb09c81fc5'
+         '3d41bf574cd3bed0c4f14afca9bc4819'
+         'c4f912f0ca7fa455948f9f6a73314d93'
+         'd963ac54cc672887ed973a12e1173146')
+
+_sconsopts=(VERSION="$pkgver" PREFIX=/usr PREFIX_CONF=/etc SKIPUTILS='NSIS Menu' STRIP_CP=false)
+
+build() {
+  # Apply patches from fedora repository
+  cd "$srcdir/nsis-$pkgver-src"
+  patch -Np1 < '../nsis-2.43-64bit-fixes.patch?h=f18'
+  patch -Np1 < '../nsis-2.43-rpm-opt.patch?h=f18'
+  patch -Np1 < '../nsis-2.45-static-libgcc.patch?h=f18'
+  patch -Np1 < '../nsis-2.46-static-libstdc++.patch?h=f18'
+  patch -Np1 < '../nsis-2.46-missing-unistd-include.patch?h=f18'
+  patch -Np0 < '../nsis-add-mingw-w64-support.patch?h=f18'
+
+  scons "${_sconsopts[@]}"
+}
+
+package() {
+  cd "$srcdir/nsis-$pkgver-src"
+  scons PREFIX_DEST="$pkgdir" "${_sconsopts[@]}" install
+  find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+  find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+}
+
+# vim:set ts=2 sw=2 et:
