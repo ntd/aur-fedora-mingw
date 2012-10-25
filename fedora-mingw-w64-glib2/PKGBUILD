@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/
 
 pkgname=fedora-mingw-w64-glib2
-pkgver=2.34.0
-pkgrel=2
+pkgver=2.34.1
+pkgrel=1
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -20,7 +20,7 @@ source=("http://ftp.gnome.org/pub/GNOME/sources/glib/${pkgver%.*}/glib-$pkgver.t
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/0001-Don-t-start-a-DBus-server-when-built-as-static-lib.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-build-dbus-proxy-testcase-only-on-unix.patch?h=f18")
-md5sums=('d80aef668f981b5dcf157633d13081c0'
+md5sums=('ee779493b083be9348a841e0a51f1b27'
          '82c31506c6f8d22296a86a6ad7511063'
          'c08c41118f5318d10f326c7c30e1a33a'
          '4b4e57380c27422e44d538a509925833')
