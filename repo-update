@@ -1,0 +1,54 @@
+#! /bin/bash
+
+usage() {
+    cat <<EOT
+Update one or more packages in a local Archlinux repository
+
+Usage: repo-udpate REPOSITORY FILE [...]
+
+where REPOSITORY is the repository to update and FILE is a
+package file (complete filename required). Either the .db
+and .files repositories are updated, if found.
+
+EOT
+}
+
+[ -z "$2" ] && usage && exit 1
+
+# Any suitable repository is valid
+repository="$1"
+repository="${repository%.db}"
+repository="${repository%.files}"
+repository="${repository%.db.tar.xz}"
+repository="${repository%.files.tar.xz}"
+
+shift
+
+files=()
+pkgs=()
+for file in $@; do
+	files+=("$file")
+	pkgs+=("${file%-*-*-*.pkg.tar.xz}")
+done
+
+repo="$repository.db.tar.xz"
+if [ -w "$repo" ]; then
+    echo "repo-update => updating $repo"
+    echo repo-remove "$repo" ${pkgs[@]} && repo-add "$repo" ${files[@]}
+    if repo-remove "$repo" ${pkgs[@]} && repo-add "$repo" ${files[@]}; then
+    	echo "repo-update => $repo update successful"
+    else
+    	echo "repo-update => $repo update failed"
+    fi
+fi
+
+repo="$repository.files.tar.xz"
+if [ -w "$repo" ]; then
+    echo "Updating $repo ... "
+    echo repo-remove "$repo" ${pkgs[@]} && repo-add --files "$repo" ${files[@]}
+    if repo-remove "$repo" ${pkgs[@]} && repo-add --files "$repo" ${files[@]}; then
+    	echo "repo-update => $repo update successful"
+    else
+    	echo "repo-update => $repo update failed"
+    fi
+fi
