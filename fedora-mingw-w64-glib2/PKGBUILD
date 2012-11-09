@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-glib2
 pkgver=2.35.1
-pkgrel=1
+pkgrel=2
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -19,11 +19,14 @@ options=(!strip !buildflags !libtool)
 source=("http://ftp.gnome.org/pub/GNOME/sources/glib/${pkgver%.*}/glib-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/0001-Don-t-start-a-DBus-server-when-built-as-static-lib.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch?h=f18"
-        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-build-dbus-proxy-testcase-only-on-unix.patch?h=f18")
+        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-build-dbus-proxy-testcase-only-on-unix.patch?h=f18"
+        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/tree/glib-commit2b17e7.patch")
 md5sums=('6375a4441c2723fb155c8315f0eab26f'
          '82c31506c6f8d22296a86a6ad7511063'
          'c08c41118f5318d10f326c7c30e1a33a'
-         '4b4e57380c27422e44d538a509925833')
+         '4b4e57380c27422e44d538a509925833'
+         '8ca1df9fdb45afaf3f53ce413d7751cb')
+
 
 _architectures=(i686-w64-mingw32
                 x86_64-w64-mingw32)
@@ -39,6 +42,7 @@ build() {
   patch -Np1 < '../0001-Don-t-start-a-DBus-server-when-built-as-static-lib.patch?h=f18'
   patch -Np1 < '../0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch?h=f18'
   patch -Np1 < '../glib-build-dbus-proxy-testcase-only-on-unix.patch?h=f18'
+  patch -Np1 < '../glib-commit2b17e7.patch'
 
   # Required by the dbus-proxy patch
   autoreconf -if
