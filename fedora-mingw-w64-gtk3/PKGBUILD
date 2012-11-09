@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/
 
 pkgname=fedora-mingw-w64-gtk3
-pkgver=3.6.1
+pkgver=3.7.0
 pkgrel=1
 pkgdesc='GTK+3 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
@@ -23,7 +23,7 @@ options=(!strip !buildflags !libtool)
 source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/0001-Don-t-build-gtk-launch-on-Win32-environments.patch?h=f18"
         "gtk.immodules")
-md5sums=('2f5905dd721321fc1586b0843417339d'
+md5sums=('8f00883cd2c8568484e1de40343977c4'
          'ef4c302e15d9dd9b20899346f18032fc'
          '34cff3de6f72b1e7d81ffe772463d32d')
 
