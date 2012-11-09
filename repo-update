@@ -28,6 +28,7 @@ files=()
 pkgs=()
 for file in $@; do
 	files+=("$file")
+	file="$(basename $file)"
 	pkgs+=("${file%-*-*-*.pkg.tar.xz}")
 done
 
