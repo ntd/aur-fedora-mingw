@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-binutils.git/
 
 pkgname=fedora-mingw-w64-binutils
-pkgver=2.22.52.0.4
+pkgver=2.23.51.0.5
 pkgrel=1
 pkgdesc='A set of programs to assemble and manipulate binary and object files (mingw-w64)'
 arch=(any)
@@ -17,7 +17,7 @@ provides=("mingw-w64-binutils=$pkgver")
 conflicts=(mingw-w64-binutils)
 options=(!libtool)
 source=("http://www.kernel.org/pub/linux/devel/binutils/binutils-$pkgver.tar.bz2")
-md5sums=('2a5beea06d6f3e21107365b91184e11c')
+md5sums=('a08000d6c18b4667095e416816550a33')
 
 _architectures=(i686-w64-mingw32
                 x86_64-w64-mingw32)
