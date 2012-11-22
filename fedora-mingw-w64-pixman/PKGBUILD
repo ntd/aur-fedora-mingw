@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-pixman.git/
 
 pkgname=fedora-mingw-w64-pixman
-pkgver=0.24.4
+pkgver=0.28.0
 pkgrel=1
 pkgdesc='The pixel-manipulation library for X and cairo (mingw-w64)'
 arch=(any)
@@ -19,7 +19,7 @@ provides=("mingw-w64-pixman=$pkgver")
 conflicts=(mingw-w64-pixman)
 options=(!strip !buildflags !libtool)
 source=("http://cairographics.org/releases/pixman-$pkgver.tar.gz")
-md5sums=('fee074965c310c46d9c0ab3e5fd656bf')
+md5sums=('0554c354aed2d7845180f310a9a15f20')
 
 _architectures=(i686-w64-mingw32
                 x86_64-w64-mingw32)
