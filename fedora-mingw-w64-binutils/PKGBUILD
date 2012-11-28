@@ -5,13 +5,13 @@
 
 pkgname=fedora-mingw-w64-binutils
 pkgver=2.23.51.0.5
-pkgrel=1
+pkgrel=2
 pkgdesc='A set of programs to assemble and manipulate binary and object files (mingw-w64)'
 arch=(any)
 url='http://www.gnu.org/software/binutils/'
 license=(GPL)
 groups=(fedora-mingw)
-depends=()
+depends=(zlib)
 makedepends=()
 provides=("mingw-w64-binutils=$pkgver")
 conflicts=(mingw-w64-binutils)
