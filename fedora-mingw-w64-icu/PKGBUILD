@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-icu.git/
 
 pkgname=fedora-mingw-w64-icu
-pkgver=4.8.1.1
+pkgver=49.1.2
 pkgrel=1
 pkgdesc='International Components for Unicode library (mingw-w64)'
 arch=(any)
@@ -19,17 +19,15 @@ provides=("mingw-w64-icu=$pkgver")
 conflicts=(mingw-w64-icu)
 options=(!strip !buildflags !libtool)
 source=("http://download.icu-project.org/files/icu4c/$pkgver/icu4c-${pkgver//./_}-src.tgz"
-        "http://pkgs.fedoraproject.org/cgit/mingw-icu.git/plain/icu4c-4_6_1-crossbuild.patch?h=f18"
+        "http://pkgs.fedoraproject.org/cgit/mingw-icu.git/plain/icu4c-4_6_1-crossbuild.patch?id=b942c392347ba1b68c4aa0603a774cecf5035915"
         "http://pkgs.fedoraproject.org/cgit/mingw-icu.git/plain/icu4c-4_6_1-use-correct-genccode-assembly-on-win32-and-win64.patch?h=f18"
-        "http://pkgs.fedoraproject.org/cgit/mingw-icu.git/plain/icu4c-4_6_1-mingw-w64-mkdir-compatibility.patch?h=f18")
-md5sums=('ea93970a0275be6b42f56953cd332c17'
-         '13c1483f76ad85a1e52b0d0644328e12'
+        "http://pkgs.fedoraproject.org/cgit/mingw-icu.git/plain/icu4c-4_6_1-mingw-w64-mkdir-compatibility.patch?id=b942c392347ba1b68c4aa0603a774cecf5035915")
+md5sums=('bbc609fe5237202d7abf016141012a45'
+         '8e6e8e7c5ab08c5e7f028406e94055f6'
          'c480877485438a1f677ca23f7d915692'
-         '156a8f5d2c54952c0b4e7e71dbad8693')
+         'c1194c6ac4bc02bd46f127a457ab4e93')
 
-
-_architectures=(i686-w64-mingw32
-                x86_64-w64-mingw32)
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
   local tardir="$srcdir/${pkgname#fedora-mingw-w64-}"
@@ -38,9 +36,9 @@ build() {
 
   # Apply patches from fedora repository
   cd "$tardir"
-  patch -Np1 < '../icu4c-4_6_1-crossbuild.patch?h=f18'
+  patch -Np1 < '../icu4c-4_6_1-crossbuild.patch?id=b942c392347ba1b68c4aa0603a774cecf5035915'
   patch -Np1 < '../icu4c-4_6_1-use-correct-genccode-assembly-on-win32-and-win64.patch?h=f18'
-  patch -Np1 < '../icu4c-4_6_1-mingw-w64-mkdir-compatibility.patch?h=f18'
+  patch -Np1 < '../icu4c-4_6_1-mingw-w64-mkdir-compatibility.patch?id=b942c392347ba1b68c4aa0603a774cecf5035915'
 
   # Needed by genccode patch
   tardir="$tardir/source"
@@ -84,7 +82,7 @@ package() {
 
     sed -i -e 's,default_ENABLE_RPATH=.*,default_ENABLE_RPATH="N",' -e 's,^SO=.*$,SO="dll",' $prefix/bin/icu-config
     find "$pkgdir" -name '*.dll' -type l -delete
-    mv -f "$prefix/lib/libicudata48.1.1.dll" "$prefix/lib/icudata48.dll"
+    mv -f "$prefix/lib/libicudata$pkgver.dll" "$prefix/lib/icudata${pkgver%%.*}.dll"
     mv "$prefix"/lib/*.dll "$prefix/bin/"
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
     find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
