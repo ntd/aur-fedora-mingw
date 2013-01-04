@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-gettext.git/
 
 pkgname=fedora-mingw-w64-gettext
-pkgver=0.18.1.1
+pkgver=0.18.2
 pkgrel=1
 pkgdesc='GNU internationalization library (mingw-w64)'
 arch=(any)
@@ -16,43 +16,21 @@ makedepends=('mingw-w64-gcc>=4.7.0' autoconf automake libtool)
 provides=("mingw-w64-gettext=$pkgver")
 conflicts=(mingw-w64-gettext)
 options=(!strip !buildflags !libtool)
-source=("http://ftp.gnu.org/pub/gnu/gettext/gettext-$pkgver.tar.gz"
-        "http://pkgs.fedoraproject.org/cgit/mingw-gettext.git/plain/gettext-0.18.1.1-tml.patch?h=f18")
-md5sums=('3dd55b952826d2b32f51308f2f91aa89'
-         'daa03e4e4549fbab89b84889e748b355')
+source=("http://ftp.gnu.org/pub/gnu/gettext/gettext-$pkgver.tar.gz")
+md5sums=('0c86e5af70c195ab8bd651d17d783928')
 
-_architectures=(i686-w64-mingw32
-                x86_64-w64-mingw32)
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
   local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
   local builddir
   local arch
 
-  # Apply patches from fedora repository
-  cd "$tardir"
-  patch -Np0 < '../gettext-0.18.1.1-tml.patch?h=f18'
-
-  # The libtool bundled with this package is too old for win64 support
-  autoreconf -if
-
-  export CFLAGS='-O2 -pipe'
-  export CXXFLAGS="$CFLAGS"
-  unset  LDFLAGS
-  export gl_cv_func_memchr_works="yes"
-  export ac_cv_func_strnlen_working="yes"
-
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    # No idea why but CXX must be explicitely set because the
-    # gettext-tools subproject fails to autodetect it. Others
-    # MingW scripts, such as Fedora mxe and AUR ones, do not
-    # include this workaround though, so I suppose there is
-    # something wrong in my environment.
     "$tardir/configure" \
-      CXX="$arch-g++" \
       --prefix="/usr/$arch" \
       --host="$arch" \
       --disable-java \
