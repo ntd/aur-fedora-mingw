@@ -1,0 +1,35 @@
+#! /bin/bash
+
+root="$(dirname $0)"
+
+pkgs=(	fedora-mingw-w64-binutils
+	fedora-mingw-w64-bzip2
+	fedora-mingw-w64-termcap
+	fedora-mingw-w64-expat
+	fedora-mingw-w64-win-iconv
+	fedora-mingw-w64-gettext
+	fedora-mingw-w64-libjpeg-turbo
+	fedora-mingw-w64-libffi
+	fedora-mingw-w64-glib2
+	fedora-mingw-w64-icu
+	fedora-mingw-w64-fontconfig
+	fedora-mingw-w64-freetype
+	fedora-mingw-w64-pixman
+	fedora-mingw-w64-cairo
+	fedora-mingw-w64-gdk-pixbuf
+	fedora-mingw-w64-atk
+	fedora-mingw-w64-harfbuzz
+	fedora-mingw-w64-pango
+	fedora-mingw-w64-gtk2
+	fedora-mingw-w64-gtk3
+	fedora-nsis)
+
+for pkg in ${pkgs[@]}; do
+	cd "$pkg"
+	if [ *.pkg.tar.xz = "*.pkg.tar.xz" ]; then
+		makepkg -f
+		if ! yaourt -Uf --noconfirm *.pkg.tar.xz; then exit 1; fi
+		rm -fr pkg src
+	fi
+	cd ..
+done
