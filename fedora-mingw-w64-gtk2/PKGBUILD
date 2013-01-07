@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-gtk2
 pkgver=2.24.14
-pkgrel=1
+pkgrel=2
 pkgdesc='GTK+2 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -24,16 +24,17 @@ source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.t
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/gtk2-fix-gmodule-linking.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/mingw32-gtk2-enable_static_build.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/gtk-fix-out-of-source-build.patch?h=f18"
-        "gtk.immodules")
+        "gtk.immodules"
+        "http://bugzilla-attachments.gnome.org/attachment.cgi?id=232892")
 md5sums=('e2c16f119ed624893ecfc3775930ae4c'
          '44ca5d1ce91f5364182c6ea2614c7688'
          '79bffd98464d9a62ecc5533d157b3f87'
          '396835720e308acaa0372e5a45c463d4'
          '8231dd2b7484574968d5faa57262af2a'
-         '9967ded27c0eb3b615acae7539621607')
+         '9967ded27c0eb3b615acae7539621607'
+         'bc451f6edba7a66cca245ab84a139405')
 
-_architectures=(i686-w64-mingw32
-                x86_64-w64-mingw32)
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
   # gtk2 != gtk+, so hardcoding it in $tardir
@@ -45,6 +46,7 @@ build() {
   cd "$tardir"
   patch -Np1 < '../mingw32-gtk2-2.15.0-xbuttons.patch?h=f18'
   patch -Np0 < '../gtk2-fix-gmodule-linking.patch?h=f18'
+  patch -Np1 < '../attachment.cgi?id=232892'
   autoreconf -if
   patch -Np0 < '../mingw32-gtk2-enable_static_build.patch?h=f18'
   patch -Np0 < '../gtk-fix-out-of-source-build.patch?h=f18'
