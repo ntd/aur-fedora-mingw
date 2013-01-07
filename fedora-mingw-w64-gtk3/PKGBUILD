@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-gtk3
 pkgver=3.7.0
-pkgrel=1
+pkgrel=2
 pkgdesc='GTK+3 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -22,13 +22,14 @@ conflicts=(mingw-w64-gtk3)
 options=(!strip !buildflags !libtool)
 source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/0001-Don-t-build-gtk-launch-on-Win32-environments.patch?h=f18"
-        "gtk.immodules")
+        "gtk.immodules"
+        "http://bugzilla-attachments.gnome.org/attachment.cgi?id=232908")
 md5sums=('8f00883cd2c8568484e1de40343977c4'
          'ef4c302e15d9dd9b20899346f18032fc'
-         '34cff3de6f72b1e7d81ffe772463d32d')
+         '34cff3de6f72b1e7d81ffe772463d32d'
+         '0064e2e524809ed5a828a50887e3113b')
 
-_architectures=(i686-w64-mingw32
-                x86_64-w64-mingw32)
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
   # gtk3 != gtk+, so hardcoding it in $tardir
@@ -39,6 +40,7 @@ build() {
   # Apply patches from fedora repository
   cd "$tardir"
   patch -Np1 < '../0001-Don-t-build-gtk-launch-on-Win32-environments.patch?h=f18'
+  patch -Np1 < '../attachment.cgi?id=232908'
   autoreconf -if
 
   export CFLAGS='-O2 -pipe'
