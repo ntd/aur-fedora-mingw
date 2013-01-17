@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-fontconfig.git/
 
 pkgname=fedora-mingw-w64-fontconfig
-pkgver=2.10.1
+pkgver=2.10.91
 pkgrel=1
 pkgdesc='A library for configuring and customizing font access (mingw-w64)'
 arch=(any)
@@ -16,11 +16,10 @@ makedepends=('mingw-w64-gcc>=4.7.0' mingw-w64-pkg-config)
 provides=("mingw-w64-fontconfig=$pkgver")
 conflicts=(mingw-w64-fontconfig)
 options=(!strip !buildflags !libtool)
-source=("http://www.fontconfig.org/release/fontconfig-$pkgver.tar.gz")
-md5sums=('c94e380eea42f2f23ca9537035ef1899')
+source=("http://www.fontconfig.org/release/fontconfig-$pkgver.tar.bz2")
+md5sums=('c795bb39fab3a656e5dff8bad6a199f6')
 
-_architectures=(i686-w64-mingw32
-                x86_64-w64-mingw32)
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
   local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
