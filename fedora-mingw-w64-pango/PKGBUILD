@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-pango.git/
 
 pkgname=fedora-mingw-w64-pango
-pkgver=1.32.5
-pkgrel=2
+pkgver=1.32.6
+pkgrel=1
 pkgdesc='A library for layout and rendering of text (mingw-w64)'
 arch=(any)
 url='http://www.pango.org/'
@@ -24,13 +24,11 @@ options=(!strip !buildflags !libtool)
 source=("http://ftp.gnome.org/pub/GNOME/sources/pango/${pkgver%.*}/pango-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-pango.git/plain/pango-enable-delay-load-of-freetype-and-fontconfig.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-pango.git/plain/pango_enable_static_build.patch?h=f18"
-        "pango.modules"
-        "http://git.gnome.org/browse/pango/patch/?id=f45cdd9a4fef1096b071e6bad4cc40e06f48ba46")
-md5sums=('8e846804d6e219bc795a26a4a39b5bfd'
+        "pango.modules")
+md5sums=('1af2e3a0ac5a258eff5ceddb6ed60ebd'
          '757da453d21be895d4fbc31ffd45fb25'
          '9ead454899077d5a0cd354f32f924b4c'
-         '967c8dec6087eac30dda63bac3bf58a0'
-         '93e5110f41a05acfe7c82d6f250e327c')
+         '967c8dec6087eac30dda63bac3bf58a0')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -42,7 +40,6 @@ build() {
   # Apply patches from fedora repository
   cd "$tardir"
   patch -Np0 < '../pango-enable-delay-load-of-freetype-and-fontconfig.patch?h=f18'
-  patch -Np1 < '../?id=f45cdd9a4fef1096b071e6bad4cc40e06f48ba46'
   autoreconf -if
   patch -Np0 < '../pango_enable_static_build.patch?h=f18'
 
