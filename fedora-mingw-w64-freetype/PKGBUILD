@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-freetype.git/
 
 pkgname=fedora-mingw-w64-freetype
-pkgver=2.4.10
-pkgrel=2
+pkgver=2.4.11
+pkgrel=1
 pkgdesc='TrueType font rendering library (mingw-w64)'
 arch=(any)
 url='http://freetype.sourceforge.net/'
@@ -20,14 +20,12 @@ source=("http://downloads.sourceforge.net/sourceforge/freetype/freetype-$pkgver.
         "http://pkgs.fedoraproject.org/cgit/mingw-freetype.git/plain/freetype-2.3.0-enable-spr.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-freetype.git/plain/freetype-2.2.1-enable-valid.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-freetype.git/plain/freetype-multilib.patch?h=f18")
-md5sums=('13286702e9390a91661f980608adaff1'
+md5sums=('b93435488942486c8d0ca22e8f768034'
          '816dc8619a6904a7385769433c0a8653'
          '214119610444c9b02766ccee5e220680'
          '3bb0a2e25ed0a74e7218b8e82103c415')
 
-
-_architectures=(i686-w64-mingw32
-                x86_64-w64-mingw32)
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
   local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
