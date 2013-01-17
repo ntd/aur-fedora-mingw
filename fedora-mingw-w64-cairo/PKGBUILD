@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-cairo.git/
 
 pkgname=fedora-mingw-w64-cairo
-pkgver=1.12.8
+pkgver=1.12.10
 pkgrel=1
 pkgdesc='Cairo vector graphics library (mingw-w64)'
 arch=(any)
@@ -19,11 +19,9 @@ provides=("mingw-w64-cairo=$pkgver")
 conflicts=(mingw-w64-cairo)
 options=(!strip !buildflags !libtool)
 source=("http://cairographics.org/releases/cairo-$pkgver.tar.xz")
-sha1sums=('56a10bf3b804367c97734d655c23a9f652d5c297')
+md5sums=('bddd5c5b734ab4b9683eb0ba363070d4')
 
-
-_architectures=(i686-w64-mingw32
-                x86_64-w64-mingw32)
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
   local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
