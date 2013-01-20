@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-glib2
 pkgver=2.35.4
-pkgrel=2
+pkgrel=3
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -20,12 +20,14 @@ source=("http://ftp.gnome.org/pub/GNOME/sources/glib/${pkgver%.*}/glib-$pkgver.t
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/0001-Don-t-start-a-DBus-server-when-built-as-static-lib.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-build-dbus-proxy-testcase-only-on-unix.patch?h=f18"
-        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-send-log-messages-to-correct-stdout-and-stderr.patch?id=d2262b6ca2230b2dc169aa4798b59e645859a195")
+        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-send-log-messages-to-correct-stdout-and-stderr.patch?id=d2262b6ca2230b2dc169aa4798b59e645859a195"
+        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/commit-9e9d028.patch?id=25630468d10f5b8504107b0a11528f29ff25e441")
 md5sums=('5dd69d52722a9c123015b9b6dd45ab3d'
          '82c31506c6f8d22296a86a6ad7511063'
          'c08c41118f5318d10f326c7c30e1a33a'
          '4b4e57380c27422e44d538a509925833'
-         '7b065f9bc154bf996523974a698b24de')
+         '7b065f9bc154bf996523974a698b24de'
+         '88095c5fa2889d00ba610664a8fb84d9')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -49,15 +51,17 @@ build() {
   # https://bugzilla.gnome.org/show_bug.cgi?id=692085
   patch -Np0 < '../glib-send-log-messages-to-correct-stdout-and-stderr.patch?id=d2262b6ca2230b2dc169aa4798b59e645859a195'
 
+  # Fix build failure when using gcc 4.8
+  # https://bugzilla.gnome.org/show_bug.cgi?id=692079
+  # Upstream commit 9e9d028
+  patch -Np1 < '../commit-9e9d028.patch?id=25630468d10f5b8504107b0a11528f29ff25e441'
+
   # Required by the dbus-proxy patch
   autoreconf -if
 
   export CFLAGS='-O2 -pipe'
   export CXXFLAGS="$CFLAGS"
   unset  LDFLAGS
-
-  # Work around more strict behaviour of gcc 4.8, GNOME BZ #692079
-  export CFLAGS="$CFLAGS -Wno-error=format='.*'"
 
   for arch in ${_architectures[@]}; do
     # GLib can't build static and shared libraries in one go, so we build GLib twice
