@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-glib2
 pkgver=2.35.4
-pkgrel=1
+pkgrel=2
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -46,6 +46,7 @@ build() {
   # win32 API function AttachConsole can be used to dynamically attach GUI
   # applications to a console and the file descriptors of stderr and stdout
   # will become different than 1 and 2
+  # https://bugzilla.gnome.org/show_bug.cgi?id=692085
   patch -Np0 < '../glib-send-log-messages-to-correct-stdout-and-stderr.patch?id=d2262b6ca2230b2dc169aa4798b59e645859a195'
 
   # Required by the dbus-proxy patch
@@ -54,6 +55,9 @@ build() {
   export CFLAGS='-O2 -pipe'
   export CXXFLAGS="$CFLAGS"
   unset  LDFLAGS
+
+  # Work around more strict behaviour of gcc 4.8, GNOME BZ #692079
+  export CFLAGS="$CFLAGS -Wno-error=format='.*'"
 
   for arch in ${_architectures[@]}; do
     # GLib can't build static and shared libraries in one go, so we build GLib twice
@@ -65,7 +69,7 @@ build() {
       --host="$arch" \
       --disable-shared \
       --enable-static
-    make
+    make V=1
     mkdir -p "$builddir-shared"
     cd "$builddir-shared"
     "$tardir/configure" \
