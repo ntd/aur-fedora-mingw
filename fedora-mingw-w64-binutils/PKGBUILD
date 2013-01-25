@@ -5,27 +5,34 @@
 
 pkgname=fedora-mingw-w64-binutils
 pkgver=2.23.51.0.5
-pkgrel=2
+pkgrel=3
 pkgdesc='A set of programs to assemble and manipulate binary and object files (mingw-w64)'
 arch=(any)
 url='http://www.gnu.org/software/binutils/'
-license=(GPL)
+license=(GPL LGPL)
 groups=(fedora-mingw)
 depends=(zlib)
 makedepends=()
 provides=("mingw-w64-binutils=$pkgver")
 conflicts=(mingw-w64-binutils)
 options=(!libtool)
-source=("http://www.kernel.org/pub/linux/devel/binutils/binutils-$pkgver.tar.bz2")
-md5sums=('a08000d6c18b4667095e416816550a33')
+source=("http://www.kernel.org/pub/linux/devel/binutils/binutils-$pkgver.tar.bz2"
+        "http://pkgs.fedoraproject.org/cgit/mingw-binutils.git/plain/binutils.git-260cd95271cdf002ed8e419898fd29c42e257841.patch?id=21c00241c50b8addb3b081e01ac82aff3110a4b0")
+md5sums=('a08000d6c18b4667095e416816550a33'
+         'e06567e9c414026e8347c2e1a5427c47')
 
-_architectures=(i686-w64-mingw32
-                x86_64-w64-mingw32)
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
   local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
   local builddir
   local arch
+
+  # Apply patches from fedora repository
+  cd "$tardir"
+  # Resolves: *-mingw32-windres: unexpected version string length 68 != 32 + 8
+  # https://bugzilla.redhat.com/show_bug.cgi?id=902960
+  patch -Np1 < '../binutils.git-260cd95271cdf002ed8e419898fd29c42e257841.patch?id=21c00241c50b8addb3b081e01ac82aff3110a4b0'
 
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
