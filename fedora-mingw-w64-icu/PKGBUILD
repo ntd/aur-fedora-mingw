@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-icu
 pkgver=49.1.2
-pkgrel=1
+pkgrel=2
 pkgdesc='International Components for Unicode library (mingw-w64)'
 arch=(any)
 url='http://www.icu-project.org/'
@@ -88,6 +88,7 @@ package() {
     find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
     rm -fr "$prefix/share"
+    rm -fr "$prefix/lib/icu"
   done
 }
 
