@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-glib2
 pkgver=2.35.4
-pkgrel=3
+pkgrel=4
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
