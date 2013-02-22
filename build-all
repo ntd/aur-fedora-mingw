@@ -1,6 +1,22 @@
 #! /bin/bash
+#
+# A serie of packages to skip can be optionally specified
+# on the command line. For example, the following command
+# will build everything but binutils and cairo:
+#
+# ./build-all fedora-mingw-w64-binutils fedora-mingw-w64-cairo
 
 root="$(dirname $0)"
+
+function found() {
+    local needle="$1"
+    shift
+    while : ; do
+	haystack=$1
+	shift || return 1
+	[[ "$haystack" = "$needle" ]] && return 0
+    done
+}
 
 pkgs=(	fedora-mingw-w64-binutils
 	fedora-mingw-w64-bzip2
@@ -25,6 +41,7 @@ pkgs=(	fedora-mingw-w64-binutils
 	fedora-nsis)
 
 for pkg in ${pkgs[@]}; do
+	found "$pkg" "$@" && continue
 	cd "$pkg"
 	if [ *.pkg.tar.xz = "*.pkg.tar.xz" ]; then
 		makepkg -f
