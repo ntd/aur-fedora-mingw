@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-glib2
 pkgver=2.35.4
-pkgrel=5
+pkgrel=6
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -101,7 +101,7 @@ package() {
     cd "$builddir-shared"
     make DESTDIR="$pkgdir" install
 
-    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
+    find "$prefix" -regex '.*\.\(bat\|def\|exp\)' -exec rm -f {} +
     find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
     rm -fr "$prefix/share/bash-completion"
