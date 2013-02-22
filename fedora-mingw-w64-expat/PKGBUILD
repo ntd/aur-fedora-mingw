@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-expat
 pkgver=2.1.0
-pkgrel=2
+pkgrel=3
 pkgdesc='An XML parser library (mingw-w64)'
 arch=(any)
 url='http://expat.sourceforge.net/'
@@ -19,8 +19,7 @@ options=(!strip !buildflags !libtool)
 source=("http://downloads.sourceforge.net/sourceforge/expat/expat-$pkgver.tar.gz")
 md5sums=('dd7dab7a5fea97d2a6a43f511449b7cd')
 
-_architectures=(i686-w64-mingw32
-                x86_64-w64-mingw32)
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
   local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"

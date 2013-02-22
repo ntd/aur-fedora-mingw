@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-libjpeg-turbo
 pkgver=1.2.1
-pkgrel=2
+pkgrel=3
 pkgdesc='libjpeg derivative with accelerated baseline JPEG compression and decompression (mingw-w64)'
 arch=(any)
 url='http://libjpeg-turbo.virtualgl.org/'
@@ -23,8 +23,7 @@ md5sums=('f61e60ff01381ece4d2fe65eeb52669e'
          '93f31089ff2069c9ac1eddd387d79616'
          'd618536e69bcbff2daab3897014a5eeb')
 
-_architectures=(i686-w64-mingw32
-                x86_64-w64-mingw32)
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
   local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"

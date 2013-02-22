@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-harfbuzz
 pkgver=0.9.9
-pkgrel=3
+pkgrel=4
 pkgdesc='OpenType text shaping engine (mingw-w64)'
 arch=(any)
 url='http://www.harfbuzz.org/'
@@ -24,8 +24,7 @@ md5sums=('e901ffe556d706b7d43b272f83be7f09'
          'dc3c8db194835ad113d2994a76b17edb'
          '39a89824f77cc7979b4025379b38aae4')
 
-_architectures=(i686-w64-mingw32
-                x86_64-w64-mingw32)
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
   local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"

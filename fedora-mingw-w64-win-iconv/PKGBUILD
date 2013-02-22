@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-win-iconv
 pkgver=0.0.4
-pkgrel=2
+pkgrel=3
 pkgdesc='Iconv implementation using Win32 API (mingw-w64)'
 arch=(any)
 url='http://code.google.com/p/win-iconv/'
@@ -23,9 +23,7 @@ md5sums=('7618f4a80dd4b32dd7141fbe026991d9'
          '93f31089ff2069c9ac1eddd387d79616'
          'd618536e69bcbff2daab3897014a5eeb')
 
-
-_architectures=(i686-w64-mingw32
-                x86_64-w64-mingw32)
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
   local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
