@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-binutils
 pkgver=2.23.51.0.9
-pkgrel=1
+pkgrel=2
 pkgdesc='A set of programs to assemble and manipulate binary and object files (mingw-w64)'
 arch=(any)
 url='http://www.gnu.org/software/binutils/'
@@ -55,6 +55,7 @@ package() {
   done
 
   rm -fr "$pkgdir/usr/lib"
+  rm -fr "$pkgdir/usr/share"
 }
 
 # vim:set ts=2 sw=2 et:
