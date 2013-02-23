@@ -51,6 +51,7 @@ build() {
   # https://bugzilla.gnome.org/show_bug.cgi?id=692085
   patch -Np0 < '../glib-send-log-messages-to-correct-stdout-and-stderr.patch?id=d2262b6ca2230b2dc169aa4798b59e645859a195'
 
+  # https://bugzilla.gnome.org/show_bug.cgi?id=694506
   patch -Np0 < '../glib-formatstring.patch?id=68af84c18dd0796c67033e98e06149b8739b20f6'
 
   # Required by the dbus-proxy patch
