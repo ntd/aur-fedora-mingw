@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/
 
 pkgname=fedora-mingw-w64-gtk2
-pkgver=2.24.15
-pkgrel=3
+pkgver=2.24.16
+pkgrel=1
 pkgdesc='GTK+2 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -23,11 +23,17 @@ source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.t
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/mingw32-gtk2-2.15.0-xbuttons.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/mingw32-gtk2-enable_static_build.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/gtk-fix-out-of-source-build.patch?h=f18"
+        "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/icon-padding.patch?id=95be474adc76e60caa692330cf2706b90848146f"
+        "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/tooltip-positioning.patch?id=95be474adc76e60caa692330cf2706b90848146f"
+        "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/window-dragging.patch?id=95be474adc76e60caa692330cf2706b90848146f"
         "gtk.immodules")
-md5sums=('68f034fb4f68086790d7488cf00e71c8'
+md5sums=('ea8ba95edd3896eca2d48450080d1f2d'
          '44ca5d1ce91f5364182c6ea2614c7688'
          '396835720e308acaa0372e5a45c463d4'
          '8231dd2b7484574968d5faa57262af2a'
+         '5c6d42eb6651106f605c2ac9d92a3951'
+         '86159ea0934b25a7bbda9aa436ffc551'
+         '147a90540b678b941e7d5d71054b2447'
          '9967ded27c0eb3b615acae7539621607')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
@@ -41,6 +47,12 @@ build() {
   # Apply patches from fedora repository
   cd "$tardir"
   patch -Np1 < '../mingw32-gtk2-2.15.0-xbuttons.patch?h=f18'
+  # https://bugzilla.gnome.org/show_bug.cgi?id=583273
+  patch -Np1 < '../icon-padding.patch?id=95be474adc76e60caa692330cf2706b90848146f'
+  # https://bugzilla.gnome.org/show_bug.cgi?id=599618
+  patch -Np1 < '../tooltip-positioning.patch?id=95be474adc76e60caa692330cf2706b90848146f'
+  # https://bugzilla.gnome.org/show_bug.cgi?id=611313
+  patch -Np1 < '../window-dragging.patch?id=95be474adc76e60caa692330cf2706b90848146f'
   autoreconf -if
   patch -Np0 < '../mingw32-gtk2-enable_static_build.patch?h=f18'
   patch -Np0 < '../gtk-fix-out-of-source-build.patch?h=f18'
