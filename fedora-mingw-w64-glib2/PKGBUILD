@@ -5,14 +5,15 @@
 
 pkgname=fedora-mingw-w64-glib2
 pkgver=2.35.8
-pkgrel=2
+pkgrel=3
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
 license=(LGPL)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-gettext fedora-mingw-w64-libffi)
-makedepends=('mingw-w64-gcc>=4.7.0' mingw-w64-pkg-config 'glib2>=2.31.20' autoconf automake libtool)
+makedepends=('mingw-w64-gcc>=4.7.0' mingw-w64-pkg-config 'glib2>=2.31.20'
+             autoconf automake libtool gtk-doc)
 provides=("mingw-w64-glib2=$pkgver")
 conflicts=(mingw-w64-glib2)
 options=(!strip !buildflags !libtool)
