@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-harfbuzz.git/
 
 pkgname=fedora-mingw-w64-harfbuzz
-pkgver=0.9.9
-pkgrel=4
+pkgver=0.9.14
+pkgrel=1
 pkgdesc='OpenType text shaping engine (mingw-w64)'
 arch=(any)
 url='http://www.harfbuzz.org/'
@@ -20,7 +20,7 @@ options=(!strip !buildflags !libtool)
 source=("http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-$pkgver.tar.bz2"
         "http://pkgs.fedoraproject.org/cgit/mingw-harfbuzz.git/plain/GetProcAddress_Script_OpenType.diff?id=00afde08e2825864ad3c5a27c0b2783a3ec27cc0"
         "http://pkgs.fedoraproject.org/cgit/mingw-harfbuzz.git/plain/harfbuzz-0.9.9-fix-build-failure.patch?id=00afde08e2825864ad3c5a27c0b2783a3ec27cc0")
-md5sums=('e901ffe556d706b7d43b272f83be7f09'
+md5sums=('7e1990b79060e98e2d31f677a0ac9eed'
          'dc3c8db194835ad113d2994a76b17edb'
          '39a89824f77cc7979b4025379b38aae4')
 
