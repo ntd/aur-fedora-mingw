@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/
 
 pkgname=fedora-mingw-w64-gtk3
-pkgver=3.7.6
-pkgrel=4
+pkgver=3.7.14
+pkgrel=1
 pkgdesc='GTK+3 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -21,14 +21,12 @@ provides=("mingw-w64-gtk3=$pkgver")
 conflicts=(mingw-w64-gtk3)
 options=(!strip !buildflags !libtool)
 source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.tar.xz"
-        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/0001-Don-t-build-gtk-launch-when-gio-unix-is-not-availabl.patch?id=b63e31724f2786202a38f8b7fb8539b009f4e621"
-        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/0002-Only-build-native-update-icon-cache-when-no-external.patch?id=b63e31724f2786202a38f8b7fb8539b009f4e621"
+        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/commit-a2cd99.patch?id=14aeddfdf4bdd95b4dba78e99b91475b78fde3e7"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/0003-Don-t-use-AC_CANONICAL_TARGET.patch?id=b63e31724f2786202a38f8b7fb8539b009f4e621"
         "gtk.immodules")
 
-md5sums=('76c5ee266b31c8b8c615a233a883984c'
-         '32a5318010948f4b16169a2848614e3e'
-         '6302cf1945c78cd3df94a50d8ce7ddce'
+md5sums=('6171e8c9513a9ae639d660231ca6dbed'
+         'a7175512f725d2cf82cc78d5cbcf9899'
          '77b0525b67057fa6afaf5405d80509ae'
          '9655591f6ed7b9371dc7c15f8237d383')
 
@@ -42,8 +40,9 @@ build() {
 
   # Apply patches from fedora repository
   cd "$tardir"
-  patch -Np1 < '../0001-Don-t-build-gtk-launch-when-gio-unix-is-not-availabl.patch?id=b63e31724f2786202a38f8b7fb8539b009f4e621'
-  patch -Np1 < '../0002-Only-build-native-update-icon-cache-when-no-external.patch?id=b63e31724f2786202a38f8b7fb8539b009f4e621'
+  # Link with -lwinmm
+  # https://git.gnome.org/browse/gtk+/commit/?id=a2cd9983c3e017238a9e0fa41674171a9adacdc4
+  patch -Np1 < '../commit-a2cd99.patch?id=14aeddfdf4bdd95b4dba78e99b91475b78fde3e7'
   patch -Np1 < '../0003-Don-t-use-AC_CANONICAL_TARGET.patch?id=b63e31724f2786202a38f8b7fb8539b009f4e621'
   autoreconf -if
 
