@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/
 
 pkgname=fedora-mingw-w64-glib2
-pkgver=2.35.9
+pkgver=2.36.0
 pkgrel=1
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
@@ -24,7 +24,7 @@ source=("http://ftp.gnome.org/pub/GNOME/sources/glib/${pkgver%.*}/glib-$pkgver.t
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-send-log-messages-to-correct-stdout-and-stderr.patch?id=d2262b6ca2230b2dc169aa4798b59e645859a195"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-formatstring.patch?id=0c8f0dd8eb827c05f1a2ea986f9a84dd0afa8df4"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-prefer-constructors-over-DllMain.patch?id=fba82fe33fd50b11e4561596736629714dea569d")
-md5sums=('0afa8ddc839a86474c04fd0870182ba3'
+md5sums=('2047dff287473450593edecb18f79c17'
          '82c31506c6f8d22296a86a6ad7511063'
          'c08c41118f5318d10f326c7c30e1a33a'
          '4b4e57380c27422e44d538a509925833'
