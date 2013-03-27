@@ -8,7 +8,7 @@
 # and gdiplus support is not enabled.
 
 pkgname=fedora-mingw-w64-gdk-pixbuf
-pkgver=2.27.3
+pkgver=2.28.0
 pkgrel=1
 pkgdesc='An image loading library (mingw-w64)'
 arch=(any)
@@ -24,7 +24,7 @@ conflicts=(mingw-w64-gdk-pixbuf2)
 options=(!strip !buildflags !libtool)
 source=("http://ftp.gnome.org/pub/GNOME/sources/gdk-pixbuf/${pkgver%.*}/gdk-pixbuf-$pkgver.tar.xz"
         "gdk-pixbuf.loaders")
-md5sums=('19a90ccd7e44646067745033e391f85e'
+md5sums=('6992493c88db7e38cb94da75148d8ea2'
          'ff9e0cc33a8f5b1889b624ab2bae3337')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
