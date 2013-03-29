@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-glib2
 pkgver=2.36.0
-pkgrel=1
+pkgrel=2
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -18,16 +18,12 @@ provides=("mingw-w64-glib2=$pkgver")
 conflicts=(mingw-w64-glib2)
 options=(!strip !buildflags !libtool)
 source=("http://ftp.gnome.org/pub/GNOME/sources/glib/${pkgver%.*}/glib-$pkgver.tar.xz"
-        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/0001-Don-t-start-a-DBus-server-when-built-as-static-lib.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch?h=f18"
-        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-build-dbus-proxy-testcase-only-on-unix.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-send-log-messages-to-correct-stdout-and-stderr.patch?id=d2262b6ca2230b2dc169aa4798b59e645859a195"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-formatstring.patch?id=0c8f0dd8eb827c05f1a2ea986f9a84dd0afa8df4"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-prefer-constructors-over-DllMain.patch?id=fba82fe33fd50b11e4561596736629714dea569d")
 md5sums=('2047dff287473450593edecb18f79c17'
-         '82c31506c6f8d22296a86a6ad7511063'
          'c08c41118f5318d10f326c7c30e1a33a'
-         '4b4e57380c27422e44d538a509925833'
          '7b065f9bc154bf996523974a698b24de'
          '79336791aa59eb3ab537e4823ce9293c'
          '74dba4282d1072599c4f9191b5f54072')
@@ -42,9 +38,7 @@ build() {
 
   # Apply patches from fedora repository
   cd "$tardir"
-  patch -Np1 < '../0001-Don-t-start-a-DBus-server-when-built-as-static-lib.patch?h=f18'
   patch -Np1 < '../0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch?h=f18'
-  patch -Np1 < '../glib-build-dbus-proxy-testcase-only-on-unix.patch?h=f18'
 
   # By default g_log_default_handler always assumes that stdout and stderr
   # are file descriptors 1 and 2. On Win32 this isn't always the case as the
