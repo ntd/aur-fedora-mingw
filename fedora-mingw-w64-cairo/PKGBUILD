@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-cairo
 pkgver=1.12.14
-pkgrel=1
+pkgrel=2
 pkgdesc='Cairo vector graphics library (mingw-w64)'
 arch=(any)
 url='http://cairographics.org/'
@@ -14,12 +14,19 @@ groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-fontconfig fedora-mingw-w64-freetype
          mingw-w64-libxml2 fedora-mingw-w64-pixman mingw-w64-libpng
          fedora-mingw-w64-win-iconv mingw-w64-zlib fedora-mingw-w64-glib2)
-makedepends=('mingw-w64-gcc>=4.7.0' mingw-w64-tools mingw-w64-pkg-config)
+makedepends=('mingw-w64-gcc>=4.7.0' mingw-w64-tools mingw-w64-pkg-config
+             autoconf automake libtool gtk-doc)
 provides=("mingw-w64-cairo=$pkgver")
 conflicts=(mingw-w64-cairo)
 options=(!strip !buildflags !libtool)
-source=("http://cairographics.org/releases/cairo-$pkgver.tar.xz")
-md5sums=('27b634113d0f52152d60ae8e2ec7daa7')
+source=("http://cairographics.org/releases/cairo-$pkgver.tar.xz"
+        "http://pkgs.fedoraproject.org/cgit/mingw-cairo.git/plain/0001-win32-Free-the-fallback-upon-finish.patch?id=602fd779ff72e25af2fdf28aaec8b8d71da75aad"
+        "http://pkgs.fedoraproject.org/cgit/mingw-cairo.git/plain/0002-win32-fix-corrupted-drawing.patch?id=602fd779ff72e25af2fdf28aaec8b8d71da75aad"
+        "http://pkgs.fedoraproject.org/cgit/mingw-cairo.git/plain/0003-build-sys-do-not-try-to-build-util-sphinx-on-Windows.patch?id=602fd779ff72e25af2fdf28aaec8b8d71da75aad")
+md5sums=('27b634113d0f52152d60ae8e2ec7daa7'
+         'f4aa6f5ac47c68a36a6b5db111bd8591'
+         'f295332761cf3c1426d867eda3374a4d'
+         'ee1f9b94e8aa268e580980891fa50ebf')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -27,6 +34,16 @@ build() {
   local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
   local builddir
   local arch
+
+  # Apply patches from fedora repository
+  cd "$tardir"
+  # cherry-picked from upcoming 1.12.15
+  patch -Np1 < '../0001-win32-Free-the-fallback-upon-finish.patch?id=602fd779ff72e25af2fdf28aaec8b8d71da75aad'
+  patch -Np1 < '../0002-win32-fix-corrupted-drawing.patch?id=602fd779ff72e25af2fdf28aaec8b8d71da75aad'
+  # https://bugs.freedesktop.org/show_bug.cgi?id=63043
+  patch -Np1 < '../0003-build-sys-do-not-try-to-build-util-sphinx-on-Windows.patch?id=602fd779ff72e25af2fdf28aaec8b8d71da75aad'
+
+  autoreconf -if
 
   # Function to generate an import library for delay-loading
   gen_delay_lib() {
