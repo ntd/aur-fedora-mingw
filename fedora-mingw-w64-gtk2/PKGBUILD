@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-gtk2
 pkgver=2.24.17
-pkgrel=1
+pkgrel=2
 pkgdesc='GTK+2 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -27,6 +27,7 @@ source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.t
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/icon-padding.patch?id=95be474adc76e60caa692330cf2706b90848146f"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/tooltip-positioning.patch?id=95be474adc76e60caa692330cf2706b90848146f"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/window-dragging.patch?id=95be474adc76e60caa692330cf2706b90848146f"
+        "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/gtk-dont-define-initguid.patch?id=3224e445dad240da5f5ebfe371e8c9f627459089"
         "gtk.immodules")
 md5sums=('a10cc43fad8d64f8893d779b1f8322ff'
          '44ca5d1ce91f5364182c6ea2614c7688'
@@ -35,6 +36,7 @@ md5sums=('a10cc43fad8d64f8893d779b1f8322ff'
          '5c6d42eb6651106f605c2ac9d92a3951'
          '86159ea0934b25a7bbda9aa436ffc551'
          '147a90540b678b941e7d5d71054b2447'
+         '4038939df90f80ea6923d67afff28e03'
          '9967ded27c0eb3b615acae7539621607')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
@@ -54,6 +56,18 @@ build() {
   patch -Np1 < '../tooltip-positioning.patch?id=95be474adc76e60caa692330cf2706b90848146f'
   # https://bugzilla.gnome.org/show_bug.cgi?id=611313
   patch -Np1 < '../window-dragging.patch?id=95be474adc76e60caa692330cf2706b90848146f'
+  # As of mingw-w64 r5589 the header knownfolders.h was added
+  # which contains definitions like FOLDERID_Windows
+  # As these are also part of libuuid.a you'll get linker failures like:
+  # /usr/i686-w64-mingw32/sys-root/mingw/lib/libuuid.a(lib32_libuuid_a-uuid.o):(.rdata+0x0): multiple definition of `FOLDERID_Windows'
+  # win32/.libs/libgdk-win32.a(gdkdnd-win32.o):gdkdnd-win32.c:(.rdata+0x360): first defined here
+  #
+  # Workaround this for now until mingw-w64 upstream has come up
+  # with a statement whether this is expected behaviour and what
+  # component should be fixed exactly
+  #
+  # http://mingw-w64.svn.sourceforge.net/viewvc/mingw-w64?view=revision&revision=5589
+  patch -Np0 < '../gtk-dont-define-initguid.patch?id=3224e445dad240da5f5ebfe371e8c9f627459089'
   autoreconf -if
   patch -Np0 < '../mingw32-gtk2-enable_static_build.patch?h=f18'
   patch -Np0 < '../gtk-fix-out-of-source-build.patch?h=f18'
