@@ -1,0 +1,82 @@
+# Maintainer: Nicola Fontana <ntd@entidi.it>
+#
+# Port of the Fedora package found at
+# http://pkgs.fedoraproject.org/cgit/mingw-crt.git/
+
+pkgname=fedora-mingw-w64-crt
+pkgver=5716
+pkgrel=1
+pkgdesc='MinGW-w64 CRT for Windows'
+arch=(any)
+url='http://mingw-w64.sourceforge.net'
+license=('custom')
+groups=('fedora-mingw')
+depends=('mingw-w64-gcc-base' 'mingw-w64-binutils' 'mingw-w64-headers')
+makedepends=(svn autoconf automake libtool)
+optdepends=()
+provides=(mingw-w64-crt)
+conflicts=(mingw-w64-crt)
+replaces=()
+backup=()
+options=(!strip !buildflags !libtool)
+source=("http://pkgs.fedoraproject.org/cgit/mingw-crt.git/plain/mingw-w64-crt-add-vsprintf_s-wrapper.patch?id=489cd6256f5067ff7f66b78940a79d35bc0134ef")
+md5sums=('6b28db9711921b1ffd3fccc057dd8875')
+
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
+_svnmod='mingw-w64'
+_svntrunk='http://mingw-w64.svn.sourceforge.net/svnroot/mingw-w64/trunk'
+
+build() {
+  local svndir="$srcdir/$_svnmod"
+  local builddir
+  local arch
+
+  if [[ -d "$svndir/.svn" ]]; then
+    cd "$_svnmod"
+    svn up -r "$pkgver"
+  else
+    cd "$srcdir"
+    svn co "$_svntrunk" --config-dir ./ -r "$pkgver" "$_svnmod" && cd "$_svnmod"
+  fi
+
+  msg "SVN checkout done or server timeout"
+
+  # Apply patches from fedora repository
+  cd "$svndir/mingw-w64-crt"
+  patch -Np1 < '../../mingw-w64-crt-add-vsprintf_s-wrapper.patch?id=489cd6256f5067ff7f66b78940a79d35bc0134ef'
+
+  autoreconf -if
+
+  export CFLAGS='-O2 -pipe'
+  export CXXFLAGS="$CFLAGS"
+  unset  LDFLAGS
+
+  for arch in ${_architectures[@]}; do
+    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    mkdir -p "$builddir"
+    cd "$builddir"
+    "$svndir/mingw-w64-crt/configure" \
+      --prefix="/usr/$arch" \
+      --host="$arch"
+    make
+  done
+}
+
+package() {
+  local arch
+  local prefix
+
+  for arch in ${_architectures[@]}; do
+    prefix="$pkgdir/usr/$arch"
+
+    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    make DESTDIR="$pkgdir" install
+
+    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+    rm -fr "$prefix/share"
+  done
+}
+
+# vim:set ts=2 sw=2 et:

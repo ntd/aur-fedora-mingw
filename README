@@ -11,7 +11,6 @@ http://pkgs.fedoraproject.org/cgit/
 The following dependencies have been compiled directly
 from AUR:
 
-mingw-w64-crt
 mingw-w64-gcc
 mingw-w64-gcc-base
 mingw-w64-headers-bootstrap
