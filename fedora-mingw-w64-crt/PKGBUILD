@@ -5,13 +5,13 @@
 
 pkgname=fedora-mingw-w64-crt
 pkgver=5716
-pkgrel=1
+pkgrel=2
 pkgdesc='MinGW-w64 CRT for Windows'
 arch=(any)
 url='http://mingw-w64.sourceforge.net'
 license=('custom')
 groups=('fedora-mingw')
-depends=('mingw-w64-gcc-base' 'mingw-w64-binutils' 'mingw-w64-headers')
+depends=('fedora-mingw-w64-headers-bootstrap' 'fedora-mingw-w64-gcc-bootstrap' 'mingw-w64-binutils')
 makedepends=(svn autoconf automake libtool)
 optdepends=()
 provides=(mingw-w64-crt)
