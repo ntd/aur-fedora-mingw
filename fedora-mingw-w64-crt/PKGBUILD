@@ -11,8 +11,9 @@ arch=(any)
 url='http://mingw-w64.sourceforge.net'
 license=('custom')
 groups=('fedora-mingw')
-depends=('fedora-mingw-w64-headers-bootstrap' 'fedora-mingw-w64-gcc-bootstrap' 'mingw-w64-binutils')
-makedepends=(svn autoconf automake libtool)
+depends=('mingw-w64-binutils')
+makedepends=('fedora-mingw-w64-headers-bootstrap' 'fedora-mingw-w64-gcc-bootstrap'
+             svn autoconf automake libtool)
 optdepends=()
 provides=(mingw-w64-crt)
 conflicts=(mingw-w64-crt)
