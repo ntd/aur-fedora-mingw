@@ -1,7 +1,8 @@
 # Maintainer: Nicola Fontana <ntd@entidi.it>
 #
 # Port of the Fedora package found at
-# http://pkgs.fedoraproject.org/cgit/mingw-gcc.git/ 
+# http://pkgs.fedoraproject.org/cgit/mingw-gcc.git/
+
 pkgname=fedora-mingw-w64-gcc-bootstrap
 pkgver=4.8.0
 pkgrel=1
