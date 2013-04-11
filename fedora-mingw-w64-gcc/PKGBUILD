@@ -16,8 +16,8 @@ depends=('zlib' 'libmpc' 'ppl' 'cloog'
 makedepends=('mingw-w64-headers' 'mingw-w64-gcc')
 optdepends=()
 provides=("mingw-w64-gcc=$pkgver")
-conflicts=(mingw-w64-gcc)
-replaces=()
+conflicts=()
+replaces=(mingw-w64-gcc)
 backup=()
 options=(!strip !buildflags !libtool !emptydirs)
 source=("ftp://gcc.gnu.org/pub/gcc/releases/gcc-$pkgver/gcc-$pkgver.tar.bz2"

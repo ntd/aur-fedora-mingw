@@ -14,7 +14,8 @@ groups=(fedora-mingw)
 depends=(zlib)
 makedepends=(flex bison texinfo)
 provides=("mingw-w64-binutils=$pkgver")
-conflicts=(mingw-w64-binutils)
+conflicts=()
+replaces=(mingw-w64-binutils)
 options=(!libtool)
 source=("http://www.kernel.org/pub/linux/devel/binutils/binutils-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-binutils.git/plain/bfd_doc.txt?id=8ce795d81dcaac71998a10cf292728de746871c9"
