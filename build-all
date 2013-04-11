@@ -52,7 +52,8 @@ for pkg in ${pkgs[@]}; do
 	cd "$pkg"
 	if [ *.pkg.tar.xz = "*.pkg.tar.xz" ]; then
 		makepkg -f
-		if ! yaourt -U --force --noconfirm *.pkg.tar.xz; then exit 1; fi
+		# Is there a way to force the removing of conflicting packages?
+		if ! yaourt -U --noconfirm *.pkg.tar.xz; then exit 1; fi
 		rm -fr pkg src
 	fi
 	cd ..
