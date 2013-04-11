@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-headers
 pkgver=5716
-pkgrel=2
+pkgrel=3
 pkgdesc='MinGW-w64 headers for Windows'
 arch=(any)
 url='http://mingw-w64.sourceforge.net'
@@ -67,11 +67,6 @@ package() {
 
     cd "$srcdir/headers-$arch"
     make DESTDIR="$pkgdir" install
-
-    # Drop the dummy pthread headers, eventually installed by the
-    # fedora-mingw-pthreads-dummy package
-    rm -f "$prefix/include/pthread_time.h" \
-          "$prefix/include/pthread_unistd.h"
   done
 }
 
