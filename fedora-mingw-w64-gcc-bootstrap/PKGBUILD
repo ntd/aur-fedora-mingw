@@ -2,6 +2,8 @@
 #
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-gcc.git/
+# compiled for bootstrapping. It is not intended for general use:
+# see ../README.md for details on the bootstrap process.
 
 pkgname=fedora-mingw-w64-gcc-bootstrap
 pkgver=4.8.0
