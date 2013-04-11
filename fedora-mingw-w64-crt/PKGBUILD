@@ -12,7 +12,7 @@ url='http://mingw-w64.sourceforge.net'
 license=('custom')
 groups=('fedora-mingw')
 depends=('mingw-w64-binutils')
-makedepends=('fedora-mingw-w64-headers-bootstrap' 'fedora-mingw-w64-gcc-bootstrap'
+makedepends=('mingw-w64-headers' 'mingw-w64-gcc'
              svn autoconf automake libtool)
 optdepends=()
 provides=(mingw-w64-crt)
