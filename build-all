@@ -1,5 +1,9 @@
 #! /bin/bash
 #
+# Builds all the GTK+ MinGW toolchain skipping the packages that
+# have been previously compiled (that is, the directories still
+# containing a .pkg.tar.xz file).
+#
 # A serie of packages to skip can be optionally specified
 # on the command line. For example, the following command
 # will build everything but binutils and cairo:
@@ -20,24 +24,28 @@ function found() {
 
 pkgs=(	fedora-mingw-w64-binutils
 	fedora-mingw-w64-headers
-	fedora-mingw-w64-pthreads-dummy
 	fedora-mingw-w64-gcc-bootstrap
 	fedora-mingw-w64-crt
 	fedora-mingw-w64-gcc-nogomp
 	fedora-mingw-w64-pthreads
 	fedora-mingw-w64-gcc
+	mingw-w64-pkg-config
+	mingw-w64-zlib
 	fedora-mingw-w64-bzip2
 	fedora-mingw-w64-termcap
 	fedora-mingw-w64-expat
+	mingw-w64-libxml2
 	fedora-mingw-w64-win-iconv
 	fedora-mingw-w64-gettext
+	mingw-w64-libpng
 	fedora-mingw-w64-libjpeg-turbo
 	fedora-mingw-w64-libffi
+	fedora-mingw-w64-tools
 	fedora-mingw-w64-glib2
-	fedora-mingw-w64-icu
-	fedora-mingw-w64-fontconfig
 	fedora-mingw-w64-freetype
+	fedora-mingw-w64-fontconfig
 	fedora-mingw-w64-pixman
+	fedora-mingw-w64-icu
 	fedora-mingw-w64-cairo
 	fedora-mingw-w64-gdk-pixbuf
 	fedora-mingw-w64-atk
@@ -49,12 +57,17 @@ pkgs=(	fedora-mingw-w64-binutils
 
 for pkg in ${pkgs[@]}; do
 	found "$pkg" "$@" && continue
-	cd "$pkg"
-	if [ *.pkg.tar.xz = "*.pkg.tar.xz" ]; then
-		makepkg -f
-		# Is there a way to force the removing of conflicting packages?
-		if ! yaourt -U --noconfirm *.pkg.tar.xz; then exit 1; fi
-		rm -fr pkg src
+	if [ ! -d "$pkg" ]; then
+	    # No package directory found: try to build from AUR
+	    if ! yaourt -Sa --noconfirm "$pkg"; then exit 1; fi
+	elif [ -z "$(find "$pkg" -maxdepth 1 -name '*.pkg.tar.xz')" ]; then
+	    # The directory exists and does not contain any .pkg.tar.xz file:
+	    # build the package with makepkg
+	    cd "$pkg"
+	    makepkg -f
+	    # Is there a way to force the removing of conflicting packages?
+	    if ! yes | LC_ALL='' yaourt -U *.pkg.tar.xz; then exit 1; fi
+	    rm -fr pkg src
+	    cd ..
 	fi
-	cd ..
 done
