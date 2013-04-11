@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-headers
 pkgver=5716
-pkgrel=1
+pkgrel=2
 pkgdesc='MinGW-w64 headers for Windows'
 arch=(any)
 url='http://mingw-w64.sourceforge.net'
@@ -40,6 +40,11 @@ build() {
   fi
 
   msg "SVN checkout done or server timeout"
+
+  export CFLAGS='-O2 -pipe'
+  export CXXFLAGS="$CFLAGS"
+  unset  LDFLAGS
+  unset  CPPFLAGS
 
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/headers-$arch"

@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-glib2
 pkgver=2.36.0
-pkgrel=2
+pkgrel=3
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -62,6 +62,7 @@ build() {
   export CFLAGS='-O2 -pipe'
   export CXXFLAGS="$CFLAGS"
   unset  LDFLAGS
+  unset  CPPFLAGS
 
   for arch in ${_architectures[@]}; do
     # GLib can't build static and shared libraries in one go, so we build GLib twice

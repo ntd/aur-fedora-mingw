@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-pthreads
 pkgver=2.8.0
-pkgrel=1
+pkgrel=2
 _prerelease_date=20110511
 pkgdesc='MinGW-w64 pthreads library'
 arch=(any)
@@ -41,9 +41,10 @@ build() {
   patch -Np1 < '../mingw32-pthreads-2.8.0-20110511-use-wine-for-tests.patch?id=5b9069c334ab34007650489869344ae6b73296db'
   patch -Np1 < '../mingw32-pthreads-flags.patch?id=5b9069c334ab34007650489869344ae6b73296db'
 
-  export CFLAGS='-O2 -pipe -D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4'
+  export CFLAGS='-O2 -pipe'
   export CXXFLAGS="$CFLAGS"
   unset  LDFLAGS
+  unset  CPPFLAGS
 
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"

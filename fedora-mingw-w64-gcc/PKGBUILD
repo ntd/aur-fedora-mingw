@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-gcc
 pkgver=4.8.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Cross GCC for the MinGW-w64 cross-compiler"
 arch=('i686' 'x86_64')
 url="http://gcc.gnu.org"
@@ -49,6 +49,7 @@ build() {
   export CFLAGS='-O2'
   export CXXFLAGS="$CFLAGS"
   unset  LDFLAGS
+  unset  CPPFLAGS
 
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
