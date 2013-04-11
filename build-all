@@ -52,7 +52,7 @@ for pkg in ${pkgs[@]}; do
 	cd "$pkg"
 	if [ *.pkg.tar.xz = "*.pkg.tar.xz" ]; then
 		makepkg -f
-		if ! yaourt -Uf --noconfirm *.pkg.tar.xz; then exit 1; fi
+		if ! yaourt -U --force --noconfirm *.pkg.tar.xz; then exit 1; fi
 		rm -fr pkg src
 	fi
 	cd ..
