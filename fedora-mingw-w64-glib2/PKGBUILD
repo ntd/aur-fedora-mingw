@@ -11,7 +11,7 @@ arch=(any)
 url='http://www.gtk.org/'
 license=(LGPL)
 groups=(fedora-mingw)
-depends=(mingw-w64-crt fedora-mingw-w64-gettext fedora-mingw-w64-libffi)
+depends=(mingw-w64-crt mingw-w64-libffi mingw-w64-zlib mingw-w64-gettext)
 makedepends=(mingw-w64-gcc mingw-w64-pkg-config 'glib2>=2.31.20'
              autoconf automake libtool gtk-doc)
 provides=("mingw-w64-glib2=$pkgver")
