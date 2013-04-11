@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-gcc-bootstrap
 pkgver=4.8.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Cross GCC for the MinGW-w64 cross-compiler (bootstrap)"
 arch=('i686' 'x86_64')
 url="http://gcc.gnu.org"
@@ -27,9 +27,11 @@ md5sums=('e6040024eb9e761c3bea348d1fa5abb0'
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
-  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
+  local tardir="$srcdir/gcc-$pkgver"
   local builddir
   local arch
+
+  echo 'Fedora-archlinux MinGW $pkgver-$pkgrel' > $tardir/gcc/DEV-PHASE
 
   # Apply patches from fedora repository
   cd "$tardir"
@@ -51,14 +53,10 @@ build() {
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    ${srcdir}/gcc-${pkgver}/configure --prefix=/usr \
-        --target=${arch} \
-        --enable-languages="c,c++" \
-        --enable-shared \
-        --enable-static \
-        --enable-threads=win32 \
-        --enable-fully-dynamic-string \
-        --with-system-zlib --with-ppl --enable-cloog-backend=isl \
+    $tardir/configure \
+        --prefix=/usr \
+        --with-gxx-include-dir=/usr/$arch/include/c++ \
+        --target=$arch \
         --disable-lto \
         --disable-libgomp \
         --with-gnu-as \
@@ -70,6 +68,7 @@ build() {
         --disable-nls \
         --without-included-gettext \
         --disable-win32-registry \
+        --enable-languages="c,c++" \
         --with-bugurl=http://bugzilla.redhat.com/bugzilla
     make all-gcc
   done
