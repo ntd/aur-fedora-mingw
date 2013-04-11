@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-gtk3
 pkgver=3.8.0
-pkgrel=2
+pkgrel=3
 pkgdesc='GTK+3 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -22,9 +22,11 @@ conflicts=(mingw-w64-gtk3)
 options=(!strip !buildflags !libtool)
 source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/0003-Don-t-use-AC_CANONICAL_TARGET.patch?id=b63e31724f2786202a38f8b7fb8539b009f4e621"
+        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk-dont-define-initguid.patch?id=82ccf489f4763e375805d848351ac3f8fda8e88b"
         "gtk.immodules")
 md5sums=('ee8042469449c2bc702dbd9fa690f405'
          '77b0525b67057fa6afaf5405d80509ae'
+         '4038939df90f80ea6923d67afff28e03'
          '9655591f6ed7b9371dc7c15f8237d383')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
@@ -38,6 +40,19 @@ build() {
   # Apply patches from fedora repository
   cd "$tardir"
   patch -Np1 < '../0003-Don-t-use-AC_CANONICAL_TARGET.patch?id=b63e31724f2786202a38f8b7fb8539b009f4e621'
+  # As of mingw-w64 r5589 the header knownfolders.h was added
+  # which contains definitions like FOLDERID_Windows
+  # As these are also part of libuuid.a you'll get linker failures like:
+  # /usr/i686-w64-mingw32/sys-root/mingw/lib/libuuid.a(lib32_libuuid_a-uuid.o):(.rdata+0x0): multiple definition of `FOLDERID_Windows'
+  # win32/.libs/libgdk-win32.a(gdkdnd-win32.o):gdkdnd-win32.c:(.rdata+0x360): first defined here
+  #
+  # Workaround this for now until mingw-w64 upstream has come up
+  # with a statement whether this is expected behaviour and what
+  # component should be fixed exactly
+  #
+  # http://mingw-w64.svn.sourceforge.net/viewvc/mingw-w64?view=revision&revision=5589
+  patch -Np0 < '../gtk-dont-define-initguid.patch?id=82ccf489f4763e375805d848351ac3f8fda8e88b'
+
   autoreconf -if
 
   export CFLAGS='-O2 -pipe'
