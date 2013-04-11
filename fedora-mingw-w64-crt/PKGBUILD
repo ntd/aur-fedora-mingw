@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-crt
 pkgver=5716
-pkgrel=2
+pkgrel=3
 pkgdesc='MinGW-w64 CRT for Windows'
 arch=(any)
 url='http://mingw-w64.sourceforge.net'
