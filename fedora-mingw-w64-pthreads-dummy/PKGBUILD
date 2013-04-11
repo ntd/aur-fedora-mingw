@@ -1,0 +1,41 @@
+# Maintainer: Nicola Fontana <ntd@entidi.it>
+#
+# Provides placeholder headers for bootstrapping GCC without threads:
+# see ../README.md for details on the bootstrap process.
+
+pkgname=fedora-mingw-w64-pthreads-dummy
+pkgver=0.0.1
+pkgrel=1
+pkgdesc='MinGW-w64 pthreads library (dummy)'
+arch=(any)
+url='http://sourceware.org/pthreads-win32/'
+license=(LGPL)
+groups=(fedora-mingw)
+depends=()
+makedepends=()
+optdepends=()
+provides=(mingw-w64-pthreads)
+conflicts=(mingw-w64-winphtreads)
+replaces=(mingw-w64-winpthreads)
+options=(!strip !buildflags !libtool !emptydirs)
+source=("dummy.h")
+md5sums=('34fbcd18a28595ea3b942aa46d6a3a4d')
+
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
+
+build() {
+  :
+}
+
+package() {
+  local arch
+  local prefix
+
+  for arch in ${_architectures[@]}; do
+    prefix="$pkgdir/usr/$arch"
+    install -Dm 0644 "$srcdir/dummy.h" "$prefix/include/pthread_time.h"
+    install -Dm 0644 "$srcdir/dummy.h" "$prefix/include/pthread_unistd.h"
+  done
+}
+
+# vim:set ts=2 sw=2 et:
