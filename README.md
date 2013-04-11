@@ -51,5 +51,4 @@ The following dependencies have been compiled directly from AUR:
 mingw-w64-libpng
 mingw-w64-libxml2
 mingw-w64-pkg-config
-mingw-w64-tools
 mingw-w64-zlib
