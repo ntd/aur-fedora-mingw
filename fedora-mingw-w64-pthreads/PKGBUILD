@@ -15,8 +15,9 @@ groups=(fedora-mingw)
 depends=()
 makedepends=('fedora-mingw-w64-headers' 'mingw-w64-gcc'
              'mingw-w64-binutils' 'mingw-w64-crt')
-provides=(mingw-w64-pthreads)
-conflicts=(mingw-w64-pthreads mingw-w64-winphtreads)
+provides=(mingw-w64-pthreads mingw-w64-pthreads-dummy)
+conflicts=(mingw-w64-pthreads mingw-w64-pthreads-dummy)
+replaces=(mingw-w64-winpthreads)
 options=(!strip !buildflags !libtool)
 source=("http://pkgs.fedoraproject.org/repo/pkgs/mingw32-pthreads/pthreads-w32-$_prerelease_date.tar.bz2/30200c77d2042bdb479a1c8cf6a44471/pthreads-w32-$_prerelease_date.tar.bz2"
         "http://pkgs.fedoraproject.org/cgit/mingw-pthreads.git/plain/mingw32-pthreads-2.8.0-20110511-no-failing-tests.patch?id=5b9069c334ab34007650489869344ae6b73296db"

@@ -15,7 +15,7 @@ license=('GPL' 'LGPL' 'FDL' 'custom')
 groups=('fedora-mingw-bootstrap')
 depends=('zlib' 'libmpc' 'ppl' 'cloog'
          'mingw-w64-crt' 'mingw-w64-binutils')
-makedepends=('mingw-w64-headers' 'mingw-w64-gcc')
+makedepends=('mingw-w64-headers' 'mingw-w64-gcc' 'mingw-pthreads-dummy')
 optdepends=()
 provides=(mingw-w64-gcc)
 conflicts=(mingw-w64-gcc)

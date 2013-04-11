@@ -19,6 +19,13 @@ function found() {
 }
 
 pkgs=(	fedora-mingw-w64-binutils
+	fedora-mingw-w64-headers
+	fedora-mingw-w64-pthreads-dummy
+	fedora-mingw-w64-gcc-bootstrap
+	fedora-mingw-w64-crt
+	fedora-mingw-w64-gcc-nogomp
+	fedora-mingw-w64-pthreads
+	fedora-mingw-w64-gcc
 	fedora-mingw-w64-bzip2
 	fedora-mingw-w64-termcap
 	fedora-mingw-w64-expat
