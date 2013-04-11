@@ -1,19 +1,22 @@
-Collection of PKGBUILDs for building a mingw-64 toolchain for archlinux. Think
-of it as an extension to AUR.
+Collection of PKGBUILDs for cross-building GTK+2 and GTK+3 applications on
+ArchLinux using a mingw-w64 system. Think of it as a spur of AUR.
 
 Motivation
 ==========
 
-I badly needed a MinGW environment to cross compile my GTK+3 applications for
+I badly needed a MinGW environment for cross-compiling my GTK+ applications for
 win32 and win64, but the PKGBUILDs provided by [AUR](http://aur.archlinux.org/)
 were a mess, that is the toolchain was not working out of the box and required
 a lot of work to be put on the road (it is clear nobody was using it).
 Submitting patches and waiting they were accepted is too slow and time
-consuming, so I decided to build my own PKGBUILDs basing the scripts on the
-[Fedora MinGW](http://pkgs.fedoraproject.org/cgit/) as it seems the best
-maintained toolchain available out there.
+consuming, so I decided to develop my own PKGBUILDs basing the code on the
+[Fedora MinGW](http://pkgs.fedoraproject.org/cgit/) environment, as it seems
+the best maintained toolchain available. As far as I know, the cross-compiler
+by [OpenSUSE](http://build.opensuse.org/project/show?project=windows:mingw) is
+also based on the Fedora one.
 
-I am trying to keep them in sync with Fedora.
+I am trying to keep these packages  in sync with Fedora and, although not
+mapped exactly 1:1 (I dropped some feature I do not use) they are quite close.
 
 Bootstrapping GCC
 =================
