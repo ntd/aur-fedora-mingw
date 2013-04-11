@@ -35,6 +35,7 @@ build() {
   if [[ -d "$svndir/.svn" ]]; then
     cd "$_svnmod"
     svn up -r "$pkgver"
+    svn revert -R .
   else
     cd "$srcdir"
     svn co "$_svntrunk" --config-dir ./ -r "$pkgver" "$_svnmod" && cd "$_svnmod"
