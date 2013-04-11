@@ -63,6 +63,8 @@ package() {
     cd "$srcdir/headers-$arch"
     make DESTDIR="$pkgdir" install
 
+    # Drop the dummy pthread headers, eventually installed by the
+    # fedora-mingw-pthreads-dummy package
     rm -f "$prefix/include/pthread_time.h" \
           "$prefix/include/pthread_unistd.h"
   done
