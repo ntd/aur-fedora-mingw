@@ -8,16 +8,17 @@
 pkgname=fedora-mingw-w64-gcc-nogomp
 pkgver=4.8.0
 pkgrel=1
-pkgdesc="Cross GCC for the MinGW-w64 cross-compiler"
+pkgdesc="Cross GCC for the MinGW-w64 cross-compiler (no libgomp support)"
 arch=('i686' 'x86_64')
 url="http://gcc.gnu.org"
 license=('GPL' 'LGPL' 'FDL' 'custom')
 groups=('fedora-mingw-bootstrap')
-depends=('zlib' 'libmpc' 'ppl' 'cloog' 'fedora-mingw-w64-crt' 'mingw-w64-binutils')
-makedepends=('fedora-mingw-w64-headers-bootstrap' 'fedora-mingw-w64-gcc-bootstrap')
+depends=('zlib' 'libmpc' 'ppl' 'cloog'
+         'mingw-w64-crt' 'mingw-w64-binutils')
+makedepends=('mingw-w64-headers' 'mingw-w64-gcc')
 optdepends=()
 provides=(mingw-w64-gcc)
-conflicts=(mingw-w64-gcc fedora-mingw-w64-gcc fedora-mingw-w64-gcc-bootstrap)
+conflicts=(mingw-w64-gcc)
 replaces=()
 backup=()
 options=(!strip !buildflags !libtool !emptydirs)
