@@ -14,7 +14,7 @@ groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-fontconfig fedora-mingw-w64-freetype
          mingw-w64-libxml2 fedora-mingw-w64-pixman mingw-w64-libpng
          fedora-mingw-w64-win-iconv mingw-w64-zlib fedora-mingw-w64-glib2)
-makedepends=('mingw-w64-gcc>=4.7.0' mingw-w64-tools mingw-w64-pkg-config
+makedepends=(mingw-w64-gcc mingw-w64-tools mingw-w64-pkg-config
              autoconf automake libtool gtk-doc)
 provides=("mingw-w64-cairo=$pkgver")
 conflicts=(mingw-w64-cairo)

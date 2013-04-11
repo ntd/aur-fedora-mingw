@@ -12,7 +12,7 @@ url='http://www.gnu.org/software/gettext/'
 license=(GPL)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-win-iconv fedora-mingw-w64-termcap)
-makedepends=('mingw-w64-gcc>=4.7.0' autoconf automake libtool)
+makedepends=(mingw-w64-gcc autoconf automake libtool)
 provides=("mingw-w64-gettext=$pkgver")
 conflicts=(mingw-w64-gettext)
 options=(!strip !buildflags !libtool)

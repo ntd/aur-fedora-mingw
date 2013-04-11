@@ -12,7 +12,7 @@ url='http://expat.sourceforge.net/'
 license=(custom)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt)
-makedepends=('mingw-w64-gcc>=4.7.0')
+makedepends=(mingw-w64-gcc)
 provides=("mingw-w64-expat=$pkgver")
 conflicts=(mingw-w64-expat)
 options=(!strip !buildflags !libtool)

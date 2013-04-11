@@ -14,7 +14,7 @@ license=(custom)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt)
 # pkg-config is not used because of --disable-gtk but is checked anyway
-makedepends=('mingw-w64-gcc>=4.7.0' mingw-w64-pkg-config)
+makedepends=(mingw-w64-gcc mingw-w64-pkg-config)
 provides=("mingw-w64-pixman=$pkgver")
 conflicts=(mingw-w64-pixman)
 options=(!strip !buildflags !libtool)

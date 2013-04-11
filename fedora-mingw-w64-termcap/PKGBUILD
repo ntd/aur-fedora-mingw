@@ -19,7 +19,7 @@ url='ftp://ftp.gnu.org/gnu/termcap/'
 license=(GPL)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt)
-makedepends=('mingw-w64-gcc>=4.7.0' autoconf)
+makedepends=(mingw-w64-gcc autoconf)
 provides=("mingw-w64-termcap=$pkgver")
 conflicts=(mingw-w64-termcap)
 options=(!strip !buildflags !libtool)

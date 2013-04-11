@@ -12,7 +12,7 @@ url='http://www.gtk.org/'
 license=(LGPL)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-win-iconv fedora-mingw-w64-gettext fedora-mingw-w64-glib2)
-makedepends=('mingw-w64-gcc>=4.7.0' mingw-w64-pkg-config
+makedepends=(mingw-w64-gcc mingw-w64-pkg-config
              autoconf automake libtool gtk-doc gobject-introspection)
 provides=("mingw-w64-atk=$pkgver")
 conflicts=(mingw-w64-atk)

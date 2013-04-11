@@ -17,7 +17,7 @@ license=(LGPL)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-glib2 fedora-mingw-w64-freetype
          mingw-w64-libjpeg mingw-w64-libpng)
-makedepends=('mingw-w64-gcc>=4.7.0' mingw-w64-tools mingw-w64-pkg-config
+makedepends=(mingw-w64-gcc mingw-w64-tools mingw-w64-pkg-config
              autoconf automake libtool)
 provides=("mingw-w64-gdk-pixbuf2=$pkgver")
 conflicts=(mingw-w64-gdk-pixbuf2)

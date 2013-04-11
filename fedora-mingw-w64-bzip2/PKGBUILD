@@ -12,7 +12,7 @@ url='http://www.bzip.org/'
 license=(custom)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt)
-makedepends=('mingw-w64-gcc>=4.7.0' autoconf automake libtool)
+makedepends=(mingw-w64-gcc autoconf automake libtool)
 provides=("mingw-w64-bzip2=$pkgver")
 conflicts=(mingw-w64-bzip2)
 options=(!strip !buildflags !libtool)

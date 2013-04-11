@@ -12,7 +12,7 @@ url='http://sourceware.org/libffi/'
 license=(MIT)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt)
-makedepends=('mingw-w64-gcc>=4.7.0')
+makedepends=(mingw-w64-gcc)
 provides=("mingw-w64-libffi=$pkgver")
 conflicts=(mingw-w64-libffi)
 options=(!strip !buildflags !libtool)

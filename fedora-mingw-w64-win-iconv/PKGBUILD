@@ -12,7 +12,7 @@ url='http://code.google.com/p/win-iconv/'
 license=(BSD)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt)
-makedepends=('mingw-w64-gcc>=4.7.0' 'cmake>=2.8.0')
+makedepends=(mingw-w64-gcc 'cmake>=2.8.0')
 provides=("mingw-w64-win-iconv=$pkgver")
 conflicts=(mingw-w64-win-iconv mingw-w64-libiconv)
 options=(!strip !buildflags !libtool)
