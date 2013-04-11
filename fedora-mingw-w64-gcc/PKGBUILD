@@ -1,0 +1,95 @@
+# Maintainer: Nicola Fontana <ntd@entidi.it>
+#
+# Port of the Fedora package found at
+# http://pkgs.fedoraproject.org/cgit/mingw-gcc.git/
+
+pkgname=fedora-mingw-w64-gcc
+pkgver=4.8.0
+pkgrel=1
+pkgdesc="Cross GCC for the MinGW-w64 cross-compiler"
+arch=('i686' 'x86_64')
+url="http://gcc.gnu.org"
+license=('GPL' 'LGPL' 'FDL' 'custom')
+groups=('fedora-mingw-bootstrap')
+depends=('zlib' 'libmpc' 'ppl' 'cloog'
+         'mingw-w64-crt' 'mingw-w64-binutils' 'mingw-w64-pthreads')
+makedepends=('mingw-w64-headers' 'mingw-w64-gcc')
+optdepends=()
+provides=(mingw-w64-gcc)
+conflicts=(mingw-w64-gcc)
+replaces=()
+backup=()
+options=(!strip !buildflags !libtool !emptydirs)
+source=("ftp://gcc.gnu.org/pub/gcc/releases/gcc-$pkgver/gcc-$pkgver.tar.bz2"
+        "http://pkgs.fedoraproject.org/cgit/mingw-gcc.git/plain/gcc-make-xmmintrin-header-cplusplus-compatible.patch?id=5709487acf56a911438bf85c280091369d1c21f4")
+md5sums=('e6040024eb9e761c3bea348d1fa5abb0'
+         'da6c9ba6baebe1286f3219d4181cdbb8')
+
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
+
+build() {
+  local tardir="$srcdir/gcc-$pkgver"
+  local builddir
+  local arch
+
+  echo 'Fedora-archlinux MinGW $pkgver-$pkgrel' > $tardir/gcc/DEV-PHASE
+
+  # Apply patches from fedora repository
+  cd "$tardir"
+  # The file xmmintrin.h doesn't contain an extern "C" part
+  # This conflicts with mingw-w64 intrin.h and results in build
+  # failure like this one in mingw-qt5-qtbase:
+  # /usr/lib/gcc/i686-w64-mingw32/4.8.0/include/xmmintrin.h:997:1: error: previous declaration of 'int _m_pextrw(__m64, int)' with 'C++' linkage
+  # /usr/i686-w64-mingw32/sys-root/mingw/include/intrin.h:561:28: error: conflicts with new declaration with 'C' linkage
+  # http://gcc.gnu.org/bugzilla/show_bug.cgi?id=56038
+  patch -Np0 < '../gcc-make-xmmintrin-header-cplusplus-compatible.patch?id=5709487acf56a911438bf85c280091369d1c21f4'
+
+  # using -pipe causes spurious test-suite failures
+  # http://gcc.gnu.org/bugzilla/show_bug.cgi?id=48565
+  export CFLAGS='-O2'
+  export CXXFLAGS="$CFLAGS"
+  unset  LDFLAGS
+
+  for arch in ${_architectures[@]}; do
+    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    mkdir -p "$builddir"
+    cd "$builddir"
+    $tardir/configure \
+        --prefix=/usr \
+        --with-gxx-include-dir=/usr/$arch/include/c++ \
+        --target=$arch \
+        --enable-lto \
+        --enable-libgomp \
+        --with-gnu-as \
+        --with-gnu-ld \
+        --without-newlib \
+        --disable-multilib \
+        --disable-plugin \
+        --with-system-zlib \
+        --disable-nls \
+        --without-included-gettext \
+        --disable-win32-registry \
+        --enable-languages="c,c++" \
+        --with-bugurl=http://bugzilla.redhat.com/bugzilla
+    make all
+  done
+}
+
+package() {
+  local arch
+
+  for arch in ${_architectures[@]}; do
+    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    make DESTDIR="$pkgdir" install
+  done
+
+  find "$pkgdir" -name '*.dll' -exec $arch-strip -xg {} +
+  find "$pkgdir" -name '*.a' -exec $arch-strip -g {} +
+  strip "$pkgdir"/usr/bin/*
+  rm -fr "$pkgdir/usr/share"
+
+  # These files conflict with existing installed files.
+  rm -f "$pkgdir"/usr/lib/libiberty*
+}
+
+# vim:set ts=2 sw=2 et:
