@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-binutils
 pkgver=2.23.52.0.1
-pkgrel=1
+pkgrel=2
 pkgdesc='A set of programs to assemble and manipulate binary and object files (mingw-w64)'
 arch=(any)
 url='http://www.gnu.org/software/binutils/'
@@ -38,6 +38,11 @@ build() {
   # Fix compatibility with latest texinfo
   # Patch taken from the Fedora binutils package
   patch -Np0 < '../binutils-2.23.52.0.1-as-doc-texinfo-fixes.patch?id=8ce795d81dcaac71998a10cf292728de746871c9'
+
+  export CFLAGS='-O2 -pipe'
+  export CXXFLAGS="$CFLAGS"
+  unset  LDFLAGS
+  unset  CPPFLAGS
 
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
