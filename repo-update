@@ -15,7 +15,7 @@ EOT
 
 [ -z "$2" ] && usage && exit 1
 
-# Any suitable repository is valid
+# Any suitable format is valid
 repository="$1"
 repository="${repository%.db}"
 repository="${repository%.files}"
@@ -29,9 +29,11 @@ pkgs=()
 for file in $@; do
 	files+=("$file")
 	file="$(basename $file)"
+	# Strip version and extension and keep only the package name
 	pkgs+=("${file%-*-*-*.pkg.tar.xz}")
 done
 
+# Update tha main repository
 repo="$repository.db.tar.xz"
 if [ -w "$repo" ]; then
     echo "repo-update => updating $repo"
@@ -43,6 +45,7 @@ if [ -w "$repo" ]; then
     fi
 fi
 
+# Update the files repository
 repo="$repository.files.tar.xz"
 if [ -w "$repo" ]; then
     echo "Updating $repo ... "
