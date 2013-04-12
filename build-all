@@ -30,7 +30,7 @@ pkgs=(	fedora-mingw-w64-binutils
 	fedora-mingw-w64-pthreads
 	fedora-mingw-w64-gcc
 	mingw-w64-pkg-config
-	mingw-w64-zlib
+	fedora-mingw-w64-zlib
 	fedora-mingw-w64-bzip2
 	fedora-mingw-w64-termcap
 	fedora-mingw-w64-expat
