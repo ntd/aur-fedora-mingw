@@ -37,7 +37,7 @@ pkgs=(	fedora-mingw-w64-binutils
 	mingw-w64-libxml2
 	fedora-mingw-w64-win-iconv
 	fedora-mingw-w64-gettext
-	mingw-w64-libpng
+	fedora-mingw-w64-libpng
 	fedora-mingw-w64-libjpeg-turbo
 	fedora-mingw-w64-libffi
 	fedora-mingw-w64-tools

@@ -1,0 +1,63 @@
+# Maintainer: Nicola Fontana <ntd@entidi.it>
+#
+# Port of the Fedora package found at
+# http://pkgs.fedoraproject.org/cgit/mingw-libpng.git/
+
+pkgname=fedora-mingw-w64-libpng
+pkgver=1.5.13
+pkgrel=1
+pkgdesc='A collection of routines used to create PNG format graphics (mingw-w64)'
+arch=(any)
+url='http://www.libpng.org/pub/png/libpng.html'
+license=(custom)
+groups=(fedora-mingw)
+depends=(mingw-w64-crt mingw-w64-zlib)
+makedepends=(mingw-w64-gcc)
+provides=("mingw-w64-libpng=$pkgver")
+conflicts=(mingw-w64-libpng)
+replaces=()
+options=(!strip !buildflags !libtool)
+source=("http://downloads.sourceforge.net/sourceforge/libpng/libpng-$pkgver.tar.xz")
+md5sums=('0b607a685da977f1bfc96e1c47055183')
+
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
+
+build() {
+  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
+  local builddir
+  local arch
+
+  export CFLAGS='-O2 -pipe'
+  export CXXFLAGS="$CFLAGS"
+  unset  LDFLAGS
+  unset  CPPFLAGS
+
+  for arch in ${_architectures[@]}; do
+    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    mkdir -p "$builddir"
+    cd "$builddir"
+    "$tardir/configure" \
+      --prefix="/usr/$arch" \
+      --host="$arch"
+    make
+  done
+}
+
+package() {
+  local arch
+  local prefix
+
+  for arch in ${_architectures[@]}; do
+    prefix="$pkgdir/usr/$arch"
+
+    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    make DESTDIR="$pkgdir" install
+
+    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+    rm -fr "$prefix/share"
+  done
+}
+
+# vim:set ts=2 sw=2 et:
