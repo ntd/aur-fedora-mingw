@@ -1,0 +1,97 @@
+# Maintainer: Nicola Fontana <ntd@entidi.it>
+#
+# Port of the Fedora package found at
+# http://pkgs.fedoraproject.org/cgit/mingw-libxml2.git/
+
+pkgname=fedora-mingw-w64-libxml2
+pkgver=2.9.0
+pkgrel=1
+pkgdesc='XML parsing library, version 2 (mingw-w64)'
+arch=(any)
+url='http://www.xmlsoft.org/'
+license=(MIT)
+groups=(fedora-mingw)
+depends=(mingw-w64-crt mingw-w64-zlib)
+makedepends=(mingw-w64-gcc mingw-w64-gettext)
+provides=("mingw-w64-libxml2=$pkgver")
+conflicts=(mingw-w64-libxml2)
+replaces=()
+options=(!strip !buildflags !libtool)
+source=("ftp://xmlsoft.org/libxml/libxml2-$pkgver.tar.gz"
+        "http://pkgs.fedoraproject.org/cgit/mingw-libxml2.git/plain/mingw32-libxml2-static-build-compile-fix.patch?id=b2ef773d9a92f507605e3fa6bb52c91a0119d16c")
+md5sums=('5b9bebf4f5d2200ae2c4efe8fa6103f7'
+         '0df377025082cd93cccbca547f048011')
+
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
+
+build() {
+  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
+  local builddir
+  local arch
+
+  # Apply patches from fedora repository
+  cd "$tardir"
+  patch -Np0 < '../mingw32-libxml2-static-build-compile-fix.patch?id=b2ef773d9a92f507605e3fa6bb52c91a0119d16c'
+
+  export CFLAGS='-O2 -pipe'
+  export CXXFLAGS="$CFLAGS"
+  unset  LDFLAGS
+  export CPPFLAGS='-DLIBXML_STATIC_FOR_DLL'
+
+  for arch in ${_architectures[@]}; do
+    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+
+    # LibXML2 can't build static and shared libraries in one go, so we
+    # build LibXML2 twice here
+
+    mkdir -p "$builddir-static"
+    cd "$builddir-static"
+    "$tardir/configure" \
+      --prefix="/usr/$arch" \
+      --build="$CHOST" \
+      --host="$arch" \
+      --without-python \
+      --with-modules \
+      --enable-static \
+      --disable-shared \
+      --with-threads=win32
+    make
+
+    mkdir -p "$builddir-shared"
+    cd "$builddir-shared"
+    "$tardir/configure" \
+      --prefix="/usr/$arch" \
+      --build="$CHOST" \
+      --host="$arch" \
+      --without-python \
+      --with-modules \
+      --disable-static \
+      --enable-shared \
+      --with-threads=win32
+    make
+  done
+}
+
+package() {
+  local arch
+  local prefix
+  local builddir
+
+  for arch in ${_architectures[@]}; do
+    prefix="$pkgdir/usr/$arch"
+    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+
+    # First install all the files belonging to the shared build
+    cd "$builddir-shared"
+    make DESTDIR="$pkgdir" install
+
+    # Then manually install the static library
+    install -t "$prefix/lib" "$builddir-static/.libs/libxml2.a"
+
+    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.a'   -exec $arch-strip -g {} +
+    rm -fr "$prefix/share"
+  done
+}
+
+# vim:set ts=2 sw=2 et:
