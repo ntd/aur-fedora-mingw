@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-fontconfig
 pkgver=2.10.91
-pkgrel=4
+pkgrel=5
 pkgdesc='A library for configuring and customizing font access (mingw-w64)'
 arch=(any)
 url='http://fontconfig.org/'
