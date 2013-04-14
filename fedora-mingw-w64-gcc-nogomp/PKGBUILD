@@ -13,7 +13,7 @@ arch=('i686' 'x86_64')
 url="http://gcc.gnu.org"
 license=('GPL' 'LGPL' 'FDL' 'custom')
 groups=('fedora-mingw-bootstrap')
-depends=('zlib' 'libmpc' 'ppl' 'cloog'
+depends=('zlib' 'libmpc' 'cloog'
          'mingw-w64-crt' 'mingw-w64-binutils')
 makedepends=('mingw-w64-headers' 'mingw-w64-gcc')
 optdepends=()
