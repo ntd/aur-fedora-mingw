@@ -39,8 +39,8 @@ Here is the proper order for bootstraping a new version of GCC from scratch:
 4. Build and install fedora-mingw-w64-crt.
 5. Build and install fedora-mingw-w64-gcc-nogomp: this in turn will uninstall
    fedora-mingw-w64-gcc-bootstrap. This is a final GCC package compiled
-   without libgomp support because it would require fedora-mingw-w64-pthreads,
-   still not buildable at this point.
+   without libgomp (shared memory parallelism support) because it would
+   have required fedora-mingw-w64-pthreads, not yet available.
 
 At this point you should be able to rebuild every MinGW package with the new
 compiler. After building and installing fedora-mingw-w64-pthreads you can
