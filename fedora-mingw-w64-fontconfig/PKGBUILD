@@ -5,16 +5,17 @@
 
 pkgname=fedora-mingw-w64-fontconfig
 pkgver=2.10.91
-pkgrel=5
+pkgrel=6
 pkgdesc='A library for configuring and customizing font access (mingw-w64)'
 arch=(any)
 url='http://fontconfig.org/'
 license=(custom)
 groups=(fedora-mingw)
-depends=(mingw-w64-crt fedora-mingw-w64-expat fedora-mingw-w64-freetype fedora-mingw-w64-win-iconv mingw-w64-libxml2)
+depends=(mingw-w64-crt mingw-w64-expat mingw-w64-freetype mingw-w64-win-iconv)
 makedepends=(mingw-w64-gcc mingw-w64-pkg-config)
 provides=("mingw-w64-fontconfig=$pkgver")
 conflicts=(mingw-w64-fontconfig)
+replaces=()
 options=(!strip !buildflags !libtool)
 source=("http://www.fontconfig.org/release/fontconfig-$pkgver.tar.bz2")
 md5sums=('c795bb39fab3a656e5dff8bad6a199f6')
@@ -35,13 +36,11 @@ build() {
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    # Setting cache-dir to a known directory helps to remove it later.
-    # No idea why other build systems do not consider this issue.
     "$tardir/configure" \
       --prefix="/usr/$arch" \
+      --build="$CHOST" \
       --host="$arch" \
       --with-arch="${arch%%-*}" \
-      --with-cache-dir="/tmp" \
       --disable-docs
     make
   done
@@ -65,7 +64,9 @@ package() {
     rm -fr "$prefix/share/man"
   done
 
-  rm -fr "$pkgdir/tmp"
+  # The eventual cache dir does not inficiate the final package,
+  # so leaving it untouched for debugging purposes.
+  #rm -fr "$pkgdir/../${pkgname}WINDOWSTEMPDIR_FONTCONFIG_CACHE"
 }
 
 # vim:set ts=2 sw=2 et:
