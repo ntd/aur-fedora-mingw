@@ -5,16 +5,17 @@
 
 pkgname=fedora-mingw-w64-freetype
 pkgver=2.4.11
-pkgrel=4
+pkgrel=5
 pkgdesc='TrueType font rendering library (mingw-w64)'
 arch=(any)
 url='http://freetype.sourceforge.net/'
 license=(GPL)
 groups=(fedora-mingw)
-depends=(mingw-w64-crt mingw-w64-zlib fedora-mingw-w64-bzip2)
+depends=(mingw-w64-crt mingw-w64-zlib mingw-w64-bzip2)
 makedepends=(mingw-w64-gcc)
-provides=("mingw-w64-freetype2=$pkgver")
-conflicts=(mingw-w64-freetype2)
+provides=("mingw-w64-freetype=$pkgver")
+conflicts=(mingw-w64-freetype)
+replaces=()
 options=(!strip !buildflags !libtool)
 source=("http://downloads.sourceforge.net/sourceforge/freetype/freetype-$pkgver.tar.bz2"
         "http://pkgs.fedoraproject.org/cgit/mingw-freetype.git/plain/freetype-2.3.0-enable-spr.patch?h=f18"
@@ -49,6 +50,7 @@ build() {
     cd "$builddir"
     "$tardir/configure" \
       --prefix="/usr/$arch" \
+      --build="$CHOST" \
       --host="$arch" \
       --enable-static \
       --enable-shared
