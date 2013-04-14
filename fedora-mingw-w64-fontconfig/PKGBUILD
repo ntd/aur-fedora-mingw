@@ -64,7 +64,7 @@ package() {
     rm -fr "$prefix/share/man"
   done
 
-  # The eventual cache dir does not inficiate the final package,
+  # The eventual cache dir does not invalidate the final package,
   # so leaving it untouched for debugging purposes.
   #rm -fr "$pkgdir/../${pkgname}WINDOWSTEMPDIR_FONTCONFIG_CACHE"
 }
