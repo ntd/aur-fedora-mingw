@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-crt.git/
 
 pkgname=fedora-mingw-w64-crt
-pkgver=5822
+pkgver=5849
 pkgrel=1
 pkgdesc='MinGW-w64 CRT for Windows'
 arch=(any)
@@ -20,8 +20,8 @@ conflicts=()
 replaces=(mingw-w64-crt)
 backup=()
 options=(!strip !buildflags !libtool)
-source=("http://pkgs.fedoraproject.org/cgit/mingw-crt.git/plain/mingw-w64-crt-add-vsprintf_s-wrapper.patch?id=489cd6256f5067ff7f66b78940a79d35bc0134ef")
-md5sums=('6b28db9711921b1ffd3fccc057dd8875')
+source=()
+md5sums=()
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 _svnmod='mingw-w64'
@@ -42,10 +42,6 @@ build() {
   fi
 
   msg "SVN checkout done or server timeout"
-
-  # Apply patches from fedora repository
-  cd "$svndir/mingw-w64-crt"
-  patch -Np1 < '../../mingw-w64-crt-add-vsprintf_s-wrapper.patch?id=489cd6256f5067ff7f66b78940a79d35bc0134ef'
 
   autoreconf -if
 
