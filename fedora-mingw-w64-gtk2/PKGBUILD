@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/
 
 pkgname=fedora-mingw-w64-gtk2
-pkgver=2.24.17
-pkgrel=3
+pkgver=2.24.18
+pkgrel=1
 pkgdesc='GTK+2 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -29,7 +29,7 @@ source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.t
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/window-dragging.patch?id=95be474adc76e60caa692330cf2706b90848146f"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/gtk-dont-define-initguid.patch?id=3224e445dad240da5f5ebfe371e8c9f627459089"
         "gtk.immodules")
-md5sums=('a10cc43fad8d64f8893d779b1f8322ff'
+md5sums=('4309379acdcd8abfb72ea89bce3e7746'
          '44ca5d1ce91f5364182c6ea2614c7688'
          '396835720e308acaa0372e5a45c463d4'
          '8231dd2b7484574968d5faa57262af2a'
