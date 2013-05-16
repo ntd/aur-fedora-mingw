@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/
 
 pkgname=fedora-mingw-w64-gtk3
-pkgver=3.8.0
-pkgrel=3
+pkgver=3.9.0
+pkgrel=1
 pkgdesc='GTK+3 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -23,10 +23,12 @@ options=(!strip !buildflags !libtool)
 source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/0003-Don-t-use-AC_CANONICAL_TARGET.patch?id=b63e31724f2786202a38f8b7fb8539b009f4e621"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk-dont-define-initguid.patch?id=82ccf489f4763e375805d848351ac3f8fda8e88b"
+        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/commit-914099dc.patch?id=3fa3354330e47e5b9de898579c010ffd00f9de2f"
         "gtk.immodules")
-md5sums=('ee8042469449c2bc702dbd9fa690f405'
+md5sums=('23310b5a9d1489f40ee688c5a0ea67d0'
          '77b0525b67057fa6afaf5405d80509ae'
          '4038939df90f80ea6923d67afff28e03'
+         '7fb133de82f410ca48aae51ca57dcdba'
          '9655591f6ed7b9371dc7c15f8237d383')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
@@ -52,6 +54,8 @@ build() {
   #
   # http://mingw-w64.svn.sourceforge.net/viewvc/mingw-w64?view=revision&revision=5589
   patch -Np0 < '../gtk-dont-define-initguid.patch?id=82ccf489f4763e375805d848351ac3f8fda8e88b'
+  # https://bugzilla.gnome.org/show_bug.cgi?id=699690
+  patch -Np1 < '../commit-914099dc.patch?id=3fa3354330e47e5b9de898579c010ffd00f9de2f'
 
   autoreconf -if
 
@@ -66,6 +70,7 @@ build() {
     cd "$builddir"
     "$tardir/configure" \
       --prefix="/usr/$arch" \
+      --build="$CHOST" \
       --host="$arch" \
       --enable-gtk2-dependency \
       --disable-cups
