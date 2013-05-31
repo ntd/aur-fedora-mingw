@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-crt.git/
 
 pkgname=fedora-mingw-w64-crt
-pkgver=5868
+pkgver=5876
 pkgrel=1
 pkgdesc='MinGW-w64 CRT for Windows'
 arch=(any)
