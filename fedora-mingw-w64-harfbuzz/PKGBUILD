@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-harfbuzz.git/
 
 pkgname=fedora-mingw-w64-harfbuzz
-pkgver=0.9.16
+pkgver=0.9.18
 pkgrel=1
 pkgdesc='OpenType text shaping engine (mingw-w64)'
 arch=(any)
@@ -13,16 +13,12 @@ license=(MIT)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-glib2 fedora-mingw-w64-freetype
          fedora-mingw-w64-cairo mingw-w64-icu)
-makedepends=(mingw-w64-gcc mingw-w64-pkg-config autoconf automake libtool)
+makedepends=(mingw-w64-gcc mingw-w64-pkg-config)
 provides=("mingw-w64-harfbuzz=$pkgver")
 conflicts=(mingw-w64-harfbuzz)
 options=(!strip !buildflags !libtool)
-source=("http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-$pkgver.tar.bz2"
-        "http://pkgs.fedoraproject.org/cgit/mingw-harfbuzz.git/plain/GetProcAddress_Script_OpenType.diff?id=00afde08e2825864ad3c5a27c0b2783a3ec27cc0"
-        "http://pkgs.fedoraproject.org/cgit/mingw-harfbuzz.git/plain/harfbuzz-0.9.9-fix-build-failure.patch?id=00afde08e2825864ad3c5a27c0b2783a3ec27cc0")
-md5sums=('90855e670c790c1fec4592908be3c0b8'
-         'dc3c8db194835ad113d2994a76b17edb'
-         '39a89824f77cc7979b4025379b38aae4')
+source=("http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-$pkgver.tar.bz2")
+md5sums=('0bff05fafef4894031b2b64a65ac1899')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -30,16 +26,6 @@ build() {
   local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
   local builddir
   local arch
-
-  # Apply patches from fedora repository
-  cd "$tardir"
-  patch -Np1 < '../GetProcAddress_Script_OpenType.diff?id=00afde08e2825864ad3c5a27c0b2783a3ec27cc0'
-  patch -Np1 < '../harfbuzz-0.9.9-fix-build-failure.patch?id=00afde08e2825864ad3c5a27c0b2783a3ec27cc0'
-
-  # The libtool bundled with the tarball is too old for win64 support
-  cd "$tardir"
-  autoreconf -if
-  libtoolize -cf
 
   export CFLAGS='-O2 -pipe'
   export CXXFLAGS="$CFLAGS"
