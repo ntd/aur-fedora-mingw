@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-gettext
 pkgver=0.18.2.1
-pkgrel=1
+pkgrel=2
 pkgdesc='GNU internationalization library (mingw-w64)'
 arch=(any)
 url='http://www.gnu.org/software/gettext/'
@@ -16,8 +16,10 @@ makedepends=(mingw-w64-gcc autoconf automake libtool)
 provides=("mingw-w64-gettext=$pkgver")
 conflicts=(mingw-w64-gettext)
 options=(!strip !buildflags !libtool)
-source=("http://ftp.gnu.org/pub/gnu/gettext/gettext-$pkgver.tar.gz")
-md5sums=('034c8103b14654ebd300fadac44d6f14')
+source=("http://ftp.gnu.org/pub/gnu/gettext/gettext-$pkgver.tar.gz"
+        "http://pkgs.fedoraproject.org/cgit/mingw-gettext.git/plain/gettext-use-proper-cdecl.patch?id=0b8425c75237694e263a7f0aac31670db8e10d36")
+md5sums=('034c8103b14654ebd300fadac44d6f14'
+         '066ac93fc528fc00327d604b8a0a9942')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -25,6 +27,11 @@ build() {
   local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
   local builddir
   local arch
+
+  # Apply patches from fedora repository
+  cd "$tardir"
+  # Fix FTBFS due to invalid use of cdecl (__cdecl should be used instead)
+  patch -Np0 < '../gettext-use-proper-cdecl.patch?id=0b8425c75237694e263a7f0aac31670db8e10d36'
 
   export CFLAGS='-O2 -pipe'
   export CXXFLAGS="$CFLAGS"
