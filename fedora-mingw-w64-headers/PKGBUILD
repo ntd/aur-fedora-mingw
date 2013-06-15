@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-headers.git/
 
 pkgname=fedora-mingw-w64-headers
-pkgver=5876
+pkgver=5904
 pkgrel=1
 pkgdesc='MinGW-w64 headers for Windows'
 arch=(any)
@@ -24,7 +24,7 @@ md5sums=()
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 _svnmod='mingw-w64'
-_svntrunk='http://mingw-w64.svn.sourceforge.net/svnroot/mingw-w64/trunk'
+_svntrunk='svn://svn.code.sf.net/p/mingw-w64/code/trunk'
 
 build() {
   local svndir="$srcdir/$_svnmod"
