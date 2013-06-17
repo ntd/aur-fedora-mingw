@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-icu.git/
 
 pkgname=fedora-mingw-w64-icu
-pkgver=49.1.2
-pkgrel=5
+pkgver=50.1.2
+pkgrel=1
 pkgdesc='International Components for Unicode library (mingw-w64)'
 arch=(any)
 url='http://www.icu-project.org/'
@@ -19,11 +19,11 @@ provides=("mingw-w64-icu=$pkgver")
 conflicts=(mingw-w64-icu)
 options=(!strip !buildflags !libtool)
 source=("http://download.icu-project.org/files/icu4c/$pkgver/icu4c-${pkgver//./_}-src.tgz"
-        "http://pkgs.fedoraproject.org/cgit/mingw-icu.git/plain/icu4c-4_6_1-crossbuild.patch?id=b942c392347ba1b68c4aa0603a774cecf5035915"
+        "http://pkgs.fedoraproject.org/cgit/mingw-icu.git/plain/icu4c-4_6_1-crossbuild.patch?id=f7a0fef35cf370c8c0add164e72499f05817cc79"
         "http://pkgs.fedoraproject.org/cgit/mingw-icu.git/plain/icu4c-4_6_1-use-correct-genccode-assembly-on-win32-and-win64.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-icu.git/plain/icu4c-4_6_1-mingw-w64-mkdir-compatibility.patch?id=b942c392347ba1b68c4aa0603a774cecf5035915")
-md5sums=('bbc609fe5237202d7abf016141012a45'
-         '8e6e8e7c5ab08c5e7f028406e94055f6'
+md5sums=('beb98aa972219c9fcd9c8a71314943c9'
+         '91358645bc0a6b4d2b502f43cb7293f4'
          'c480877485438a1f677ca23f7d915692'
          'c1194c6ac4bc02bd46f127a457ab4e93')
 
@@ -36,7 +36,7 @@ build() {
 
   # Apply patches from fedora repository
   cd "$tardir"
-  patch -Np1 < '../icu4c-4_6_1-crossbuild.patch?id=b942c392347ba1b68c4aa0603a774cecf5035915'
+  patch -Np1 < '../icu4c-4_6_1-crossbuild.patch?id=f7a0fef35cf370c8c0add164e72499f05817cc79'
   patch -Np1 < '../icu4c-4_6_1-use-correct-genccode-assembly-on-win32-and-win64.patch?h=f18'
   patch -Np1 < '../icu4c-4_6_1-mingw-w64-mkdir-compatibility.patch?id=b942c392347ba1b68c4aa0603a774cecf5035915'
 
@@ -74,6 +74,9 @@ build() {
 package() {
   local arch
   local prefix
+  local api
+
+  api=${pkgver%%.*}
 
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
@@ -81,13 +84,13 @@ package() {
     cd "$srcdir/$pkgname-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
 
-    sed -i -e 's,default_ENABLE_RPATH=.*,default_ENABLE_RPATH="N",' -e 's,^SO=.*$,SO="dll",' $prefix/bin/icu-config
     find "$pkgdir" -name '*.dll' -type l -delete
-    mv -f "$prefix/lib/libicudata$pkgver.dll" "$prefix/lib/icudata${pkgver%%.*}.dll"
+    mv -f "$prefix/lib/libicudata$api.dll" "$prefix/lib/icudata$api.dll"
     mv "$prefix"/lib/*.dll "$prefix/bin/"
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
     find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+    rm -f "$prefix/bin/icu-config"
     rm -fr "$prefix/share"
     rm -fr "$prefix/lib/icu"
   done
