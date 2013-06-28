@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-crt.git/
 
 pkgname=fedora-mingw-w64-crt
-pkgver=5904
+pkgver=5915
 pkgrel=1
 pkgdesc='MinGW-w64 CRT for Windows'
 arch=(any)
@@ -20,10 +20,8 @@ conflicts=(mingw-w64-crt)
 replaces=()
 backup=()
 options=(!strip !buildflags !libtool)
-source=('http://pkgs.fedoraproject.org/cgit/mingw-crt.git/plain/mingw-w64-workaround-ilockcxch-regression.patch?id=1bf1eb9c12998caae21d6355e6d959933843f8d4'
-        'http://pkgs.fedoraproject.org/cgit/mingw-crt.git/plain/mingw-w64-commit-r5898.patch?id=1bf1eb9c12998caae21d6355e6d959933843f8d4')
-md5sums=('757dc0ec3ee529678f0d796cc2f00c5e'
-         'faf0728f212b670d4598462ca144c5c7')
+source=('http://pkgs.fedoraproject.org/cgit/mingw-crt.git/plain/mingw-w64-workaround-ilockcxch-regression.patch?id=1bf1eb9c12998caae21d6355e6d959933843f8d4')
+md5sums=('757dc0ec3ee529678f0d796cc2f00c5e')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 _svnmod='mingw-w64'
@@ -57,9 +55,6 @@ build() {
   # still waiting on a proper solution. To workaround it
   # we do a partial revert the commit in question for now
   patch -Np0 < '../mingw-w64-workaround-ilockcxch-regression.patch?id=1bf1eb9c12998caae21d6355e6d959933843f8d4'
-  # Commit r5898 also introduced a similar regression
-  # for the win64 target so also revert that one for now
-  patch -RNp1 < '../mingw-w64-commit-r5898.patch?id=1bf1eb9c12998caae21d6355e6d959933843f8d4'
 
   autoreconf -if
 
