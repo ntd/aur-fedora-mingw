@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-crt.git/
 
 pkgname=fedora-mingw-w64-crt
-pkgver=5915
+pkgver=5949
 pkgrel=1
 pkgdesc='MinGW-w64 CRT for Windows'
 arch=(any)
@@ -20,8 +20,8 @@ conflicts=(mingw-w64-crt)
 replaces=()
 backup=()
 options=(!strip !buildflags !libtool)
-source=('http://pkgs.fedoraproject.org/cgit/mingw-crt.git/plain/mingw-w64-workaround-ilockcxch-regression.patch?id=1bf1eb9c12998caae21d6355e6d959933843f8d4')
-md5sums=('757dc0ec3ee529678f0d796cc2f00c5e')
+source=()
+md5sums=()
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 _svnmod='mingw-w64'
@@ -42,19 +42,6 @@ build() {
   fi
 
   msg "SVN checkout done or server timeout"
-
-  # Apply patches from fedora repository
-
-  # Revert r5713 for now as it causes shared libraries
-  # without an explicit exported symbols list (.def file) to
-  # automatically export the symbol InterlockedCompareExchange.
-  # This symbol is part of the Win32 API so it shouldn't
-  # be exported again in individual shared libraries.
-  # This issue only happens for the i686-w64-mingw32 target.
-  # We reported this issue upstream on 2013-05-23 but we're
-  # still waiting on a proper solution. To workaround it
-  # we do a partial revert the commit in question for now
-  patch -Np0 < '../mingw-w64-workaround-ilockcxch-regression.patch?id=1bf1eb9c12998caae21d6355e6d959933843f8d4'
 
   autoreconf -if
 
