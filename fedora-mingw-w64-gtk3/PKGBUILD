@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/
 
 pkgname=fedora-mingw-w64-gtk3
-pkgver=3.9.0
+pkgver=3.9.8
 pkgrel=1
 pkgdesc='GTK+3 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
@@ -15,20 +15,28 @@ depends=(mingw-w64-crt fedora-mingw-w64-atk fedora-mingw-w64-cairo
          fedora-mingw-w64-gdk-pixbuf fedora-mingw-w64-gettext
          fedora-mingw-w64-glib2 fedora-mingw-w64-win-iconv
          fedora-mingw-w64-pango fedora-mingw-w64-pixman mingw-w64-zlib)
-makedepends=(mingw-w64-gcc mingw-w64-pkg-config glib2
-             autoconf automake libtool gtk-doc gobject-introspection)
+makedepends=(mingw-w64-gcc mingw-w64-pkg-config glib2)
+# Upstream packaging has gone wrong:
+#
+# make[2]: Entering directory `/builddir/build/BUILD/gtk+-3.9.8/build_win32/gdk'
+# cd ../.. && /bin/sh /builddir/build/BUILD/gtk+-3.9.8/build-aux/missing automake-1.13 --gnu gdk/Makefile
+# /builddir/build/BUILD/gtk+-3.9.8/build-aux/missing: line 81: automake-1.13: command not found
+# WARNING: 'automake-1.13' is missing on your system.
+#
+# Workaround this for now
+makedepends+=(autoconf automake libtool)
 provides=("mingw-w64-gtk3=$pkgver")
 conflicts=(mingw-w64-gtk3)
 options=(!strip !buildflags !libtool)
 source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.tar.xz"
-        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/0003-Don-t-use-AC_CANONICAL_TARGET.patch?id=b63e31724f2786202a38f8b7fb8539b009f4e621"
-        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk-dont-define-initguid.patch?id=82ccf489f4763e375805d848351ac3f8fda8e88b"
-        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/commit-914099dc.patch?id=3fa3354330e47e5b9de898579c010ffd00f9de2f"
+        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk3-fix-gdkdevice-win32-compilation.patch?id=604b7d5111184e434cdacb09d9d11c84cae8580d"
+        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/0004-BURN-THE-.DEF.patch?id=604b7d5111184e434cdacb09d9d11c84cae8580d"
+        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk3-dont-use-unix-specific-print-objects-on-non-unix.patch?id=604b7d5111184e434cdacb09d9d11c84cae8580d"
         "gtk.immodules")
-md5sums=('23310b5a9d1489f40ee688c5a0ea67d0'
-         '77b0525b67057fa6afaf5405d80509ae'
-         '4038939df90f80ea6923d67afff28e03'
-         '7fb133de82f410ca48aae51ca57dcdba'
+md5sums=('5243b4a63efc454b41bd24d4ffbf4342'
+         'd9f2a2def8946da252038db5a75fab89'
+         '369582585e60eab9fa5c9aa22a68e41c'
+         'ca9d992a78a6ec925ed423b8e940963b'
          '9655591f6ed7b9371dc7c15f8237d383')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
@@ -41,21 +49,12 @@ build() {
 
   # Apply patches from fedora repository
   cd "$tardir"
-  patch -Np1 < '../0003-Don-t-use-AC_CANONICAL_TARGET.patch?id=b63e31724f2786202a38f8b7fb8539b009f4e621'
-  # As of mingw-w64 r5589 the header knownfolders.h was added
-  # which contains definitions like FOLDERID_Windows
-  # As these are also part of libuuid.a you'll get linker failures like:
-  # /usr/i686-w64-mingw32/sys-root/mingw/lib/libuuid.a(lib32_libuuid_a-uuid.o):(.rdata+0x0): multiple definition of `FOLDERID_Windows'
-  # win32/.libs/libgdk-win32.a(gdkdnd-win32.o):gdkdnd-win32.c:(.rdata+0x360): first defined here
-  #
-  # Workaround this for now until mingw-w64 upstream has come up
-  # with a statement whether this is expected behaviour and what
-  # component should be fixed exactly
-  #
-  # http://mingw-w64.svn.sourceforge.net/viewvc/mingw-w64?view=revision&revision=5589
-  patch -Np0 < '../gtk-dont-define-initguid.patch?id=82ccf489f4763e375805d848351ac3f8fda8e88b'
-  # https://bugzilla.gnome.org/show_bug.cgi?id=699690
-  patch -Np1 < '../commit-914099dc.patch?id=3fa3354330e47e5b9de898579c010ffd00f9de2f'
+  # https://bugzilla.gnome.org/show_bug.cgi?id=704171
+  patch -Np0 < '../gtk3-fix-gdkdevice-win32-compilation.patch?id=604b7d5111184e434cdacb09d9d11c84cae8580d'
+  # https://bugzilla.gnome.org/show_bug.cgi?id=700445
+  patch -Np1 < '../0004-BURN-THE-.DEF.patch?id=604b7d5111184e434cdacb09d9d11c84cae8580d'
+  # https://bugzilla.gnome.org/show_bug.cgi?id=704173
+  patch -Np1 < '../gtk3-dont-use-unix-specific-print-objects-on-non-unix.patch?id=604b7d5111184e434cdacb09d9d11c84cae8580d'
 
   autoreconf -if
 
