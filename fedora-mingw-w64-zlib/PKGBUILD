@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-zlib.git/
 
 pkgname=fedora-mingw-w64-zlib
-pkgver=1.2.7
+pkgver=1.2.8
 pkgrel=1
 pkgdesc='A compression/decompression Library (mingw-w64)'
 arch=(any)
@@ -21,7 +21,7 @@ source=("http://zlib.net/zlib-$pkgver.tar.gz"
         "http://pkgs.fedoraproject.org/cgit/mingw-zlib.git/plain/mingw32-zlib-1.2.7-autotools.patch?id=2333169c09a99a357b0aaa58e0bd7dfda0932685"
         "http://pkgs.fedoraproject.org/cgit/mingw-zlib.git/plain/zlib-1.2.7-use-correct-def-file.patch?id=2333169c09a99a357b0aaa58e0bd7dfda0932685"
         "http://pkgs.fedoraproject.org/cgit/mingw-zlib.git/plain/mingw32-zlib-create-zlib1-dll.patch?id=945b6d9ff9992a5d209a2bdb58aa27701786e423")
-md5sums=('60df6a37c56e7c1366cca812414f7b85'
+md5sums=('44d667c142d7cda120332623eab69f40'
          'b553d7d9481d5a5114699e1ee7530977'
          'f03194ede4fb28e58fa9fb5e66bbab55'
          '82e72a91adf994108b21b8acf621a9d0')
