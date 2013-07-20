@@ -6,7 +6,7 @@
 
 pkgname=fedora-mingw-w64-tools
 pkgver=5716
-pkgrel=1
+pkgrel=2
 pkgdesc='MinGW-w64 gendef and genidl tools'
 arch=(any)
 url='http://mingw-w64.sourceforge.net'
