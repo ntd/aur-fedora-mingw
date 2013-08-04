@@ -61,12 +61,19 @@ for pkg in ${pkgs[@]}; do
 	    # No package directory found: try to build from AUR
 	    if ! yaourt -Sa --noconfirm "$pkg"; then exit 1; fi
 	elif [ -z "$(find "$pkg" -maxdepth 1 -name '*.pkg.tar.xz')" ]; then
-	    # The directory exists and does not contain any .pkg.tar.xz file:
-	    # build the package with makepkg
+	    # The directory exists and does not contain any .pkg.tar.xz
+	    # file: build the package with makepkg
 	    cd "$pkg"
 	    makepkg -f
-	    # Is there a way to force the removing of conflicting packages?
+
+	    # TODO: is there a more elegant way to force the removing
+	    #       of conflicting packages?
 	    if ! yes | LC_ALL='' yaourt -U *.pkg.tar.xz; then exit 1; fi
+
+	    # The tarball links (*.pkg.tar.xz) are not deleted: it is
+	    # convenient to keep the on place to easily update package
+	    # databases, i.e. using a command such as
+	    # repo-add <path-to-db> */*.pkg.tar.xz
 	    rm -fr pkg src
 	    cd ..
 	fi
