@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-pthreads
 pkgver=2.8.0
-pkgrel=3
+pkgrel=4
 _prerelease_date=20110511
 pkgdesc='MinGW-w64 pthreads library'
 arch=(any)

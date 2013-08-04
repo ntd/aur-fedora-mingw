@@ -5,7 +5,7 @@
 
 pkgname=fedora-nsis
 pkgver=2.46
-pkgrel=3
+pkgrel=4
 pkgdesc='A professional open source system to create Windows installers'
 arch=(i686 x86_64)
 url='http://nsis.sourceforge.net/'

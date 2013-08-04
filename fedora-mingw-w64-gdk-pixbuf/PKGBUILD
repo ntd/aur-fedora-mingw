@@ -9,7 +9,7 @@
 
 pkgname=fedora-mingw-w64-gdk-pixbuf
 pkgver=2.28.2
-pkgrel=3
+pkgrel=4
 pkgdesc='An image loading library (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
