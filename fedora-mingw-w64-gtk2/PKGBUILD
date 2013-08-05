@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-gtk2
 pkgver=2.24.20
-pkgrel=3
+pkgrel=4
 pkgdesc='GTK+2 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -28,6 +28,7 @@ source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.t
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/tooltip-positioning.patch?id=95be474adc76e60caa692330cf2706b90848146f"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/window-dragging.patch?id=95be474adc76e60caa692330cf2706b90848146f"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/gtk-dont-define-initguid.patch?id=3224e445dad240da5f5ebfe371e8c9f627459089"
+        "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/gtk-combo-box-dont-use-invalidated-iter.patch?id=1296c449f78d4ef378541311bb4a4833c6a26fe6"
         "gtk.immodules")
 md5sums=('9d7833331d7accd80668e29d7f567ce5'
          '44ca5d1ce91f5364182c6ea2614c7688'
@@ -37,6 +38,7 @@ md5sums=('9d7833331d7accd80668e29d7f567ce5'
          '86159ea0934b25a7bbda9aa436ffc551'
          '147a90540b678b941e7d5d71054b2447'
          '4038939df90f80ea6923d67afff28e03'
+         '1cef826891d79b06ae69cf632b358d73'
          '9967ded27c0eb3b615acae7539621607')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
@@ -68,7 +70,14 @@ build() {
   #
   # http://mingw-w64.svn.sourceforge.net/viewvc/mingw-w64?view=revision&revision=5589
   patch -Np0 < '../gtk-dont-define-initguid.patch?id=3224e445dad240da5f5ebfe371e8c9f627459089'
+  # Don't use invalidated iter in GtkComboBox
+  # Resolves segfaults in GtkFileChooserButton
+  # https://bugzilla.redhat.com/show_bug.cgi?id=985559
+  # https://bugzilla.gnome.org/show_bug.cgi?id=704508
+  patch -Np1 < '../gtk-combo-box-dont-use-invalidated-iter.patch?id=1296c449f78d4ef378541311bb4a4833c6a26fe6'
+
   autoreconf -if
+
   patch -Np0 < '../mingw32-gtk2-enable_static_build.patch?h=f18'
   patch -Np0 < '../gtk-fix-out-of-source-build.patch?h=f18'
 
