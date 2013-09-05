@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-pixman
 pkgver=0.30.0
-pkgrel=4
+pkgrel=5
 pkgdesc='The pixel-manipulation library for X and cairo (mingw-w64)'
 arch=(any)
 url='http://pixman.org/'
@@ -40,6 +40,7 @@ build() {
     "$tardir/configure" \
       --prefix="/usr/$arch" \
       --host="$arch" \
+      --disable-sse2 \
       --disable-gtk \
       --enable-shared \
       --enable-static
