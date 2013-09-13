@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/
 
 pkgname=fedora-mingw-w64-gtk3
-pkgver=3.9.8
-pkgrel=3
+pkgver=3.9.14
+pkgrel=1
 pkgdesc='GTK+3 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -29,14 +29,10 @@ provides=("mingw-w64-gtk3=$pkgver")
 conflicts=(mingw-w64-gtk3)
 options=(!strip !buildflags !libtool)
 source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.tar.xz"
-        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk3-fix-gdkdevice-win32-compilation.patch?id=604b7d5111184e434cdacb09d9d11c84cae8580d"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/0004-BURN-THE-.DEF.patch?id=604b7d5111184e434cdacb09d9d11c84cae8580d"
-        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk3-dont-use-unix-specific-print-objects-on-non-unix.patch?id=604b7d5111184e434cdacb09d9d11c84cae8580d"
         "gtk.immodules")
-md5sums=('5243b4a63efc454b41bd24d4ffbf4342'
-         'd9f2a2def8946da252038db5a75fab89'
+md5sums=('5830d1cfad5e5d3bfea97e341bc971d6'
          '369582585e60eab9fa5c9aa22a68e41c'
-         'ca9d992a78a6ec925ed423b8e940963b'
          '9655591f6ed7b9371dc7c15f8237d383')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
@@ -49,12 +45,8 @@ build() {
 
   # Apply patches from fedora repository
   cd "$tardir"
-  # https://bugzilla.gnome.org/show_bug.cgi?id=704171
-  patch -Np0 < '../gtk3-fix-gdkdevice-win32-compilation.patch?id=604b7d5111184e434cdacb09d9d11c84cae8580d'
   # https://bugzilla.gnome.org/show_bug.cgi?id=700445
   patch -Np1 < '../0004-BURN-THE-.DEF.patch?id=604b7d5111184e434cdacb09d9d11c84cae8580d'
-  # https://bugzilla.gnome.org/show_bug.cgi?id=704173
-  patch -Np1 < '../gtk3-dont-use-unix-specific-print-objects-on-non-unix.patch?id=604b7d5111184e434cdacb09d9d11c84cae8580d'
 
   autoreconf -if
 
