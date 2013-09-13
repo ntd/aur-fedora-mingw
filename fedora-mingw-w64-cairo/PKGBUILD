@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-cairo.git/
 
 pkgname=fedora-mingw-w64-cairo
-pkgver=1.12.14
-pkgrel=7
+pkgver=1.12.16
+pkgrel=1
 pkgdesc='Cairo vector graphics library (mingw-w64)'
 arch=(any)
 url='http://cairographics.org/'
@@ -20,15 +20,9 @@ provides=("mingw-w64-cairo=$pkgver")
 conflicts=(mingw-w64-cairo)
 options=(!strip !buildflags !libtool)
 source=("http://cairographics.org/releases/cairo-$pkgver.tar.xz"
-        "http://pkgs.fedoraproject.org/cgit/mingw-cairo.git/plain/0001-win32-Free-the-fallback-upon-finish.patch?id=602fd779ff72e25af2fdf28aaec8b8d71da75aad"
-        "http://pkgs.fedoraproject.org/cgit/mingw-cairo.git/plain/0002-win32-fix-corrupted-drawing.patch?id=602fd779ff72e25af2fdf28aaec8b8d71da75aad"
-        "http://pkgs.fedoraproject.org/cgit/mingw-cairo.git/plain/0003-build-sys-do-not-try-to-build-util-sphinx-on-Windows.patch?id=602fd779ff72e25af2fdf28aaec8b8d71da75aad"
-        "https://bugs.freedesktop.org/attachment.cgi?id=82797")
-md5sums=('27b634113d0f52152d60ae8e2ec7daa7'
-        'f4aa6f5ac47c68a36a6b5db111bd8591'
-        'f295332761cf3c1426d867eda3374a4d'
-        'ee1f9b94e8aa268e580980891fa50ebf'
-        '3dcedbad7d33d7352ea4b5c8180b0c5d')
+        "http://pkgs.fedoraproject.org/cgit/mingw-cairo.git/plain/0003-build-sys-do-not-try-to-build-util-sphinx-on-Windows.patch?id=602fd779ff72e25af2fdf28aaec8b8d71da75aad")
+md5sums=('a1304edcdc99282f478b995ee5f8f854'
+        'ee1f9b94e8aa268e580980891fa50ebf')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -39,13 +33,8 @@ build() {
 
   # Apply patches from fedora repository
   cd "$tardir"
-  # cherry-picked from upcoming 1.12.15
-  patch -Np1 < '../0001-win32-Free-the-fallback-upon-finish.patch?id=602fd779ff72e25af2fdf28aaec8b8d71da75aad'
-  patch -Np1 < '../0002-win32-fix-corrupted-drawing.patch?id=602fd779ff72e25af2fdf28aaec8b8d71da75aad'
   # https://bugs.freedesktop.org/show_bug.cgi?id=63043
   patch -Np1 < '../0003-build-sys-do-not-try-to-build-util-sphinx-on-Windows.patch?id=602fd779ff72e25af2fdf28aaec8b8d71da75aad'
-  # https://bugs.freedesktop.org/show_bug.cgi?id=63787
-  patch -Np1 < '../attachment.cgi?id=82797'
 
   autoreconf -if
 
