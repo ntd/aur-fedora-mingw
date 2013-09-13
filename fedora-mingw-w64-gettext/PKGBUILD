@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-gettext.git/
 
 pkgname=fedora-mingw-w64-gettext
-pkgver=0.18.3
-pkgrel=3
+pkgver=0.18.3.1
+pkgrel=1
 pkgdesc='GNU internationalization library (mingw-w64)'
 arch=(any)
 url='http://www.gnu.org/software/gettext/'
@@ -17,7 +17,7 @@ provides=("mingw-w64-gettext=$pkgver")
 conflicts=(mingw-w64-gettext)
 options=(!strip !buildflags !libtool)
 source=("http://ftp.gnu.org/pub/gnu/gettext/gettext-$pkgver.tar.gz")
-md5sums=('3fa4236c41b7e837355de144210207ec')
+md5sums=('3fc808f7d25487fc72b5759df7419e02')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
