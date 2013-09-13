@@ -4,15 +4,15 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-freetype.git/
 
 pkgname=fedora-mingw-w64-freetype
-pkgver=2.4.12
-pkgrel=3
+pkgver=2.5.0.1
+pkgrel=1
 pkgdesc='TrueType font rendering library (mingw-w64)'
 arch=(any)
 url='http://freetype.sourceforge.net/'
 license=(GPL)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt mingw-w64-zlib mingw-w64-bzip2)
-makedepends=(mingw-w64-gcc)
+makedepends=(mingw-w64-gcc mingw-w64-libpng)
 provides=("mingw-w64-freetype=$pkgver")
 conflicts=(mingw-w64-freetype)
 replaces=()
@@ -20,7 +20,7 @@ options=(!strip !buildflags !libtool)
 source=("http://downloads.sourceforge.net/sourceforge/freetype/freetype-$pkgver.tar.bz2"
         "http://pkgs.fedoraproject.org/cgit/mingw-freetype.git/plain/freetype-2.3.0-enable-spr.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-freetype.git/plain/freetype-2.2.1-enable-valid.patch?h=f18")
-md5sums=('3463102764315eb86c0d3c2e1f3ffb7d'
+md5sums=('c72e9010b1d986d556fc0b2b5fcbf31a'
          '816dc8619a6904a7385769433c0a8653'
          '214119610444c9b02766ccee5e220680')
 
@@ -50,7 +50,9 @@ build() {
       --build="$CHOST" \
       --host="$arch" \
       --enable-static \
-      --enable-shared
+      --enable-shared \
+      LIBPNG_CFLAGS="$(/usr/$arch/bin/libpng-config --cflags)" \
+      LIBPNG_LDFLAGS="$(/usr/$arch/bin/libpng-config --ldflags)"
     make
   done
 }
