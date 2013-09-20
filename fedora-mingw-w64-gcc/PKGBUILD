@@ -5,14 +5,14 @@
 
 pkgname=fedora-mingw-w64-gcc
 pkgver=4.8.1
-pkgrel=2
+pkgrel=3
 pkgdesc="Cross GCC for the MinGW-w64 cross-compiler"
 arch=('i686' 'x86_64')
 url="http://gcc.gnu.org"
 license=('GPL' 'LGPL' 'FDL' 'custom')
 groups=('fedora-mingw-bootstrap')
 depends=('zlib' 'libmpc' 'cloog'
-         'mingw-w64-crt' 'mingw-w64-binutils' 'mingw-w64-pthreads')
+         'mingw-w64-crt' 'mingw-w64-binutils' 'mingw-w64-winpthreads')
 makedepends=('mingw-w64-headers' 'mingw-w64-gcc')
 optdepends=()
 provides=("mingw-w64-gcc=$pkgver")
