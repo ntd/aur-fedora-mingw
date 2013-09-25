@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/
 
 pkgname=fedora-mingw-w64-gtk3
-pkgver=3.9.14
+pkgver=3.10.0
 pkgrel=1
 pkgdesc='GTK+3 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
@@ -31,7 +31,7 @@ options=(!strip !buildflags !libtool)
 source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/0004-BURN-THE-.DEF.patch?id=604b7d5111184e434cdacb09d9d11c84cae8580d"
         "gtk.immodules")
-md5sums=('5830d1cfad5e5d3bfea97e341bc971d6'
+md5sums=('f5148a330886b906ba0eb7842409d93f'
          '369582585e60eab9fa5c9aa22a68e41c'
          '9655591f6ed7b9371dc7c15f8237d383')
 
