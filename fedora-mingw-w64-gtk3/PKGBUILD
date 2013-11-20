@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/
 
 pkgname=fedora-mingw-w64-gtk3
-pkgver=3.10.0
+pkgver=3.11.2
 pkgrel=1
 pkgdesc='GTK+3 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
@@ -15,7 +15,8 @@ depends=(mingw-w64-crt fedora-mingw-w64-atk fedora-mingw-w64-cairo
          fedora-mingw-w64-gdk-pixbuf fedora-mingw-w64-gettext
          fedora-mingw-w64-glib2 fedora-mingw-w64-win-iconv
          fedora-mingw-w64-pango fedora-mingw-w64-pixman mingw-w64-zlib)
-makedepends=(mingw-w64-gcc mingw-w64-pkg-config glib2)
+makedepends=(mingw-w64-gcc mingw-w64-pkg-config
+             glib2 gobject-introspection)
 # Upstream packaging has gone wrong:
 #
 # make[2]: Entering directory `/builddir/build/BUILD/gtk+-3.9.8/build_win32/gdk'
@@ -31,7 +32,7 @@ options=(!strip !buildflags !libtool)
 source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/0004-BURN-THE-.DEF.patch?id=604b7d5111184e434cdacb09d9d11c84cae8580d"
         "gtk.immodules")
-md5sums=('f5148a330886b906ba0eb7842409d93f'
+md5sums=('dd73f4f1d657f96d459334f6722086be'
          '369582585e60eab9fa5c9aa22a68e41c'
          '9655591f6ed7b9371dc7c15f8237d383')
 
@@ -83,6 +84,11 @@ package() {
     find "$prefix" -regex '.*\.\(bat\|def\|exp\)' -exec rm -f {} +
     find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+
+    # Remove desktop files and corresponding icons as they aren't
+    # useful for win32
+    rm -f "$prefix"/share/applications/*.desktop
+    rm -f "$prefix"/share/icons/hicolor/*/apps/*.png
 
     # Compile the basic schemas, a requirement to have working
     # GtkFileChooser (and possibly GtkColorChooser) widgets.
