@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-crt.git/
 
 pkgname=fedora-mingw-w64-crt
-pkgver=3.0.0
+pkgver=6379
 pkgrel=1
 pkgdesc='MinGW-w64 CRT for Windows'
 arch=(any)
@@ -12,22 +12,38 @@ url='http://mingw-w64.sourceforge.net/'
 license=('custom')
 groups=('fedora-mingw')
 depends=('mingw-w64-binutils')
-makedepends=('mingw-w64-headers' 'mingw-w64-gcc')
+makedepends=('mingw-w64-headers' 'mingw-w64-gcc'
+             svn autoconf automake libtool)
 optdepends=()
 provides=(mingw-w64-crt)
 conflicts=()
 replaces=()
 backup=()
 options=(!strip !buildflags !libtool)
-source=("http://downloads.sourceforge.net/sourceforge/mingw-w64/mingw-w64/mingw-w64-v$pkgver.tar.bz2")
-md5sums=('22b0030702fe00927daf1ae6ddfb526e')
+source=()
+md5sums=()
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
+_svnmod='mingw-w64'
+_svntrunk='svn://svn.code.sf.net/p/mingw-w64/code/trunk'
 
 build() {
-  local tardir="$srcdir/mingw-w64-v$pkgver"
+  local svndir="$srcdir/$_svnmod"
   local builddir
   local arch
+
+  if [[ -d "$svndir/.svn" ]]; then
+    cd "$_svnmod"
+    svn up -r "$pkgver"
+    svn revert -R .
+  else
+    cd "$srcdir"
+    svn co "$_svntrunk" --config-dir ./ -r "$pkgver" "$_svnmod" && cd "$_svnmod"
+  fi
+
+  msg "SVN checkout done or server timeout"
+
+  autoreconf -if
 
   export CFLAGS='-O2 -pipe'
   export CXXFLAGS="$CFLAGS"
@@ -38,7 +54,7 @@ build() {
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    "$tardir/mingw-w64-crt/configure" \
+    "$svndir/mingw-w64-crt/configure" \
       --prefix="/usr/$arch" \
       --host="$arch"
     make
