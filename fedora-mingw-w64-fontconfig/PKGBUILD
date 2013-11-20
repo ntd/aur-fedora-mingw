@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-fontconfig.git/
 
 pkgname=fedora-mingw-w64-fontconfig
-pkgver=2.10.95
+pkgver=2.11.0
 pkgrel=1
 pkgdesc='A library for configuring and customizing font access (mingw-w64)'
 arch=(any)
@@ -17,8 +17,10 @@ provides=("mingw-w64-fontconfig=$pkgver")
 conflicts=(mingw-w64-fontconfig)
 replaces=()
 options=(!strip !buildflags !libtool)
-source=("http://www.fontconfig.org/release/fontconfig-$pkgver.tar.bz2")
-md5sums=('45c5ba47be70577faa05c3aaf2b6a7e1')
+source=("http://www.fontconfig.org/release/fontconfig-$pkgver.tar.bz2"
+        "http://pkgs.fedoraproject.org/cgit/mingw-fontconfig.git/plain/fontconfig-disable-migration-testcase-on-win32.patch?id=332b9f475053aba063d99c5aa1fc8a7486e95131")
+md5sums=('000bd4baf7aefa828e03414d0c8c7dc5'
+         'a10fef13b7cc1159ea32e939123c3980')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -26,6 +28,15 @@ build() {
   local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
   local builddir
   local arch
+
+  # Apply patches from fedora repository
+  cd "$tardir"
+
+  # The testcase called 'migration' relies too much on UNIX features
+  # like chmod, so disable the testcase when cross-compiling for win32
+  patch -Np1 < '../fontconfig-disable-migration-testcase-on-win32.patch?id=332b9f475053aba063d99c5aa1fc8a7486e95131'
+
+  autoreconf -if
 
   export CFLAGS='-O2 -pipe'
   export CXXFLAGS="$CFLAGS"
