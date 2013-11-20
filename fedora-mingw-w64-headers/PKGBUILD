@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-headers.git/
 
 pkgname=fedora-mingw-w64-headers
-pkgver=3.0.0
+pkgver=6379
 pkgrel=1
 pkgdesc='MinGW-w64 headers for Windows'
 arch=(any)
@@ -12,22 +12,35 @@ url='http://mingw-w64.sourceforge.net/'
 license=('custom')
 groups=('fedora-mingw')
 depends=('mingw-w64-winpthreads')
-makedepends=()
+makedepends=(svn)
 optdepends=()
 provides=(mingw-w64-headers)
 conflicts=()
-replaces=()
+replaces=(mingw-w64-headers)
 backup=()
 options=(!strip !buildflags !libtool)
-source=("http://downloads.sourceforge.net/sourceforge/mingw-w64/mingw-w64/mingw-w64-v$pkgver.tar.bz2")
-md5sums=('22b0030702fe00927daf1ae6ddfb526e')
+source=()
+md5sums=()
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
+_svnmod='mingw-w64'
+_svntrunk='svn://svn.code.sf.net/p/mingw-w64/code/trunk'
 
 build() {
-  local tardir="$srcdir/mingw-w64-v$pkgver"
+  local svndir="$srcdir/$_svnmod"
   local builddir
   local arch
+
+  if [[ -d "$svndir/.svn" ]]; then
+    cd "$_svnmod"
+    svn up -r "$pkgver"
+    svn revert -R .
+  else
+    cd "$srcdir"
+    svn co "$_svntrunk" --config-dir ./ -r "$pkgver" "$_svnmod" && cd "$_svnmod"
+  fi
+
+  msg "SVN checkout done or server timeout"
 
   export CFLAGS='-O2 -pipe'
   export CXXFLAGS="$CFLAGS"
@@ -35,10 +48,10 @@ build() {
   unset  CPPFLAGS
 
   for arch in ${_architectures[@]}; do
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$srcdir/headers-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    "$tardir/mingw-w64-headers/configure" \
+    "$svndir/mingw-w64-headers/configure" \
       --prefix="/usr/$arch" \
       --host="$arch" \
       --enable-sdk=all \
@@ -55,7 +68,7 @@ package() {
     prefix="$pkgdir/usr/$arch"
     includedir="$prefix/include"
 
-    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    cd "$srcdir/headers-$arch"
     make DESTDIR="$pkgdir" install
 
     rm -f "$includedir/pthread_signal.h" \
