@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-atk.git/
 
 pkgname=fedora-mingw-w64-atk
-pkgver=2.11.2
+pkgver=2.11.3
 pkgrel=1
 pkgdesc='A library providing a set of interfaces for accessibility (mingw-w64)'
 arch=(any)
@@ -17,8 +17,10 @@ makedepends=(mingw-w64-gcc mingw-w64-pkg-config
 provides=("mingw-w64-atk=$pkgver")
 conflicts=(mingw-w64-atk)
 options=(!strip !buildflags !libtool)
-source=("http://ftp.gnome.org/pub/GNOME/sources/atk/${pkgver%.*}/atk-$pkgver.tar.xz")
-md5sums=('471944d72b925c30f59e848a3ec0d08c')
+source=("http://ftp.gnome.org/pub/GNOME/sources/atk/${pkgver%.*}/atk-$pkgver.tar.xz"
+        "http://pkgs.fedoraproject.org/cgit/mingw-atk.git/plain/atk-export-symbol-atk_object_get_object_locale.patch?id=eca5d925faa37511dc7e586b0f9e74eab1f03651")
+md5sums=('2b4316e69cbe0a1998ba39cdc8c89692'
+         'a3991b93e226389215cd6e184a844687')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -26,6 +28,10 @@ build() {
   local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
   local builddir
   local arch
+
+  # Apply patches from fedora repository
+  cd "$tardir"
+  patch -Np0 < '../atk-export-symbol-atk_object_get_object_locale.patch?id=eca5d925faa37511dc7e586b0f9e74eab1f03651'
 
   # I have to do this otherwise win64 build fails
   # (the Fedora package seems to not need it).
