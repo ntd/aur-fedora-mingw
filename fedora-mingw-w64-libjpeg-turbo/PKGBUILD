@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-libjpeg-turbo
 pkgver=1.3.0
-pkgrel=1
+pkgrel=2
 pkgdesc='libjpeg derivative with accelerated baseline JPEG compression and decompression (mingw-w64)'
 arch=(any)
 url='http://libjpeg-turbo.virtualgl.org/'

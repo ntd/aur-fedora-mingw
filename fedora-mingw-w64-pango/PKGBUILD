@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-pango
 pkgver=1.36.1
-pkgrel=1
+pkgrel=2
 pkgdesc='A library for layout and rendering of text (mingw-w64)'
 arch=(any)
 url='http://www.pango.org/'

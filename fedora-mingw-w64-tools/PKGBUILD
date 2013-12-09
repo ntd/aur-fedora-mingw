@@ -5,8 +5,8 @@
 # without widl support.
 
 pkgname=fedora-mingw-w64-tools
-pkgver=5716
-pkgrel=3
+pkgver=6388
+pkgrel=1
 pkgdesc='MinGW-w64 gendef and genidl tools'
 arch=(any)
 url='http://mingw-w64.sourceforge.net'
