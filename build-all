@@ -29,6 +29,7 @@ pkgs=(	fedora-mingw-w64-binutils
 	fedora-mingw-w64-gcc-nogomp
 	fedora-mingw-w64-winpthreads
 	fedora-mingw-w64-gcc
+	fedora-mingw-w64-tools
 	mingw-w64-pkg-config
 	fedora-mingw-w64-zlib
 	fedora-mingw-w64-bzip2
@@ -40,7 +41,6 @@ pkgs=(	fedora-mingw-w64-binutils
 	fedora-mingw-w64-libpng
 	fedora-mingw-w64-libjpeg-turbo
 	fedora-mingw-w64-libffi
-	fedora-mingw-w64-tools
 	fedora-mingw-w64-glib2
 	fedora-mingw-w64-freetype
 	fedora-mingw-w64-fontconfig
