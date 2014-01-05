@@ -5,7 +5,7 @@
 # without widl support.
 
 pkgname=fedora-mingw-w64-tools
-pkgver=6388
+pkgver=6432
 pkgrel=1
 pkgdesc='MinGW-w64 gendef and genidl tools'
 arch=(any)
@@ -20,8 +20,10 @@ conflicts=(mingw-w64-tools)
 replaces=()
 backup=()
 options=(!strip !buildflags !libtool)
-source=("http://pkgs.fedoraproject.org/cgit/mingw-w64-tools.git/plain/mingw-w64-tools-2.0.999-s390.patch?id=178171478ff0f48e4d538cbb445a348eeeb4e87e")
-md5sums=('a6264cd76bca66af28e677ce1e22ae1d')
+source=("http://pkgs.fedoraproject.org/cgit/mingw-w64-tools.git/plain/mingw-w64-tools-2.0.999-s390.patch?id=178171478ff0f48e4d538cbb445a348eeeb4e87e"
+        "http://pkgs.fedoraproject.org/cgit/mingw-w64-tools.git/plain/mingw-w64-tools-2.0.999-widl-includedir.patch?id=b45525908faaf3e2242724345340eb86e41ff24b")
+md5sums=('a6264cd76bca66af28e677ce1e22ae1d'
+         'e448767d2af073c99795f72bc4e1700c')
 
 _svnmod='mingw-w64'
 _svntrunk='http://mingw-w64.svn.sourceforge.net/svnroot/mingw-w64/trunk'
@@ -44,6 +46,7 @@ build() {
   # Apply patches from fedora repository
   cd "$svndir"
   patch -Np2 < '../mingw-w64-tools-2.0.999-s390.patch?id=178171478ff0f48e4d538cbb445a348eeeb4e87e'
+  patch -Np1 < '../mingw-w64-tools-2.0.999-widl-includedir.patch?id=b45525908faaf3e2242724345340eb86e41ff24b'
 
   export CFLAGS='-O2 -pipe'
   export CXXFLAGS="$CFLAGS"
