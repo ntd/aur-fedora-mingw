@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-headers.git/
 
 pkgname=fedora-mingw-w64-headers
-pkgver=6388
-pkgrel=2
+pkgver=6432
+pkgrel=1
 pkgdesc='MinGW-w64 headers for Windows'
 arch=(any)
 url='http://mingw-w64.sourceforge.net/'
