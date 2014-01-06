@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-winpthreads.git/
 
 pkgname=fedora-mingw-w64-winpthreads
-pkgver=6379
-pkgrel=2
+pkgver=6432
+pkgrel=1
 pkgdesc='MinGW-w64 winpthreads for Windows'
 arch=(any)
 url='http://mingw-w64.sourceforge.net/'
