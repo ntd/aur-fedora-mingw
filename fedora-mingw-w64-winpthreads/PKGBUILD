@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-winpthreads.git/
 
 pkgname=fedora-mingw-w64-winpthreads
-pkgver=6432
+pkgver=6460
 pkgrel=1
 pkgdesc='MinGW-w64 winpthreads for Windows'
 arch=(any)
