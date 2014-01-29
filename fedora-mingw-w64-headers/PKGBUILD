@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-headers.git/
 
 pkgname=fedora-mingw-w64-headers
-pkgver=6432
+pkgver=6469
 pkgrel=1
 pkgdesc='MinGW-w64 headers for Windows'
 arch=(any)
