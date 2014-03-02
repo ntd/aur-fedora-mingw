@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/
 
 pkgname=fedora-mingw-w64-glib2
-pkgver=2.39.4
+pkgver=2.39.90
 pkgrel=1
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
@@ -19,11 +19,13 @@ options=(!strip !buildflags !libtool)
 source=("http://ftp.gnome.org/pub/GNOME/sources/glib/${pkgver%.*}/glib-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-send-log-messages-to-correct-stdout-and-stderr.patch?id=d2262b6ca2230b2dc169aa4798b59e645859a195"
-        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-prefer-constructors-over-DllMain.patch?id=10ce51e70078f0c5b76d3ee1582d75e43f7f3363")
-md5sums=('e209e61ce14979fd2c0e76112c31df85'
+        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-prefer-constructors-over-DllMain.patch?id=10ce51e70078f0c5b76d3ee1582d75e43f7f3363"
+        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-commit-9cb5385.patch?id=e531c1c3f4af96684eb93e397efa7f54965a3502")
+md5sums=('093029dfbda10dfc6a5e5d951373c4dc'
          'c08c41118f5318d10f326c7c30e1a33a'
          '7b065f9bc154bf996523974a698b24de'
-         '46969e815f3ab19582ba33667a52048b')
+         '46969e815f3ab19582ba33667a52048b'
+         '09050e72765d629c305b9671e04d16e8')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -49,6 +51,9 @@ build() {
   # This prevents having to depend on DllMain in static libraries
   # http://lists.fedoraproject.org/pipermail/fedora-mingw/2013-March/006429.html
   patch -Np1 < '../glib-prefer-constructors-over-DllMain.patch?id=10ce51e70078f0c5b76d3ee1582d75e43f7f3363'
+
+  # Fix build on Windows
+  patch -Np1 < '../glib-commit-9cb5385.patch?id=e531c1c3f4af96684eb93e397efa7f54965a3502'
 
   export CFLAGS='-O2 -pipe'
   export CXXFLAGS="$CFLAGS"
