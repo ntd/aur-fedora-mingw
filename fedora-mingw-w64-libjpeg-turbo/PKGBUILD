@@ -5,25 +5,21 @@
 
 pkgname=fedora-mingw-w64-libjpeg-turbo
 pkgver=1.3.0
-pkgrel=2
+pkgrel=3
 pkgdesc='libjpeg derivative with accelerated baseline JPEG compression and decompression (mingw-w64)'
 arch=(any)
 url='http://libjpeg-turbo.virtualgl.org/'
 license=(GPL custom)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt)
-makedepends=(mingw-w64-gcc cmake nasm)
-provides=("mingw-w64-libjpeg=8.0.2")
-conflicts=(mingw-w64-libjpeg)
-options=(!strip !buildflags !libtool)
+makedepends=(mingw-w64-gcc mingw-w64-cmake nasm)
+provides=(mingw-w64-libjpeg=8.0.2)
+conflicts=(mingw-w64-libjpeg mingw-w64-libjpeg-turbo)
+options=(!strip staticlibs !buildflags)
 source=("http://downloads.sourceforge.net/project/libjpeg-turbo/$pkgver/libjpeg-turbo-$pkgver.tar.gz"
-        "http://pkgs.fedoraproject.org/cgit/mingw-libjpeg-turbo.git/plain/libjpeg-turbo-match-autoconf-behavior.patch?id=8f8b58073df47e55a74d1e62453ce17875a0d475"
-        "Toolchain-i686-w64-mingw32.cmake"
-        "Toolchain-x86_64-w64-mingw32.cmake")
+        "http://pkgs.fedoraproject.org/cgit/mingw-libjpeg-turbo.git/plain/libjpeg-turbo-match-autoconf-behavior.patch?id=8f8b58073df47e55a74d1e62453ce17875a0d475")
 md5sums=('e1e65cc711a1ade1322c06ad4a647741'
-         '6b00863ecdd729cb757e7f3672324f6f'
-         '93f31089ff2069c9ac1eddd387d79616'
-         'd618536e69bcbff2daab3897014a5eeb')
+         '6b00863ecdd729cb757e7f3672324f6f')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -32,10 +28,7 @@ build() {
   local builddir
   local arch
 
-  export CFLAGS='-O2 -pipe'
-  export CXXFLAGS="$CFLAGS"
-  unset  LDFLAGS
-  unset  CPPFLAGS
+  unset LDFLAGS CPPFLAGS
 
   # Apply patches from fedora repository
   cd "$tardir"
@@ -48,15 +41,7 @@ build() {
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    cmake "$tardir" \
-      -DCMAKE_INSTALL_PREFIX:PATH="/usr/$arch" \
-      -DCMAKE_INSTALL_LIBDIR:PATH="/usr/$arch/lib" \
-      -DINCLUDE_INSTALL_DIR:PATH="/usr/$arch/include" \
-      -DLIB_INSTALL_DIR:PATH="/usr/$arch/lib" \
-      -DSYSCONF_INSTALL_DIR:PATH="/usr/$arch/etc" \
-      -DSHARE_INSTALL_PREFIX:PATH="/usr/$arch/share" \
-      -DBUILD_SHARED_LIBS:BOOL=ON \
-      -DCMAKE_TOOLCHAIN_FILE="$srcdir/Toolchain-$arch.cmake"
+    $arch-cmake "$tardir"
     make
   done
 }
