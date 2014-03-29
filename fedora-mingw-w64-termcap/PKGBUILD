@@ -12,17 +12,17 @@
 
 pkgname=fedora-mingw-w64-termcap
 pkgver=1.3.1
-pkgrel=7
+pkgrel=8
 pkgdesc='MinGW terminal feature database (mingw-w64)'
 arch=(any)
 url='ftp://ftp.gnu.org/gnu/termcap/'
 license=(GPL)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt)
-makedepends=(mingw-w64-gcc autoconf)
-provides=("mingw-w64-termcap=$pkgver")
+makedepends=(mingw-w64-gcc autoconf automake libtool)
+provides=(mingw-w64-termcap=$pkgver)
 conflicts=(mingw-w64-termcap)
-options=(!strip !buildflags !libtool)
+options=(!strip staticlibs !buildflags)
 source=("ftp://ftp.gnu.org/gnu/termcap/termcap-$pkgver.tar.gz")
 md5sums=('ffe6f86e63a3a29fa53ac645faaabdfa')
 
@@ -33,6 +33,8 @@ build() {
   local builddir
   local arch
 
+  unset LDFLAGS CPPFLAGS
+
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
     mkdir -p "$builddir"
@@ -40,12 +42,10 @@ build() {
 
     # This old configure script needs some help to understand what is needed.
     ac_cv_c_cross=1 "$tardir/configure" \
+      --build="$CHOST" \
       --prefix="/usr/$arch" \
       --host="$arch"
     make \
-      CFLAGS='-O2 -pipe' \
-      LDFLAGS='' \
-      CPPFLAGS='' \
       CC="$arch-gcc" \
       AR="$arch-ar" \
       RANLIB="$arch-ranlib"
