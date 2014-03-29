@@ -24,37 +24,15 @@ also based on the Fedora one.
 I am trying to keep these packages  in sync with Fedora and, although not
 mapped exactly 1:1 (I dropped some feature I do not use) they are quite close.
 
-Bootstrapping GCC
-=================
-
-The information reported here is loosely based on the
-[Fedora wiki](http://fedoraproject.org/wiki/MinGW/CrossCompilerFramework)
-
-Some compilers and libraries, such as gcc, requires themselves. Put in other
-words, to be able to compile gcc you need to break a circular dependency.
-
-An older version of gcc with special parameters is used to generate the first
-stripped down version (gcc-bootstrap) and then gcc is rebuilt with it to get
-the final version (gcc-nogomp).
-
-Here is the proper order for bootstraping a new version of GCC from scratch:
-
-1. Build and install fedora-mingw-w64-binutils.
-2. Build and install fedora-mingw-w64-headers.
-3. Build and install fedora-mingw-w64-gcc-bootstrap.
-4. Build and install fedora-mingw-w64-crt.
-5. Build and install fedora-mingw-w64-gcc-nogomp: this in turn will uninstall
-   fedora-mingw-w64-gcc-bootstrap. This is a final GCC package compiled
-   without libgomp (shared memory parallelism support) because it would
-   have required fedora-mingw-w64-pthreads, not yet available.
-
-At this point you should be able to rebuild every MinGW package with the new
-compiler. After building and installing fedora-mingw-w64-pthreads you can
-also recompile GCC with libgomp support (fedora-mingw-w64-gcc).
-
 Other dependencies
 ==================
 
-The following dependencies have been compiled directly from AUR:
+The following dependencies have been compiled directly from Archlinux
+or pulled in from AUR:
 
+mingw-w64-headers
+mingw-w64-binutils
+mingw-w64-crt
+mingw-w64-winpthreads
+mingw-w64-gcc
 mingw-w64-pkg-config

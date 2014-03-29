@@ -22,14 +22,7 @@ function found() {
     done
 }
 
-pkgs=(	fedora-mingw-w64-binutils
-	fedora-mingw-w64-headers
-	fedora-mingw-w64-gcc-bootstrap
-	fedora-mingw-w64-crt
-	fedora-mingw-w64-gcc-nogomp
-	fedora-mingw-w64-winpthreads
-	fedora-mingw-w64-gcc
-	fedora-mingw-w64-tools
+pkgs=(	mingw-w64-gcc
 	mingw-w64-pkg-config
 	fedora-mingw-w64-zlib
 	fedora-mingw-w64-bzip2
