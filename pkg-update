@@ -23,6 +23,6 @@ popd > /dev/null
 yes | LC_ALL='' yaourt -U "$1"/*.pkg.tar.xz || die "Package upgrade failed"
 
 # WARNING: hardcoded repository path ahead
-$repoupdate /home/aur/pkg/entidi "$1"/*.pkg.tar.xz || die "$repoupdate failed"
+$repoupdate $HOME/workdir/aur-fedora-mingw/pkg/entidi "$1"/*.pkg.tar.xz || die "$repoupdate failed"
 
 rm -fr "$1"/pkg "$1"/src "$1"/*.pkg.tar.xz

@@ -5,23 +5,20 @@
 
 pkgname=fedora-mingw-w64-win-iconv
 pkgver=0.0.4
-pkgrel=7
+pkgrel=8
 pkgdesc='Iconv implementation using Win32 API (mingw-w64)'
 arch=(any)
 url='http://code.google.com/p/win-iconv/'
 license=(BSD)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt)
-makedepends=(mingw-w64-gcc 'cmake>=2.8.0')
-provides=("mingw-w64-win-iconv=$pkgver")
-conflicts=(mingw-w64-win-iconv mingw-w64-libiconv)
-options=(!strip !buildflags !libtool)
-source=("http://win-iconv.googlecode.com/files/win-iconv-$pkgver.tar.bz2"
-        "Toolchain-i686-w64-mingw32.cmake"
-        "Toolchain-x86_64-w64-mingw32.cmake")
-md5sums=('7618f4a80dd4b32dd7141fbe026991d9'
-         '93f31089ff2069c9ac1eddd387d79616'
-         'd618536e69bcbff2daab3897014a5eeb')
+makedepends=(mingw-w64-gcc mingw-w64-cmake)
+provides=(mingw-w64-win-iconv=$pkgver)
+conflicts=(mingw-w64-win-iconv)
+replaces=(mingw-w64-libiconv)
+options=(!strip staticlibs !buildflags)
+source=("http://win-iconv.googlecode.com/files/win-iconv-$pkgver.tar.bz2")
+md5sums=('7618f4a80dd4b32dd7141fbe026991d9')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -30,26 +27,13 @@ build() {
   local builddir
   local arch
 
-  export CFLAGS='-O2 -pipe'
-  export CXXFLAGS="$CFLAGS"
-  unset  LDFLAGS
-  unset  CPPFLAGS
+  unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    PATH="/usr/$arch/bin:$PATH" cmake "$tardir" \
-      -DCMAKE_VERBOSE_MAKEFILE=ON \
-      -DCMAKE_INSTALL_PREFIX:PATH="/usr/$arch" \
-      -DCMAKE_INSTALL_LIBDIR:PATH="/usr/$arch/lib" \
-      -DINCLUDE_INSTALL_DIR:PATH="/usr/$arch/include" \
-      -DLIB_INSTALL_DIR:PATH="/usr/$arch/lib" \
-      -DSYSCONF_INSTALL_DIR:PATH="/usr/$arch/etc" \
-      -DSHARE_INSTALL_PREFIX:PATH="/usr/$arch/share" \
-      -DBUILD_SHARED_LIBS:BOOL=ON \
-      -DCMAKE_TOOLCHAIN_FILE="$srcdir/Toolchain-$arch.cmake" \
-      -DBUILD_STATIC=1
+    $arch-cmake -DBUILD_STATIC=1 "$tardir"
     make
   done
 }
@@ -67,7 +51,6 @@ package() {
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
     find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
-    rm -fr "$prefix/share"
   done
 }
 
