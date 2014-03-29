@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-glib2
 pkgver=2.39.90
-pkgrel=1
+pkgrel=2
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -13,9 +13,9 @@ license=(LGPL)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt mingw-w64-libffi mingw-w64-zlib mingw-w64-gettext)
 makedepends=(mingw-w64-gcc mingw-w64-pkg-config 'glib2>=2.31.20')
-provides=("mingw-w64-glib2=$pkgver")
+provides=(mingw-w64-glib2=$pkgver)
 conflicts=(mingw-w64-glib2)
-options=(!strip !buildflags !libtool)
+options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/glib/${pkgver%.*}/glib-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-send-log-messages-to-correct-stdout-and-stderr.patch?id=d2262b6ca2230b2dc169aa4798b59e645859a195"
@@ -66,6 +66,7 @@ build() {
     mkdir -p "$builddir-static"
     cd "$builddir-static"
     "$tardir/configure" \
+      --build="$CHOST" \
       --prefix="/usr/$arch" \
       --host="$arch" \
       --disable-shared \
@@ -74,6 +75,7 @@ build() {
     mkdir -p "$builddir-shared"
     cd "$builddir-shared"
     "$tardir/configure" \
+      --build="$CHOST" \
       --prefix="/usr/$arch" \
       --host="$arch" \
       --enable-shared \
