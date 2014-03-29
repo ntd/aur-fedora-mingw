@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-libxml2
 pkgver=2.9.1
-pkgrel=4
+pkgrel=5
 pkgdesc='XML parsing library, version 2 (mingw-w64)'
 arch=(any)
 url='http://www.xmlsoft.org/'
@@ -13,10 +13,9 @@ license=(MIT)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt mingw-w64-zlib)
 makedepends=(mingw-w64-gcc mingw-w64-gettext)
-provides=("mingw-w64-libxml2=$pkgver")
+provides=(mingw-w64-libxml2=$pkgver)
 conflicts=(mingw-w64-libxml2)
-replaces=()
-options=(!strip !buildflags !libtool)
+options=(!strip staticlibs !buildflags)
 source=("ftp://xmlsoft.org/libxml/libxml2-$pkgver.tar.gz"
         "http://pkgs.fedoraproject.org/cgit/mingw-libxml2.git/plain/mingw32-libxml2-static-build-compile-fix.patch?id=b2ef773d9a92f507605e3fa6bb52c91a0119d16c")
 md5sums=('9c0cfef285d5c4a5c80d00904ddab380'
@@ -33,9 +32,7 @@ build() {
   cd "$tardir"
   patch -Np0 < '../mingw32-libxml2-static-build-compile-fix.patch?id=b2ef773d9a92f507605e3fa6bb52c91a0119d16c'
 
-  export CFLAGS='-O2 -pipe'
-  export CXXFLAGS="$CFLAGS"
-  unset  LDFLAGS
+  unset LDFLAGS
   export CPPFLAGS='-DLIBXML_STATIC_FOR_DLL'
 
   for arch in ${_architectures[@]}; do
@@ -47,8 +44,8 @@ build() {
     mkdir -p "$builddir-static"
     cd "$builddir-static"
     "$tardir/configure" \
-      --prefix="/usr/$arch" \
       --build="$CHOST" \
+      --prefix="/usr/$arch" \
       --host="$arch" \
       --without-python \
       --with-modules \
@@ -60,8 +57,8 @@ build() {
     mkdir -p "$builddir-shared"
     cd "$builddir-shared"
     "$tardir/configure" \
-      --prefix="/usr/$arch" \
       --build="$CHOST" \
+      --prefix="/usr/$arch" \
       --host="$arch" \
       --without-python \
       --with-modules \
