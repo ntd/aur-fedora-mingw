@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-atk.git/
 
 pkgname=fedora-mingw-w64-atk
-pkgver=2.11.3
-pkgrel=3
+pkgver=2.12.0
+pkgrel=1
 pkgdesc='A library providing a set of interfaces for accessibility (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -19,7 +19,7 @@ conflicts=(mingw-w64-atk)
 options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/atk/${pkgver%.*}/atk-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-atk.git/plain/atk-export-symbol-atk_object_get_object_locale.patch?id=eca5d925faa37511dc7e586b0f9e74eab1f03651")
-md5sums=('2b4316e69cbe0a1998ba39cdc8c89692'
+md5sums=('930238dec55fdbf8eda9975b44f07b76'
          'a3991b93e226389215cd6e184a844687')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
