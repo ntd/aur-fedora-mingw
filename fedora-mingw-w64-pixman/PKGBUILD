@@ -5,19 +5,18 @@
 
 pkgname=fedora-mingw-w64-pixman
 pkgver=0.30.0
-pkgrel=6
+pkgrel=7
 pkgdesc='The pixel-manipulation library for X and cairo (mingw-w64)'
 arch=(any)
 url='http://pixman.org/'
-license=(LGPL MPL)
-license=(custom)
+license=(LGPL MPL custom)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt)
 # pkg-config is not used because of --disable-gtk but is checked anyway
 makedepends=(mingw-w64-gcc mingw-w64-pkg-config)
-provides=("mingw-w64-pixman=$pkgver")
+provides=(mingw-w64-pixman=$pkgver)
 conflicts=(mingw-w64-pixman)
-options=(!strip !buildflags !libtool)
+options=(!strip staticlibs !buildflags)
 source=("http://cairographics.org/releases/pixman-$pkgver.tar.gz")
 md5sums=('ae7ac97921dfa59086ca2231621a79c7')
 
@@ -28,16 +27,14 @@ build() {
   local builddir
   local arch
 
-  export CFLAGS='-O2 -pipe'
-  export CXXFLAGS="$CFLAGS"
-  unset  LDFLAGS
-  unset  CPPFLAGS
+  unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
     "$tardir/configure" \
+      --build="$CHOST" \
       --prefix="/usr/$arch" \
       --host="$arch" \
       --disable-sse2 \
