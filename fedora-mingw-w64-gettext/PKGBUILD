@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-gettext
 pkgver=0.18.3.1
-pkgrel=2
+pkgrel=3
 pkgdesc='GNU internationalization library (mingw-w64)'
 arch=(any)
 url='http://www.gnu.org/software/gettext/'
@@ -13,9 +13,9 @@ license=(GPL)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-win-iconv fedora-mingw-w64-termcap)
 makedepends=(mingw-w64-gcc autoconf automake libtool)
-provides=("mingw-w64-gettext=$pkgver")
+provides=(mingw-w64-gettext=$pkgver)
 conflicts=(mingw-w64-gettext)
-options=(!strip !buildflags !libtool)
+options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnu.org/pub/gnu/gettext/gettext-$pkgver.tar.gz")
 md5sums=('3fc808f7d25487fc72b5759df7419e02')
 
@@ -26,16 +26,14 @@ build() {
   local builddir
   local arch
 
-  export CFLAGS='-O2 -pipe'
-  export CXXFLAGS="$CFLAGS"
-  unset  LDFLAGS
-  unset  CPPFLAGS
+  unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
     "$tardir/configure" \
+      --build="$CHOST" \
       --prefix="/usr/$arch" \
       --host="$arch" \
       --disable-java \
