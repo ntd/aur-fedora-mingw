@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/
 
 pkgname=fedora-mingw-w64-gtk3
-pkgver=3.11.2
-pkgrel=3
+pkgver=3.12.0
+pkgrel=1
 pkgdesc='GTK+3 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -31,10 +31,10 @@ conflicts=(mingw-w64-gtk3)
 options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/0004-BURN-THE-.DEF.patch?id=604b7d5111184e434cdacb09d9d11c84cae8580d"
-        "gtk.immodules")
-md5sums=('dd73f4f1d657f96d459334f6722086be'
+        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk.immodules?id=3028da05cb7e088b4477a5b30262c7c4ca1e7937")
+md5sums=('4e493fb68cded7420a7d8bcebdf13811'
          '369582585e60eab9fa5c9aa22a68e41c'
-         '9655591f6ed7b9371dc7c15f8237d383')
+         'df8ad196a274f9e0d91bfb0078a0f9bd')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -78,6 +78,9 @@ package() {
 
     cd "$srcdir/$pkgname-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
+
+    # Install the gtk.immodules file
+    install -m 0644 '../gtk.immodules?id=3028da05cb7e088b4477a5b30262c7c4ca1e7937' $prefix/etc/gtk-3.0/gtk.immodules
 
     # Do not remove exe files (leave gtk3-demo.exe for testing purpose)
     find "$prefix" -regex '.*\.\(bat\|def\|exp\)' -exec rm -f {} +
