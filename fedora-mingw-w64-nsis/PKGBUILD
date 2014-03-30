@@ -3,18 +3,19 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-nsis.git/
 
-pkgname=fedora-nsis
+pkgname=fedora-mingw-w64-nsis
 pkgver=2.46
-pkgrel=5
+pkgrel=1
 pkgdesc='A professional open source system to create Windows installers'
 arch=(i686 x86_64)
 url='http://nsis.sourceforge.net/'
 license=(custom:zlib)
+groups=(fedora-mingw)
 depends=(mingw-w64-crt)
-makedepends=(mingw-w64-gcc fedora-mingw-w64-binutils scons)
-provides=("nsis=$pkgver")
+makedepends=(mingw-w64-gcc mingw-w64-binutils scons)
+provides=(nsis=$pkgver)
 conflicts=(nsis)
-options=(!strip !buildflags !libtool)
+options=(!strip staticlibs !buildflags)
 source=("http://sourceforge.net/projects/nsis/files/NSIS%202/$pkgver/nsis-$pkgver-src.tar.bz2/download"
         "http://pkgs.fedoraproject.org/cgit/mingw-nsis.git/plain/nsis-2.43-64bit-fixes.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-nsis.git/plain/nsis-2.43-rpm-opt.patch?h=f18"
@@ -42,10 +43,7 @@ build() {
   patch -Np1 < '../nsis-2.46-missing-unistd-include.patch?h=f18'
   patch -Np0 < '../nsis-add-mingw-w64-support.patch?h=f18'
 
-  export CFLAGS='-O2 -pipe'
-  export CXXFLAGS="$CFLAGS"
-  unset  LDFLAGS
-  unset  CPPFLAGS
+  unset LDFLAGS CPPFLAGS
 
   scons "${_sconsopts[@]}"
 }

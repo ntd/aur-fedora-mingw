@@ -47,7 +47,7 @@ pkgs=(	mingw-w64-gcc
 	fedora-mingw-w64-pango
 	fedora-mingw-w64-gtk2
 	fedora-mingw-w64-gtk3
-	fedora-nsis)
+	fedora-mingw-w64-nsis)
 
 for pkg in ${pkgs[@]}; do
 	found "$pkg" "$@" && continue
