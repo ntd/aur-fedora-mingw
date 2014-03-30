@@ -36,3 +36,4 @@ mingw-w64-crt
 mingw-w64-winpthreads
 mingw-w64-gcc
 mingw-w64-pkg-config
+mingw-w64-tools (required for building cairo)

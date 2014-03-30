@@ -39,6 +39,7 @@ pkgs=(	mingw-w64-gcc
 	fedora-mingw-w64-fontconfig
 	fedora-mingw-w64-pixman
 	fedora-mingw-w64-icu
+	mingw-w64-tools
 	fedora-mingw-w64-cairo
 	fedora-mingw-w64-gdk-pixbuf
 	fedora-mingw-w64-atk
