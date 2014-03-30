@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-freetype
 pkgver=2.5.0.1
-pkgrel=2
+pkgrel=3
 pkgdesc='TrueType font rendering library (mingw-w64)'
 arch=(any)
 url='http://freetype.sourceforge.net/'
@@ -13,10 +13,10 @@ license=(GPL)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt mingw-w64-zlib mingw-w64-bzip2)
 makedepends=(mingw-w64-gcc mingw-w64-libpng)
-provides=("mingw-w64-freetype=$pkgver")
+provides=(mingw-w64-freetype=$pkgver)
 conflicts=(mingw-w64-freetype)
 replaces=()
-options=(!strip !buildflags !libtool)
+options=(!strip staticlibs !buildflags)
 source=("http://downloads.sourceforge.net/sourceforge/freetype/freetype-$pkgver.tar.bz2"
         "http://pkgs.fedoraproject.org/cgit/mingw-freetype.git/plain/freetype-2.3.0-enable-spr.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-freetype.git/plain/freetype-2.2.1-enable-valid.patch?h=f18")
@@ -36,18 +36,15 @@ build() {
   patch -Np1 < '../freetype-2.3.0-enable-spr.patch?h=f18'
   patch -Np1 < '../freetype-2.2.1-enable-valid.patch?h=f18'
 
-  export CFLAGS='-O2 -pipe'
-  export CXXFLAGS="$CFLAGS"
-  unset  LDFLAGS
-  unset  CPPFLAGS
+  unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
     "$tardir/configure" \
-      --prefix="/usr/$arch" \
       --build="$CHOST" \
+      --prefix="/usr/$arch" \
       --host="$arch" \
       --enable-static \
       --enable-shared \
