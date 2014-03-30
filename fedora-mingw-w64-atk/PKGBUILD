@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-atk
 pkgver=2.11.3
-pkgrel=2
+pkgrel=3
 pkgdesc='A library providing a set of interfaces for accessibility (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -13,10 +13,10 @@ license=(LGPL)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-win-iconv fedora-mingw-w64-gettext fedora-mingw-w64-glib2)
 makedepends=(mingw-w64-gcc mingw-w64-pkg-config
-             autoconf automake libtool gtk-doc gobject-introspection)
-provides=("mingw-w64-atk=$pkgver")
+             gnome-common autoconf automake libtool gtk-doc gobject-introspection)
+provides=(mingw-w64-atk=$pkgver)
 conflicts=(mingw-w64-atk)
-options=(!strip !buildflags !libtool)
+options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/atk/${pkgver%.*}/atk-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-atk.git/plain/atk-export-symbol-atk_object_get_object_locale.patch?id=eca5d925faa37511dc7e586b0f9e74eab1f03651")
 md5sums=('2b4316e69cbe0a1998ba39cdc8c89692'
@@ -38,16 +38,14 @@ build() {
   cd $tardir
   autoreconf -if
 
-  export CFLAGS='-O2 -pipe'
-  export CXXFLAGS="$CFLAGS"
-  unset  LDFLAGS
-  unset  CPPFLAGS
+  unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
     "$tardir/configure" \
+      --build="$CHOST" \
       --prefix="/usr/$arch" \
       --host="$arch" \
       --enable-shared \
