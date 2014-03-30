@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-gtk2
 pkgver=2.24.22
-pkgrel=3
+pkgrel=4
 pkgdesc='GTK+2 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -17,9 +17,9 @@ depends=(mingw-w64-crt fedora-mingw-w64-atk fedora-mingw-w64-cairo
          fedora-mingw-w64-gdk-pixbuf fedora-mingw-w64-pixman mingw-w64-zlib)
 makedepends=(mingw-w64-gcc mingw-w64-pkg-config
              autoconf automake libtool gtk-doc gobject-introspection)
-provides=("mingw-w64-gtk2=$pkgver")
+provides=(mingw-w64-gtk2=$pkgver)
 conflicts=(mingw-w64-gtk2)
-options=(!strip !buildflags !libtool)
+options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/mingw32-gtk2-2.15.0-xbuttons.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/mingw32-gtk2-enable_static_build.patch?h=f18"
@@ -77,16 +77,14 @@ build() {
   # Force a regeneration of this file by removing the bundled copy
   rm -f gtk/gtk.def
 
-  export CFLAGS='-O2 -pipe'
-  export CXXFLAGS="$CFLAGS"
-  unset  LDFLAGS
-  unset  CPPFLAGS
+  unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
     "$tardir/configure" \
+      --build="$CHOST" \
       --prefix="/usr/$arch" \
       --host="$arch" \
       --disable-cups \
