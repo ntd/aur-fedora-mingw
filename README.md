@@ -30,10 +30,10 @@ Other dependencies
 The following dependencies have been compiled directly from Archlinux
 or pulled in from AUR:
 
-mingw-w64-headers
-mingw-w64-binutils
-mingw-w64-crt
-mingw-w64-winpthreads
-mingw-w64-gcc
-mingw-w64-pkg-config
-mingw-w64-tools (required for building cairo)
+* mingw-w64-headers
+* mingw-w64-binutils
+* mingw-w64-crt
+* mingw-w64-winpthreads
+* mingw-w64-gcc
+* mingw-w64-pkg-config
+* mingw-w64-tools (required for building cairo)
