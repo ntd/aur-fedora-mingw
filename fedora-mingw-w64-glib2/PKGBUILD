@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-glib2
 pkgver=2.40.0
-pkgrel=1
+pkgrel=2
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -19,11 +19,13 @@ options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/glib/${pkgver%.*}/glib-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-send-log-messages-to-correct-stdout-and-stderr.patch?id=d2262b6ca2230b2dc169aa4798b59e645859a195"
-        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-prefer-constructors-over-DllMain.patch?id=10ce51e70078f0c5b76d3ee1582d75e43f7f3363")
+        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-prefer-constructors-over-DllMain.patch?id=10ce51e70078f0c5b76d3ee1582d75e43f7f3363"
+        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-update-valgrind-h.patch?id=3286bb7eaf13c82319a01d36b764ac85f1bb8f0a")
 md5sums=('05fb7cb17eacbc718e90366a1eae60d9'
          'c08c41118f5318d10f326c7c30e1a33a'
          '7b065f9bc154bf996523974a698b24de'
-         '46969e815f3ab19582ba33667a52048b')
+         '46969e815f3ab19582ba33667a52048b'
+         '5dbc7ccd8a5808bd0cb9a6f1b8a1dfd2')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -49,6 +51,12 @@ build() {
   # This prevents having to depend on DllMain in static libraries
   # http://lists.fedoraproject.org/pipermail/fedora-mingw/2013-March/006429.html
   patch -Np1 < '../glib-prefer-constructors-over-DllMain.patch?id=10ce51e70078f0c5b76d3ee1582d75e43f7f3363'
+
+  # Update valgrind.h to latest from valgrind.
+  # https://bugzilla.redhat.com/show_bug.cgi?id=1095664
+  # http://bugzilla.gnome.org/show_bug.cgi?id=730198
+  # We can drop this at next glib release.
+  patch -Np1 < '../glib-update-valgrind-h.patch?id=3286bb7eaf13c82319a01d36b764ac85f1bb8f0a'
 
   export CFLAGS='-O2 -pipe'
   export CXXFLAGS="$CFLAGS"
