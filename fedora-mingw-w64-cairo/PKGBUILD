@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-cairo
 pkgver=1.12.16
-pkgrel=3
+pkgrel=4
 pkgdesc='Cairo vector graphics library (mingw-w64)'
 arch=(any)
 url='http://cairographics.org/'
@@ -49,6 +49,9 @@ build() {
   }
 
   unset LDFLAGS CPPFLAGS
+
+  # Workaround for gcc 4.9 compatibility issue
+  CFLAGS="$CFLAGS -fno-lto"
 
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
