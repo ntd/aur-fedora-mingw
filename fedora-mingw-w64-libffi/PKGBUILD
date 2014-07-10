@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-libffi
 pkgver=3.0.13
-pkgrel=5
+pkgrel=6
 pkgdesc='A portable, high level programming interface to various calling conventions (mingw-w64)'
 arch=(any)
 url='http://sourceware.org/libffi/'
