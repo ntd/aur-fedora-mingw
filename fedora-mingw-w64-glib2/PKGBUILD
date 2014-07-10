@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/
 
 pkgname=fedora-mingw-w64-glib2
-pkgver=2.40.0
-pkgrel=3
+pkgver=2.41.0
+pkgrel=0
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -22,7 +22,7 @@ source=("http://ftp.gnome.org/pub/GNOME/sources/glib/${pkgver%.*}/glib-$pkgver.t
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-prefer-constructors-over-DllMain.patch?id=10ce51e70078f0c5b76d3ee1582d75e43f7f3363"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-update-valgrind-h.patch?id=3286bb7eaf13c82319a01d36b764ac85f1bb8f0a"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-update-valgrind-h-stdint.patch?id=45af503c31678eccd7e66911d3dd94e572be45fe")
-md5sums=('05fb7cb17eacbc718e90366a1eae60d9'
+md5sums=('65a0d3fa1e79b7d21bbc09579a0f3cf3'
          'c08c41118f5318d10f326c7c30e1a33a'
          '7b065f9bc154bf996523974a698b24de'
          '46969e815f3ab19582ba33667a52048b'
