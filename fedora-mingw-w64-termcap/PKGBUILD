@@ -12,7 +12,7 @@
 
 pkgname=fedora-mingw-w64-termcap
 pkgver=1.3.1
-pkgrel=8
+pkgrel=9
 pkgdesc='MinGW terminal feature database (mingw-w64)'
 arch=(any)
 url='ftp://ftp.gnu.org/gnu/termcap/'
