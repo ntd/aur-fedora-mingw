@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/
 
 pkgname=fedora-mingw-w64-gtk3
-pkgver=3.12.2
+pkgver=3.13.2
 pkgrel=1
 pkgdesc='GTK+3 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
@@ -31,10 +31,12 @@ conflicts=(mingw-w64-gtk3)
 options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/0004-BURN-THE-.DEF.patch?id=604b7d5111184e434cdacb09d9d11c84cae8580d"
-        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk.immodules?id=3028da05cb7e088b4477a5b30262c7c4ca1e7937")
-md5sums=('0d6d8f9f79132b3b47475d047b369b1c'
+        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk.immodules?id=3028da05cb7e088b4477a5b30262c7c4ca1e7937"
+        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk-workaround-extract-strings-breakage.patch?id=444c3d82d9711a3a72ac2eb2938b6bac737dc514")
+md5sums=('47c23a8b8e2f84b0f622774c702fbff5'
          '369582585e60eab9fa5c9aa22a68e41c'
-         'df8ad196a274f9e0d91bfb0078a0f9bd')
+         'df8ad196a274f9e0d91bfb0078a0f9bd'
+         '8fffdb48c2eecf41f56e0877460d6783')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -48,6 +50,11 @@ build() {
   cd "$tardir"
   # https://bugzilla.gnome.org/show_bug.cgi?id=700445
   patch -Np1 < '../0004-BURN-THE-.DEF.patch?id=604b7d5111184e434cdacb09d9d11c84cae8580d'
+
+  # Upstream broke cross-compilation on purpose in
+  # https://git.gnome.org/browse/gtk+/commit/util?id=a28d2cb9233eff0983b7b3517a9dbb00b62fd357
+  # Workaround this breakage by doing partial reverts
+  patch -Np0 < '../gtk-workaround-extract-strings-breakage.patch?id=444c3d82d9711a3a72ac2eb2938b6bac737dc514'
 
   autoreconf -if
 
