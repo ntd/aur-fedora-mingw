@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-harfbuzz
 pkgver=0.9.28
-pkgrel=1
+pkgrel=2
 pkgdesc='OpenType text shaping engine (mingw-w64)'
 arch=(any)
 url='http://www.harfbuzz.org/'
