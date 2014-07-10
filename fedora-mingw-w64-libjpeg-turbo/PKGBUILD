@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-libjpeg-turbo
 pkgver=1.3.1
-pkgrel=1
+pkgrel=2
 pkgdesc='libjpeg derivative with accelerated baseline JPEG compression and decompression (mingw-w64)'
 arch=(any)
 url='http://libjpeg-turbo.virtualgl.org/'
@@ -17,9 +17,11 @@ provides=(mingw-w64-libjpeg=8.0.2)
 conflicts=(mingw-w64-libjpeg mingw-w64-libjpeg-turbo)
 options=(!strip staticlibs !buildflags)
 source=("http://downloads.sourceforge.net/project/libjpeg-turbo/$pkgver/libjpeg-turbo-$pkgver.tar.gz"
-        "http://pkgs.fedoraproject.org/cgit/mingw-libjpeg-turbo.git/plain/libjpeg-turbo-match-autoconf-behavior.patch?id=8f8b58073df47e55a74d1e62453ce17875a0d475")
+        "http://pkgs.fedoraproject.org/cgit/mingw-libjpeg-turbo.git/plain/libjpeg-turbo-match-autoconf-behavior.patch?id=8f8b58073df47e55a74d1e62453ce17875a0d475"
+        "http://pkgs.fedoraproject.org/cgit/mingw-libjpeg-turbo.git/plain/libjpeg-turbo-r1237.patch?id=f40c4581f5fc89a5b3e22b5c04c6acc3721b6439")
 md5sums=('2c3a68129dac443a72815ff5bb374b05'
-         '6b00863ecdd729cb757e7f3672324f6f')
+         '6b00863ecdd729cb757e7f3672324f6f'
+         'abeaa749e4156b8e4e092b94a2723dde')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -36,6 +38,9 @@ build() {
   # Make jconfig.h more autoconf friendly
   # https://bugzilla.redhat.com/show_bug.cgi?id=843193
   patch -Np1 < '../libjpeg-turbo-match-autoconf-behavior.patch?id=8f8b58073df47e55a74d1e62453ce17875a0d475'
+
+  # Fix compatibility with older CMake versions (as used on RHEL7)
+  patch -Np1 < '../libjpeg-turbo-r1237.patch?id=f40c4581f5fc89a5b3e22b5c04c6acc3721b6439'
 
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
