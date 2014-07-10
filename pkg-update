@@ -9,18 +9,17 @@ die() {
 [ -n "$1" -a -z "$2" ] || die "Usage: $0 DIRECTORY"
 [ -e "$1/PKGBUILD" ] || die "'$1' must be a package directory"
 
-repoupdate=repo-update
-[ -x $repoupdate ] || repoupdate=./repo-update
+repoupdate=./repo-update
 [ -x $repoupdate ] || repoupdate=../repo-update
+[ -x $repoupdate ] || repoupdate=repo-update
 [ -x $repoupdate ] || die "repo-update script not found in PATH, . or .."
 
 pushd "$1" > /dev/null
 makepkg
-rc=$?
 popd > /dev/null
-[ "$rc" = 0 ] || die "Package compilation failed"
+[ -r "$1"/*.pkg.tar.xz ] || die "Package compilation failed"
 
-yes | LC_ALL='' yaourt -U "$1"/*.pkg.tar.xz || die "Package upgrade failed"
+yes | LANG= yaourt -U "$1"/*.pkg.tar.xz || die "Package upgrade failed"
 
 # WARNING: hardcoded repository path ahead
 $repoupdate $HOME/workdir/aur-fedora-mingw/pkg/entidi "$1"/*.pkg.tar.xz || die "$repoupdate failed"
