@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-cairo
 pkgver=1.12.16
-pkgrel=4
+pkgrel=5
 pkgdesc='Cairo vector graphics library (mingw-w64)'
 arch=(any)
 url='http://cairographics.org/'
