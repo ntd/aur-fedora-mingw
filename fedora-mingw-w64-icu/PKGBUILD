@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-icu
 pkgver=50.1.2
-pkgrel=5
+pkgrel=6
 pkgdesc='International Components for Unicode library (mingw-w64)'
 arch=(any)
 url='http://www.icu-project.org/'
@@ -21,11 +21,13 @@ options=(!strip staticlibs !buildflags)
 source=("http://download.icu-project.org/files/icu4c/$pkgver/icu4c-${pkgver//./_}-src.tgz"
         "http://pkgs.fedoraproject.org/cgit/mingw-icu.git/plain/icu4c-4_6_1-crossbuild.patch?id=f7a0fef35cf370c8c0add164e72499f05817cc79"
         "http://pkgs.fedoraproject.org/cgit/mingw-icu.git/plain/icu4c-4_6_1-use-correct-genccode-assembly-on-win32-and-win64.patch?h=f18"
-        "http://pkgs.fedoraproject.org/cgit/mingw-icu.git/plain/icu4c-4_6_1-mingw-w64-mkdir-compatibility.patch?id=b942c392347ba1b68c4aa0603a774cecf5035915")
+        "http://pkgs.fedoraproject.org/cgit/mingw-icu.git/plain/icu4c-4_6_1-mingw-w64-mkdir-compatibility.patch?id=b942c392347ba1b68c4aa0603a774cecf5035915"
+        "http://pkgs.fedoraproject.org/cgit/mingw-icu.git/plain/icu.10318.CVE-2013-2924_changeset_34076.patch?id=ecbc40f40b154a47ea82410d86ef580907338ef1")
 md5sums=('beb98aa972219c9fcd9c8a71314943c9'
          '91358645bc0a6b4d2b502f43cb7293f4'
          'c480877485438a1f677ca23f7d915692'
-         'c1194c6ac4bc02bd46f127a457ab4e93')
+         'c1194c6ac4bc02bd46f127a457ab4e93'
+         'c145037f754572ef88d1a693e86991da')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -39,6 +41,7 @@ build() {
   patch -Np1 < '../icu4c-4_6_1-crossbuild.patch?id=f7a0fef35cf370c8c0add164e72499f05817cc79'
   patch -Np1 < '../icu4c-4_6_1-use-correct-genccode-assembly-on-win32-and-win64.patch?h=f18'
   patch -Np1 < '../icu4c-4_6_1-mingw-w64-mkdir-compatibility.patch?id=b942c392347ba1b68c4aa0603a774cecf5035915'
+  patch -Np1 < '../icu.10318.CVE-2013-2924_changeset_34076.patch?id=ecbc40f40b154a47ea82410d86ef580907338ef1'
 
   # Needed by genccode patch
   tardir="$tardir/source"
