@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-freetype.git/
 
 pkgname=fedora-mingw-w64-freetype
-pkgver=2.5.0.1
-pkgrel=3
+pkgver=2.5.3
+pkgrel=1
 pkgdesc='TrueType font rendering library (mingw-w64)'
 arch=(any)
 url='http://freetype.sourceforge.net/'
@@ -20,7 +20,7 @@ options=(!strip staticlibs !buildflags)
 source=("http://downloads.sourceforge.net/sourceforge/freetype/freetype-$pkgver.tar.bz2"
         "http://pkgs.fedoraproject.org/cgit/mingw-freetype.git/plain/freetype-2.3.0-enable-spr.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-freetype.git/plain/freetype-2.2.1-enable-valid.patch?h=f18")
-md5sums=('c72e9010b1d986d556fc0b2b5fcbf31a'
+md5sums=('d6b60f06bfc046e43ab2a6cbfd171d65'
          '816dc8619a6904a7385769433c0a8653'
          '214119610444c9b02766ccee5e220680')
 
