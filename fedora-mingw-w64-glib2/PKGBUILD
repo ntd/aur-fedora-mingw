@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/
 
 pkgname=fedora-mingw-w64-glib2
-pkgver=2.41.0
-pkgrel=3
+pkgver=2.41.2
+pkgrel=1
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -20,16 +20,12 @@ source=("http://ftp.gnome.org/pub/GNOME/sources/glib/${pkgver%.*}/glib-$pkgver.t
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-send-log-messages-to-correct-stdout-and-stderr.patch?id=d2262b6ca2230b2dc169aa4798b59e645859a195"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-prefer-constructors-over-DllMain.patch?id=10ce51e70078f0c5b76d3ee1582d75e43f7f3363"
-        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-update-valgrind-h.patch?id=3286bb7eaf13c82319a01d36b764ac85f1bb8f0a"
-        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-update-valgrind-h-stdint.patch?id=45af503c31678eccd7e66911d3dd94e572be45fe"
-        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-add-carbon_libs-ac_subst.patch?id=8619f0e912a861481f1b27c33aa440e3f55fc817")
-md5sums=('65a0d3fa1e79b7d21bbc09579a0f3cf3'
+        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-update-valgrind-h-stdint.patch?id=45af503c31678eccd7e66911d3dd94e572be45fe")
+md5sums=('9636f60e99b98fd0fdb5239f905ac008'
          'c08c41118f5318d10f326c7c30e1a33a'
          '7b065f9bc154bf996523974a698b24de'
          '46969e815f3ab19582ba33667a52048b'
-         '5dbc7ccd8a5808bd0cb9a6f1b8a1dfd2'
-         '850b4378e1b49f8b0064b1d4fd49017a'
-         '155552fe61f6bda8f70adfd508342e69')
+         '850b4378e1b49f8b0064b1d4fd49017a')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -60,12 +56,7 @@ build() {
   # https://bugzilla.redhat.com/show_bug.cgi?id=1095664
   # http://bugzilla.gnome.org/show_bug.cgi?id=730198
   # We can drop this at next glib release.
-  patch -Np1 < '../glib-update-valgrind-h.patch?id=3286bb7eaf13c82319a01d36b764ac85f1bb8f0a'
   patch -Np2 < '../glib-update-valgrind-h-stdint.patch?id=45af503c31678eccd7e66911d3dd94e572be45fe'
-
-  # Prevent an invalid @CARBON_LIBS@ from appearing in the .pc files
-  # https://bugzilla.gnome.org/show_bug.cgi?id=731657
-  patch -Np1 < '../glib-add-carbon_libs-ac_subst.patch?id=8619f0e912a861481f1b27c33aa440e3f55fc817'
 
   export CFLAGS='-O2 -pipe'
   export CXXFLAGS="$CFLAGS"
