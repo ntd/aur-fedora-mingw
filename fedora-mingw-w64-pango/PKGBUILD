@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-pango
 pkgver=1.36.5
-pkgrel=1
+pkgrel=2
 pkgdesc='A library for layout and rendering of text (mingw-w64)'
 arch=(any)
 url='http://www.pango.org/'
@@ -40,7 +40,10 @@ build() {
   # Apply patches from fedora repository
   cd "$tardir"
   patch -Np0 < '../pango-enable-delay-load-of-freetype-and-fontconfig.patch?h=f18'
+
+  gtkdocize
   autoreconf -if
+
   patch -Np0 < '../pango_enable_static_build.patch?h=f18'
 
   unset LDFLAGS CPPFLAGS
