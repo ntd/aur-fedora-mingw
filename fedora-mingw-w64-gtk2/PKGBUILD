@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-gtk2
 pkgver=2.24.24
-pkgrel=1
+pkgrel=2
 pkgdesc='GTK+2 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -62,6 +62,7 @@ build() {
   # https://bugzilla.gnome.org/show_bug.cgi?id=704508
   patch -Np1 < '../gtk-combo-box-dont-use-invalidated-iter.patch?id=1296c449f78d4ef378541311bb4a4833c6a26fe6'
 
+  gtkdocize
   autoreconf -if
 
   patch -Np0 < '../mingw32-gtk2-enable_static_build.patch?h=f18'
