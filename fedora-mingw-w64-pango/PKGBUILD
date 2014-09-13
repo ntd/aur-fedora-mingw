@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-pango.git/
 
 pkgname=fedora-mingw-w64-pango
-pkgver=1.36.5
-pkgrel=2
+pkgver=1.36.7
+pkgrel=1
 pkgdesc='A library for layout and rendering of text (mingw-w64)'
 arch=(any)
 url='http://www.pango.org/'
@@ -23,11 +23,9 @@ conflicts=(mingw-w64-pango)
 options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/pango/${pkgver%.*}/pango-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-pango.git/plain/pango-enable-delay-load-of-freetype-and-fontconfig.patch?h=f18"
-        "http://pkgs.fedoraproject.org/cgit/mingw-pango.git/plain/pango_enable_static_build.patch?h=f18"
         "pango.modules")
-md5sums=('2500930093c3ed38acb40e4255bce2f1'
+md5sums=('5e8057da0e9e1ed0484f50887ac0ae0f'
          '757da453d21be895d4fbc31ffd45fb25'
-         '9ead454899077d5a0cd354f32f924b4c'
          '967c8dec6087eac30dda63bac3bf58a0')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
@@ -43,8 +41,6 @@ build() {
 
   gtkdocize
   autoreconf -if
-
-  patch -Np0 < '../pango_enable_static_build.patch?h=f18'
 
   unset LDFLAGS CPPFLAGS
 
@@ -85,10 +81,10 @@ package() {
     mkdir -p "$prefix/etc"
     cp -f "$srcdir/pango.modules" "$prefix/etc/"
 
-    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
+    find "$prefix" -regex '.*\.\(bat\|def\|exp\)' -exec rm -f {} +
     find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
-    #rm -fr "$prefix/share"
+    rm -fr "$prefix/share"
   done
 }
 
