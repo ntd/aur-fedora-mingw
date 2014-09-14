@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/
 
 pkgname=fedora-mingw-w64-gtk3
-pkgver=3.13.2
-pkgrel=2
+pkgver=3.13.8
+pkgrel=1
 pkgdesc='GTK+3 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -30,13 +30,13 @@ provides=(mingw-w64-gtk3=$pkgver)
 conflicts=(mingw-w64-gtk3)
 options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.tar.xz"
-        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/0004-BURN-THE-.DEF.patch?id=604b7d5111184e434cdacb09d9d11c84cae8580d"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk.immodules?id=3028da05cb7e088b4477a5b30262c7c4ca1e7937"
-        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk-workaround-extract-strings-breakage.patch?id=444c3d82d9711a3a72ac2eb2938b6bac737dc514")
-md5sums=('47c23a8b8e2f84b0f622774c702fbff5'
-         '369582585e60eab9fa5c9aa22a68e41c'
+        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/0001-Bug-731013-cross-compilation-broken-when-building-ex.patch?id=8cc3bd29422d896744637ae5e605b2578d46c96f"
+        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk3-commit-62254c.patch?id=8cc3bd29422d896744637ae5e605b2578d46c96f")
+md5sums=('d518531b873d6d05d72e26802d04c267'
          'df8ad196a274f9e0d91bfb0078a0f9bd'
-         '8fffdb48c2eecf41f56e0877460d6783')
+         'c38fc9dc60b16af458f2506f57694a6b'
+         '9c9483f8704b63fe45d6169d09e053c0')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -46,20 +46,19 @@ build() {
   local builddir
   local arch
 
-  # Apply patches from fedora repository
   cd "$tardir"
-  # https://bugzilla.gnome.org/show_bug.cgi?id=700445
-  patch -Np1 < '../0004-BURN-THE-.DEF.patch?id=604b7d5111184e434cdacb09d9d11c84cae8580d'
 
-  # Upstream broke cross-compilation on purpose in
-  # https://git.gnome.org/browse/gtk+/commit/util?id=a28d2cb9233eff0983b7b3517a9dbb00b62fd357
-  # Workaround this breakage by doing partial reverts
-  patch -Np0 < '../gtk-workaround-extract-strings-breakage.patch?id=444c3d82d9711a3a72ac2eb2938b6bac737dc514'
+  # Revert this one first
+  patch -RNp1 < '../gtk3-commit-62254c.patch?id=8cc3bd29422d896744637ae5e605b2578d46c96f'
+
+  # Cross-compilation is broken as of gtk+ 3.13.2
+  # Apply a work-in-progress patch to fix compilation
+  # https://bugzilla.gnome.org/show_bug.cgi?id=731013
+  patch -Np1 < '../0001-Bug-731013-cross-compilation-broken-when-building-ex.patch?id=8cc3bd29422d896744637ae5e605b2578d46c96f'
 
   autoreconf -if
 
   unset LDFLAGS CPPFLAGS
-
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
     mkdir -p "$builddir"
