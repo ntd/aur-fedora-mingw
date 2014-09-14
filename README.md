@@ -80,3 +80,13 @@ The following dependencies need to be compiled from AUR:
 
 * mingw-w64-pkg-config
 * mingw-w64-tools (required for building cairo)
+
+License
+=======
+
+The code provided by this project is free software released under the MIT
+license. See `COPYING` for details.
+
+This license is **not** extended to the sources of the packages. Every
+package fetched by this project is free software but you need to hunt
+inside the source tree to know the exact license.
