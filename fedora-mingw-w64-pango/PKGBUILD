@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-pango.git/
 
 pkgname=fedora-mingw-w64-pango
-pkgver=1.36.7
+pkgver=1.36.8
 pkgrel=1
 pkgdesc='A library for layout and rendering of text (mingw-w64)'
 arch=(any)
@@ -24,7 +24,7 @@ options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/pango/${pkgver%.*}/pango-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-pango.git/plain/pango-enable-delay-load-of-freetype-and-fontconfig.patch?h=f18"
         "pango.modules")
-md5sums=('5e8057da0e9e1ed0484f50887ac0ae0f'
+md5sums=('217a9a753006275215fa9fa127760ece'
          '757da453d21be895d4fbc31ffd45fb25'
          '967c8dec6087eac30dda63bac3bf58a0')
 
