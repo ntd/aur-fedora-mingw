@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/
 
 pkgname=fedora-mingw-w64-gtk3
-pkgver=3.13.8
+pkgver=3.14.0
 pkgrel=1
 pkgdesc='GTK+3 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
@@ -33,7 +33,7 @@ source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.t
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk.immodules?id=3028da05cb7e088b4477a5b30262c7c4ca1e7937"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/0001-Bug-731013-cross-compilation-broken-when-building-ex.patch?id=8cc3bd29422d896744637ae5e605b2578d46c96f"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk3-commit-62254c.patch?id=8cc3bd29422d896744637ae5e605b2578d46c96f")
-md5sums=('d518531b873d6d05d72e26802d04c267'
+md5sums=('2e4e64a29e0373f36fbc98e1531da2db'
          'df8ad196a274f9e0d91bfb0078a0f9bd'
          'c38fc9dc60b16af458f2506f57694a6b'
          '9c9483f8704b63fe45d6169d09e053c0')
