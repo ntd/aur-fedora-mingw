@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/
 
 pkgname=fedora-mingw-w64-glib2
-pkgver=2.42.0
+pkgver=2.42.1
 pkgrel=1
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
@@ -19,13 +19,11 @@ options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/glib/${pkgver%.*}/glib-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-send-log-messages-to-correct-stdout-and-stderr.patch?id=d2262b6ca2230b2dc169aa4798b59e645859a195"
-        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-prefer-constructors-over-DllMain.patch?id=10ce51e70078f0c5b76d3ee1582d75e43f7f3363"
-        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-update-valgrind-h-stdint.patch?id=45af503c31678eccd7e66911d3dd94e572be45fe")
-md5sums=('71af99768063ac24033ac738e2832740'
+        "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-prefer-constructors-over-DllMain.patch?id=10ce51e70078f0c5b76d3ee1582d75e43f7f3363")
+md5sums=('89c4119e50e767d3532158605ee9121a'
          'c08c41118f5318d10f326c7c30e1a33a'
          '7b065f9bc154bf996523974a698b24de'
-         '46969e815f3ab19582ba33667a52048b'
-         '850b4378e1b49f8b0064b1d4fd49017a')
+         '46969e815f3ab19582ba33667a52048b')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -52,12 +50,6 @@ build() {
   # http://lists.fedoraproject.org/pipermail/fedora-mingw/2013-March/006429.html
   patch -Np1 < '../glib-prefer-constructors-over-DllMain.patch?id=10ce51e70078f0c5b76d3ee1582d75e43f7f3363'
 
-  # Update valgrind.h to latest from valgrind.
-  # https://bugzilla.redhat.com/show_bug.cgi?id=1095664
-  # http://bugzilla.gnome.org/show_bug.cgi?id=730198
-  # We can drop this at next glib release.
-  patch -Np2 < '../glib-update-valgrind-h-stdint.patch?id=45af503c31678eccd7e66911d3dd94e572be45fe'
-
   export CFLAGS='-O2 -pipe'
   export CXXFLAGS="$CFLAGS"
   unset  LDFLAGS
@@ -73,7 +65,8 @@ build() {
       --prefix="/usr/$arch" \
       --host="$arch" \
       --disable-shared \
-      --enable-static
+      --enable-static \
+      ac_cv_func_if_nametoindex=yes
     make V=1
     mkdir -p "$builddir-shared"
     cd "$builddir-shared"
@@ -82,7 +75,8 @@ build() {
       --prefix="/usr/$arch" \
       --host="$arch" \
       --enable-shared \
-      --disable-static
+      --disable-static \
+      ac_cv_func_if_nametoindex=yes
     make
   done
 }
