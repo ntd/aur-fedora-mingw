@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-freetype.git/
 
 pkgname=fedora-mingw-w64-freetype
-pkgver=2.5.3
-pkgrel=3
+pkgver=2.5.4
+pkgrel=1
 pkgdesc='TrueType font rendering library (mingw-w64)'
 arch=(any)
 url='http://freetype.sourceforge.net/'
@@ -18,9 +18,11 @@ conflicts=(mingw-w64-freetype)
 replaces=()
 options=(!strip staticlibs !buildflags)
 source=("http://downloads.sourceforge.net/sourceforge/freetype/freetype-$pkgver.tar.bz2"
-        "http://pkgs.fedoraproject.org/cgit/mingw-freetype.git/plain/freetype-2.2.1-enable-valid.patch?h=f18")
-md5sums=('d6b60f06bfc046e43ab2a6cbfd171d65'
-         '214119610444c9b02766ccee5e220680')
+        "http://pkgs.fedoraproject.org/cgit/mingw-freetype.git/plain/freetype-2.2.1-enable-valid.patch?h=f18"
+        "http://pkgs.fedoraproject.org/cgit/mingw-freetype.git/plain/freetype-2.5.3-enable-spr.patch?id=e994213133a3c10acd7a8e6cf6b8a4a191744ef2")
+md5sums=('438585445a2f1f71c77590155fd96616'
+         '214119610444c9b02766ccee5e220680'
+         'c7da453284e3ffdfb6139ea61d52cad6')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -32,6 +34,7 @@ build() {
   # Apply patches from fedora repository
   cd "$tardir"
   patch -Np1 < '../freetype-2.2.1-enable-valid.patch?h=f18'
+  patch -Np1 < '../freetype-2.5.3-enable-spr.patch?id=e994213133a3c10acd7a8e6cf6b8a4a191744ef2'
 
   unset LDFLAGS CPPFLAGS
 
