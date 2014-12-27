@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-libxml2.git/
 
 pkgname=fedora-mingw-w64-libxml2
-pkgver=2.9.1
-pkgrel=6
+pkgver=2.9.2
+pkgrel=1
 pkgdesc='XML parsing library, version 2 (mingw-w64)'
 arch=(any)
 url='http://www.xmlsoft.org/'
@@ -16,9 +16,11 @@ makedepends=(mingw-w64-gcc mingw-w64-gettext)
 provides=(mingw-w64-libxml2=$pkgver)
 conflicts=(mingw-w64-libxml2)
 options=(!strip staticlibs !buildflags)
-source=("ftp://xmlsoft.org/libxml/libxml2-$pkgver.tar.gz"
+source=("ftp://ftp.xmlsoft.org/libxml2/libxml2-$pkgver.tar.gz"
+        "http://pkgs.fedoraproject.org/cgit/mingw-libxml2.git/plain/libxml2-2.9.2-catalog-revert.patch?id=47ad62add5888cb5be7b2781b0197d4201b151a0"
         "http://pkgs.fedoraproject.org/cgit/mingw-libxml2.git/plain/mingw32-libxml2-static-build-compile-fix.patch?id=b2ef773d9a92f507605e3fa6bb52c91a0119d16c")
-md5sums=('9c0cfef285d5c4a5c80d00904ddab380'
+md5sums=('9e6a9aca9d155737868b3dc5fd82f788'
+         'c5f4a21e64558d01149ce2e2b8147c28'
          '0df377025082cd93cccbca547f048011')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
@@ -28,12 +30,16 @@ build() {
   local builddir
   local arch
 
-  # Apply patches from fedora repository
   cd "$tardir"
+
+  # Avoid corrupting the xml catalogs
+  # https://bugzilla.redhat.com/show_bug.cgi?id=1153753
+  patch -Np1 < '../libxml2-2.9.2-catalog-revert.patch?id=47ad62add5888cb5be7b2781b0197d4201b151a0'
+
+  # MinGW-specific patches
   patch -Np0 < '../mingw32-libxml2-static-build-compile-fix.patch?id=b2ef773d9a92f507605e3fa6bb52c91a0119d16c'
 
-  unset LDFLAGS
-  export CPPFLAGS='-DLIBXML_STATIC_FOR_DLL'
+  unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
@@ -41,9 +47,14 @@ build() {
     # LibXML2 can't build static and shared libraries in one go, so we
     # build LibXML2 twice here
 
+    # XXX: disabling zlib for now (--without-zlib) because the
+    # compilation fails otherwise with undefined references.
+    # Not sure if this is an issue of zlib of libxml2 though.
+
     mkdir -p "$builddir-static"
     cd "$builddir-static"
     "$tardir/configure" \
+      CPPFLAGS='-DLIBXML_STATIC_FOR_DLL' \
       --build="$CHOST" \
       --prefix="/usr/$arch" \
       --host="$arch" \
@@ -51,7 +62,8 @@ build() {
       --with-modules \
       --enable-static \
       --disable-shared \
-      --with-threads=win32
+      --with-threads=win32 \
+      --without-zlib
     make
 
     mkdir -p "$builddir-shared"
@@ -64,7 +76,8 @@ build() {
       --with-modules \
       --disable-static \
       --enable-shared \
-      --with-threads=win32
+      --with-threads=win32 \
+      --without-zlib
     make
   done
 }
