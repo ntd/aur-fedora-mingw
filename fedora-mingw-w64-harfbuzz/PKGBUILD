@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-harfbuzz.git/
 
 pkgname=fedora-mingw-w64-harfbuzz
-pkgver=0.9.34
+pkgver=0.9.37
 pkgrel=1
 pkgdesc='OpenType text shaping engine (mingw-w64)'
 arch=(any)
@@ -18,7 +18,7 @@ provides=(mingw-w64-harfbuzz=$pkgver)
 conflicts=(mingw-w64-harfbuzz)
 options=(!strip staticlibs !buildflags)
 source=("http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-$pkgver.tar.bz2")
-md5sums=('7a94684e560d0857c9ef28b7746d1349')
+md5sums=('bfe733250e34629a188d82e3b971bc1e')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
