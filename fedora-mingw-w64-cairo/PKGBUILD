@@ -4,8 +4,8 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-cairo.git/
 
 pkgname=fedora-mingw-w64-cairo
-pkgver=1.12.16
-pkgrel=5
+pkgver=1.14.0
+pkgrel=1
 pkgdesc='Cairo vector graphics library (mingw-w64)'
 arch=(any)
 url='http://cairographics.org/'
@@ -14,15 +14,12 @@ groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-fontconfig fedora-mingw-w64-freetype
          mingw-w64-libxml2 fedora-mingw-w64-pixman mingw-w64-libpng
          fedora-mingw-w64-win-iconv mingw-w64-zlib fedora-mingw-w64-glib2)
-makedepends=(mingw-w64-gcc mingw-w64-tools mingw-w64-pkg-config
-             autoconf automake libtool gtk-doc)
+makedepends=(mingw-w64-gcc mingw-w64-tools mingw-w64-pkg-config)
 provides=(mingw-w64-cairo=$pkgver)
 conflicts=(mingw-w64-cairo)
 options=(!strip staticlibs !buildflags)
-source=("http://cairographics.org/releases/cairo-$pkgver.tar.xz"
-        "http://pkgs.fedoraproject.org/cgit/mingw-cairo.git/plain/0003-build-sys-do-not-try-to-build-util-sphinx-on-Windows.patch?id=602fd779ff72e25af2fdf28aaec8b8d71da75aad")
-md5sums=('a1304edcdc99282f478b995ee5f8f854'
-        'ee1f9b94e8aa268e580980891fa50ebf')
+source=("http://cairographics.org/releases/cairo-$pkgver.tar.xz")
+md5sums=('fc3a5edeba703f906f2241b394f0cced')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -33,10 +30,6 @@ build() {
 
   # Apply patches from fedora repository
   cd "$tardir"
-  # https://bugs.freedesktop.org/show_bug.cgi?id=63043
-  patch -Np1 < '../0003-build-sys-do-not-try-to-build-util-sphinx-on-Windows.patch?id=602fd779ff72e25af2fdf28aaec8b8d71da75aad'
-
-  autoreconf -if
 
   # Function to generate an import library for delay-loading
   gen_delay_lib() {
@@ -50,9 +43,6 @@ build() {
 
   unset LDFLAGS CPPFLAGS
 
-  # Workaround for gcc 4.9 compatibility issue
-  CFLAGS="$CFLAGS -fno-lto"
-
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
     mkdir -p "$builddir"
@@ -62,6 +52,7 @@ build() {
     gen_delay_lib "/usr/$arch/bin/libfontconfig-1.dll" libfontconfig-delayed.dll.a
     gen_delay_lib "/usr/$arch/bin/libfreetype-6.dll" libfreetype-delayed.dll.a
 
+    ax_cv_c_float_words_bigendian=no \
     "$tardir/configure" \
       --build="$CHOST" \
       --prefix="/usr/$arch" \
