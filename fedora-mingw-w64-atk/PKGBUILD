@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-atk.git/
 
 pkgname=fedora-mingw-w64-atk
-pkgver=2.14.0
+pkgver=2.15.3
 pkgrel=1
 pkgdesc='A library providing a set of interfaces for accessibility (mingw-w64)'
 arch=(any)
@@ -18,7 +18,7 @@ provides=(mingw-w64-atk=$pkgver)
 conflicts=(mingw-w64-atk)
 options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/atk/${pkgver%.*}/atk-$pkgver.tar.xz")
-md5sums=('ecb7ca8469a5650581b1227d78051b8b')
+md5sums=('4dc8f00682eeb6bcab3b9b2fd1f2378c')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
