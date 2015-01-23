@@ -10,8 +10,8 @@ be permanents).
 Motivation
 ==========
 
-I badly needed a MinGW environment for cross-compiling my GTK+ applications for
-for win32 platforms but the PKGBUILDs found in [AUR](http://aur.archlinux.org/)
+I badly needed a MinGW environment for cross-compiling my GTK+ applications on
+Windows platforms but the PKGBUILDs found in [AUR](http://aur.archlinux.org/)
 at that time were a mess, i.e. the toolchain was not working out of the box and
 required a lot of manual work to be put on the road. It has been clear nobody
 was really using it.
@@ -26,8 +26,8 @@ based its toolchain on the Fedora one.
 I am trying to keep these packages in sync with Fedora and, although not mapped
 exactly 1:1, they are quite close.
 
-Features
-========
+Features and limits
+===================
 
 Here is the list of (potential) packages provided by this project:
 
@@ -63,6 +63,9 @@ AUR.
 If you intend to build the toolchain in your own way, refer to `build-all` to
 know the exact **order of build**, so check it out to see the most up to date
 list and order of packages.
+
+To keep the dependecies as low as possible, this toolchain does not contain
+some image format I do not use, most notably **SVG** and **tiff**.
 
 External dependencies
 =====================
