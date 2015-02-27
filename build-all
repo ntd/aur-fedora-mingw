@@ -62,7 +62,7 @@ for pkg in ${pkgs[@]}; do
 
 	    # TODO: is there a more elegant way to force the removing
 	    #       of conflicting packages?
-	    if ! yes | LC_MESSAGES= yaourt -U *.pkg.tar.xz; then exit 1; fi
+	    if ! yes | LC_MESSAGES=C yaourt -U *.pkg.tar.xz; then exit 1; fi
 
 	    # The tarball links (*.pkg.tar.xz) are not deleted: it is
 	    # convenient to keep the on place to easily update package

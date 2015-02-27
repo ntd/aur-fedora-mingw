@@ -19,7 +19,7 @@ makepkg
 popd > /dev/null
 [ -r "$1"/*.pkg.tar.xz ] || die "Package compilation failed"
 
-yes | LC_MESSAGES= yaourt -U "$1"/*.pkg.tar.xz || die "Package upgrade failed"
+yes | LC_MESSAGES=C yaourt -U "$1"/*.pkg.tar.xz || die "Package upgrade failed"
 
 # WARNING: hardcoded repository path ahead
 $repoupdate $HOME/workdir/aur-fedora-mingw/pkg/entidi "$1"/*.pkg.tar.xz || die "$repoupdate failed"
