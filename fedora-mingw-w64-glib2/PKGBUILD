@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-glib2
 pkgver=2.43.3
-pkgrel=1
+pkgrel=3
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -65,8 +65,7 @@ build() {
       --prefix="/usr/$arch" \
       --host="$arch" \
       --disable-shared \
-      --enable-static \
-      ac_cv_func_if_nametoindex=yes
+      --enable-static
     make V=1
     mkdir -p "$builddir-shared"
     cd "$builddir-shared"
@@ -75,8 +74,7 @@ build() {
       --prefix="/usr/$arch" \
       --host="$arch" \
       --enable-shared \
-      --disable-static \
-      ac_cv_func_if_nametoindex=yes
+      --disable-static
     make
   done
 }
