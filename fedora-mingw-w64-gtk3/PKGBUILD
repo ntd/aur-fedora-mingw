@@ -4,7 +4,7 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/
 
 pkgname=fedora-mingw-w64-gtk3
-pkgver=3.14.5
+pkgver=3.14.9
 pkgrel=1
 pkgdesc='GTK+3 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
@@ -30,13 +30,11 @@ provides=(mingw-w64-gtk3=$pkgver)
 conflicts=(mingw-w64-gtk3)
 options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.tar.xz"
-        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk.immodules?id=3028da05cb7e088b4477a5b30262c7c4ca1e7937"
-        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk3-bug-731013-fix-cross-compilation.patch?id=d734837aa460b213b4a68819ebc56d265dd50425"
-        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/0001-window-GtkPlug-is-conditionally-supported-on-X11-onl.patch?id=96a975609a6eb200497c1b3f1d5d94f08755101d")
-md5sums=('c6b72b1cec82061167759b9e6cec9bab'
-         'df8ad196a274f9e0d91bfb0078a0f9bd'
+        "https://bug731013.bugzilla-attachments.gnome.org/attachment.cgi?id=287100"
+        "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk.immodules?id=3028da05cb7e088b4477a5b30262c7c4ca1e7937")
+md5sums=('40902a0b035277011095946e1c61290d'
          '7e245b38b9e1d2bb6682922cabd11f64'
-         '548ef3a2c1643dda37f5ff8764abd7ac')
+         'df8ad196a274f9e0d91bfb0078a0f9bd')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -51,10 +49,7 @@ build() {
   # Cross-compilation is broken as of gtk+ 3.13.2
   # Apply a work-in-progress patch to fix compilation
   # https://bugzilla.gnome.org/show_bug.cgi?id=731013
-  patch -Np1 < '../gtk3-bug-731013-fix-cross-compilation.patch?id=d734837aa460b213b4a68819ebc56d265dd50425'
-
-  # Backported upstream patch to fix the build
-  patch -Np1 < '../0001-window-GtkPlug-is-conditionally-supported-on-X11-onl.patch?id=96a975609a6eb200497c1b3f1d5d94f08755101d'
+  patch -Np1 < '../attachment.cgi?id=287100'
 
   autoreconf -if
 
