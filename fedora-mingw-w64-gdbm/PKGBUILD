@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-gdbm
 pkgver=1.11
-pkgrel=1
+pkgrel=2
 pkgdesc='GNU database library (mingw-w64)'
 arch=(any)
 url='http://www.gnu.org/software/gdbm/gdbm.html'
@@ -60,7 +60,8 @@ build() {
       --prefix="/usr/$arch" \
       --host="$arch" \
       --enable-shared \
-      --enable-static
+      --enable-static \
+      --enable-libgdbm-compat
     make V=1
   done
 }
