@@ -1,0 +1,89 @@
+# Maintainer: Nicola Fontana <ntd@entidi.it>
+# Maintainer: Alexey Pavlov <alexpux@gmail.com>
+#
+# This is an adaptation of the MinGW package by Alexpux found on GitHub:
+# https://github.com/Alexpux/MINGW-packages/tree/master/mingw-w64-gobject-introspection
+
+pkgname=mingw-w64-gobject-introspection
+pkgver=1.42.0
+_glibver=2.43.3
+pkgrel=1
+pkgdesc='Introspection system for GObject-based libraries (mingw-w64)'
+arch=(any)
+url='https://live.gnome.org/GObjectIntrospection'
+license=(LGPL GPL)
+depends=(mingw-w64-crt fedora-mingw-w64-glib2)
+makedepends=(mingw-w64-gcc mingw-w64-pkg-config mingw-w64-python2 wine)
+options=(!strip staticlibs !buildflags)
+source=("http://ftp.gnome.org/pub/GNOME/sources/gobject-introspection/${pkgver%.*}/gobject-introspection-${pkgver}.tar.xz"
+        "0018-debug-rmtree-errors.mingw.patch"
+        "0021-tests-no-undefined.patch"
+        "0022-change-pkg-config-invocations.mingw.patch"
+        "0050-dont-load-msvcrt.patch"
+        "0055-use-pkgconfig-to-detect-python.patch"
+        "http://ftp.gnome.org/pub/GNOME/sources/glib/${_glibver%.*}/glib-${_glibver}.tar.xz")
+md5sums=('4fa52f6b67367d9c1b99b98683ced202'
+         'f0ecde986ebf1f0e28b752f9c36fb6c1'
+         '69ef34e2f57abc8afe1b9f6fa3786e97'
+         '8d3589fb959a0a68ce7ce9051fa441fe'
+         'e3598d539258678eef8dde2216419faf'
+         '4f082b00ab2b08c1cb06a06d767d16ae'
+         '2727c4dee79c5449f364cd5e27b17099')
+
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
+
+prepare() {
+  cd "$srcdir"
+  tar xvf "glib-${_glibver}.tar.xz"
+
+  cd "gobject-introspection-$pkgver"
+  patch -p1 -i ../0018-debug-rmtree-errors.mingw.patch
+  patch -p1 -i ../0021-tests-no-undefined.patch
+  patch -p1 -i ../0022-change-pkg-config-invocations.mingw.patch
+  patch -p1 -i ../0050-dont-load-msvcrt.patch
+  patch -p1 -i ../0055-use-pkgconfig-to-detect-python.patch
+
+  autoreconf -if
+}
+
+build() {
+  local tardir="$srcdir/gobject-introspection-$pkgver"
+  local builddir
+  local arch
+
+  unset LDFLAGS CPPFLAGS
+
+  for arch in ${_architectures[@]}; do
+    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    mkdir -p "$builddir"
+    cd "$builddir"
+    "$tardir/configure" \
+      --build="$CHOST" \
+      --prefix="/usr/$arch" \
+      --host="$arch" \
+      --disable-shared \
+      --enable-static \
+      --with-glib-src="$srcdir/glib-${_glibver}" \
+      PYTHON="/usr/$arch/bin/python2"
+    make
+  done
+}
+
+package() {
+  local arch
+  local prefix
+
+  for arch in ${_architectures[@]}; do
+    prefix="$pkgdir/usr/$arch"
+
+    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    make DESTDIR="$pkgdir" install
+
+    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+    rm -fr "$prefix/share"
+  done
+}
+
+# vim:set ts=2 sw=2 et:

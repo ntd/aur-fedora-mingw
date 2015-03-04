@@ -1,0 +1,20 @@
++++ gobject-introspection-1.42.0.orig/m4/python.m4	2014-03-06 05:09:17.000000000 +0100
+--- gobject-introspection-1.42.0/m4/python.m4	2015-03-02 18:51:15.508899782 +0100
+@@ -43,7 +43,7 @@
+ [AC_REQUIRE([AM_PATH_PYTHON])
+ AC_MSG_CHECKING(for headers required to compile python extensions)
+ dnl deduce PYTHON_INCLUDES
+-PYTHON_INCLUDES=`$PYTHON-config --includes`
++PYTHON_INCLUDES=`$PKG_CONFIG --cflags python2`
+ AC_SUBST(PYTHON_INCLUDES)
+ dnl check if the headers exist:
+ save_CPPFLAGS="$CPPFLAGS"
+@@ -64,7 +64,7 @@
+ AC_MSG_CHECKING(for libraries required to link against libpython)
+ dnl deduce PYTHON_LIBS
+ if test "x$PYTHON_LIBS" = x; then
+-	PYTHON_LIBS=`$PYTHON-config --ldflags --libs`
++	PYTHON_LIBS=`$PKG_CONFIG --libs python2`
+ fi
+ AC_SUBST(PYTHON_LIBS)
+ dnl check if libpython exist:
