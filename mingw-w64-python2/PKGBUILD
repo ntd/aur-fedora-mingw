@@ -8,7 +8,7 @@
 
 pkgname=mingw-w64-python2
 pkgver=2.7.9
-pkgrel=1
+pkgrel=2
 _pybasever=2.7
 pkgdesc='A high-level scripting language (mingw-w64)'
 arch=(any)
@@ -17,7 +17,7 @@ license=(PSF)
 depends=(mingw-w64-crt fedora-mingw-w64-zlib fedora-mingw-w64-bzip2
          fedora-mingw-w64-expat fedora-mingw-w64-gdbm fedora-mingw-w64-libffi
          mingw-w64-openssl)
-makedepends=(mingw-w64-gcc mingw-w64-pkg-config)
+makedepends=(mingw-w64-gcc mingw-w64-pkg-config wine "python2>=$pkgver")
 options=(!strip staticlibs !buildflags)
 source=("http://www.python.org/ftp/python/${pkgver%rc?}/Python-${pkgver}.tar.xz"
         "0000-make-_sysconfigdata.py-relocatable.patch"
@@ -273,29 +273,37 @@ prepare() {
   patch -p1 -i ../1030-use-gnu_printf-in-format.patch
   patch -p1 -i ../1040-install-msilib.patch
 
+  # Run PGEN through wine
+  # Unsetting DISPLAY avoids to rely on X server running and
+  # does not trigger dialog windows requiring user interaction:
+  # http://unix.stackexchange.com/questions/188146/use-wine-without-user-interaction
+  sed -i -e 's|$(PGEN) $(GRAMMAR_INPUT)|DISPLAY= wine $(PGEN) $(GRAMMAR_INPUT)|g' Makefile.pre.in
+
   autoreconf -vfi
 
   # Temporary workaround for FS#22322
   # See http://bugs.python.org/issue10835 for upstream report
-  #sed -i "/progname =/s/python/python${_pybasever}/" Python/pythonrun.c
+  #sed -i -e "/progname =/s/python/python${_pybasever}/" Python/pythonrun.c
 
   # Enable built-in SQLite module to load extensions (fix FS#22122)
-  sed -i "/SQLITE_OMIT_LOAD_EXTENSION/d" setup.py
+  sed -i -e "/SQLITE_OMIT_LOAD_EXTENSION/d" setup.py
 
   # FS#23997
-  sed -i -e "s|^#.* /usr/local/bin/python|#!/usr/bin/env python2|" Lib/cgi.py
+  sed -i -e "s|^#.* /usr/local/bin/python|#!/usr/bin/python2|" Lib/cgi.py
 
-  sed -i "s/python2.3/python2/g" Lib/distutils/tests/test_build_scripts.py \
-  Lib/distutils/tests/test_install_scripts.py Tools/scripts/gprof2html.py
+  sed -i -e "s/python2.3/python2/g" \
+    Lib/distutils/tests/test_build_scripts.py \
+    Lib/distutils/tests/test_install_scripts.py \
+    Tools/scripts/gprof2html.py
 
-  touch Include/graminit.h
-  touch Python/graminit.c
-  touch Parser/Python.asdl
-  touch Parser/asdl.py
-  touch Parser/asdl_c.py
-  touch Include/Python-ast.h
-  touch Python/Python-ast.c
-  echo \"\" > Parser/pgen.stamp
+  #touch Include/graminit.h
+  #touch Python/graminit.c
+  #touch Parser/Python.asdl
+  #touch Parser/asdl.py
+  #touch Parser/asdl_c.py
+  #touch Include/Python-ast.h
+  #touch Python/Python-ast.c
+  #echo \"\" > Parser/pgen.stamp
 
   # Ensure that we are using the system copy of various libraries (expat, zlib and libffi),
   # rather than copies shipped in the tarball
@@ -308,28 +316,37 @@ build() {
   local tardir="$srcdir/Python-$pkgver"
   local builddir
   local arch
+  local bits
+
+  rm -fr "$srcdir/win32" "$srcdir/win64"
 
   unset LDFLAGS CPPFLAGS
   CFLAGS='-fwrapv -D__USE_MINGW_ANSI_STDIO=1 -DNDEBUG'
   CXXFLAGS="$CFLAGS"
 
-  # Workaround for conftest error on 64-bit builds
-  export ac_cv_working_tzset=no
-
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
+    if [ $arch = i686-w64-mingw32 ]; then
+      bits=32
+    else
+      bits=64
+      # Workaround for conftest error on 64-bit builds
+      export ac_cv_working_tzset=no
+    fi
     export LIBFFI_INCLUDEDIR=$($arch-pkg-config --variable=includedir libffi)
+    export WINEARCH=win$bits
+    export WINEPREFIX="$srcdir/$WINEARCH"
     "$tardir/configure" \
       --build="$CHOST" \
       --prefix="/usr/$arch" \
       --host="$arch" \
-      --disable-shared \
-      --enable-static \
+      --enable-shared \
       --with-threads \
       --with-system-expat \
-      --with-system-ffi
+      --with-system-ffi \
+      --with-dbmliborder=gdbm:ndbm
     make
   done
 }
@@ -337,12 +354,55 @@ build() {
 package() {
   local arch
   local prefix
+  local wrapper
+  local f
 
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
+    wrapper="/usr/$arch/bin/python"
+    [ $arch = i686-w64-mingw32 ] && bits=32 || bits=64
 
     cd "$srcdir/$pkgname-$pkgver-build-$arch"
-    make DESTDIR="$pkgdir" install
+    make DESTDIR="$pkgdir" \
+      MSYSTEM=MINGW \
+      MSYS2_ARG_CONV_EXCL="--prefix=;--install-scripts=;--install-platlib=" \
+      install
+
+    # Create wrappers for running python.exe through wine
+    # The "dummy" component is required in order to avoid platform guessing
+    # from wine: https://bugs.winehq.org/show_bug.cgi?id=29661
+    cat <<EOT > "$pkgdir$wrapper${_pybasever}"
+#!/bin/sh
+prefix=\$(mktemp -d -t wine$bits-XXXXX)
+WINEARCH=win$bits WINEPREFIX=\$prefix/dummy DISPLAY= wine /usr/$arch/bin/python${_pybasever}.exe "\$@"
+rm -fr \$prefix
+EOT
+    chmod 0755 "$pkgdir$wrapper${_pybasever}"
+    ln -sf "python${_pybasever}" "$pkgdir${wrapper}2"
+    ln -sf "python${_pybasever}" "$pkgdir$wrapper"
+
+    mv "$prefix/bin/smtpd.py" "$prefix/lib/python${_pybasever}/"
+
+    # Clean up she-bangs
+    find "$prefix/lib/python${_pybasever}/" -name '*.py' | \
+       xargs sed -i -e 's|#[ ]*![ ]*/usr/bin/env python$|#!/usr/bin/env python2|'
+
+    # Clean-up references to build directory
+    sed -i -e "s|$srcdir/Python-$pkgver:||" "$prefix/lib/python${_pybasever}/config/Makefile"
+
+    # Use the wrapper also for the helper tools
+    for f in 2to3 idle pydoc python-config; do
+      sed -i -e "s|#! */usr/bin/python.*$|#!$wrapper|" "$prefix/bin/$f"
+    done
+
+    # Replace paths in sysconfig
+    sed -i -e "s|$prefix|/usr/$arch|g" \
+      "$prefix/lib/python${_pybasever}/_sysconfigdata.py" \
+      "$prefix/lib/python${_pybasever}/smtpd.py"
+
+    # Copy python import library to $prefix/lib because
+    # some programs can't find it in other locations
+    cp -a "$prefix/lib/python${_pybasever}/config/libpython${_pybasever}.dll.a" "$prefix/lib/"
 
     find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
