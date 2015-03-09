@@ -1,0 +1,6 @@
+# This file should be bogus but I did not find another way to make
+# the python build system happy with my MinGW environment
+_socket socketmodule.c timemodule.c -lwsock32 -lws2_32
+
+_ssl _ssl.c \
+	-DUSE_SSL -Iinclude/openssl -lssl -lcrypto

@@ -8,7 +8,7 @@
 
 pkgname=mingw-w64-python2
 pkgver=2.7.9
-pkgrel=2
+pkgrel=3
 _pybasever=2.7
 pkgdesc='A high-level scripting language (mingw-w64)'
 arch=(any)
@@ -96,7 +96,8 @@ source=("http://www.python.org/ftp/python/${pkgver%rc?}/Python-${pkgver}.tar.xz"
         "1010-ctypes-python-dll.patch"
         "1020-gdbm-module-includes.patch"
         "1030-use-gnu_printf-in-format.patch"
-        "1040-install-msilib.patch")
+        "1040-install-msilib.patch"
+        "Setup.local")
 md5sums=('38d530f7efc373d64a8fb1637e3baaa7'
          'c3e7a686e355e0becef0cdaf3d799a73'
          '64c2d875b560491f4934b4b776b24b1f'
@@ -174,7 +175,8 @@ md5sums=('38d530f7efc373d64a8fb1637e3baaa7'
          'fbeaa1c949ebdc6acdf810260b241fd1'
          '8b178f57df4e814590c4b599c4916043'
          '3e314df762b488ed832c147ea86c6aa5'
-         '2a622921e8eafdd8bff88b9128169a2e')
+         '2a622921e8eafdd8bff88b9128169a2e'
+         '4ad927defae6c4a58df3805a1f3fb03b')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -296,15 +298,6 @@ prepare() {
     Lib/distutils/tests/test_install_scripts.py \
     Tools/scripts/gprof2html.py
 
-  #touch Include/graminit.h
-  #touch Python/graminit.c
-  #touch Parser/Python.asdl
-  #touch Parser/asdl.py
-  #touch Parser/asdl_c.py
-  #touch Include/Python-ast.h
-  #touch Python/Python-ast.c
-  #echo \"\" > Parser/pgen.stamp
-
   # Ensure that we are using the system copy of various libraries (expat, zlib and libffi),
   # rather than copies shipped in the tarball
   rm -r Modules/expat
@@ -321,20 +314,17 @@ build() {
   rm -fr "$srcdir/win32" "$srcdir/win64"
 
   unset LDFLAGS CPPFLAGS
-  CFLAGS='-fwrapv -D__USE_MINGW_ANSI_STDIO=1 -DNDEBUG'
-  CXXFLAGS="$CFLAGS"
+  export CFLAGS='-fwrapv -D__USE_MINGW_ANSI_STDIO=1'
+  export CXXFLAGS="$CFLAGS"
+  export MSYSTEM=MINGW
 
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    if [ $arch = i686-w64-mingw32 ]; then
-      bits=32
-    else
-      bits=64
-      # Workaround for conftest error on 64-bit builds
-      export ac_cv_working_tzset=no
-    fi
+    [ $arch = i686-w64-mingw32 ] && bits=32 || bits=64
+    # Workaround for conftest error on 64-bit builds
+    export ac_cv_working_tzset=no
     export LIBFFI_INCLUDEDIR=$($arch-pkg-config --variable=includedir libffi)
     export WINEARCH=win$bits
     export WINEPREFIX="$srcdir/$WINEARCH"
@@ -346,7 +336,11 @@ build() {
       --with-threads \
       --with-system-expat \
       --with-system-ffi \
-      --with-dbmliborder=gdbm:ndbm
+      --with-build-sysroot="/usr/$arch" \
+      OPT=""
+    # Override some configuration setting with some hardcoded values
+    # because the automatic detection seems to not work
+    cp -f "$srcdir/Setup.local" Modules/Setup.local
     make
   done
 }
@@ -364,7 +358,6 @@ package() {
 
     cd "$srcdir/$pkgname-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" \
-      MSYSTEM=MINGW \
       MSYS2_ARG_CONV_EXCL="--prefix=;--install-scripts=;--install-platlib=" \
       install
 
