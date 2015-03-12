@@ -5,15 +5,14 @@
 # https://github.com/Alexpux/MINGW-packages/tree/master/mingw-w64-gobject-introspection
 
 pkgname=mingw-w64-gobject-introspection
-pkgver=1.42.0
-_glibver=2.43.3
+pkgver=1.43.3
 pkgrel=1
 pkgdesc='Introspection system for GObject-based libraries (mingw-w64)'
 arch=(any)
 url='https://live.gnome.org/GObjectIntrospection'
 license=(LGPL GPL)
 depends=(mingw-w64-crt fedora-mingw-w64-glib2)
-makedepends=(mingw-w64-gcc mingw-w64-pkg-config mingw-w64-python2 wine)
+makedepends=(mingw-w64-gcc mingw-w64-pkg-config mingw-w64-python2 wine gobject-introspection)
 options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/gobject-introspection/${pkgver%.*}/gobject-introspection-${pkgver}.tar.xz"
         "0018-debug-rmtree-errors.mingw.patch"
@@ -21,20 +20,23 @@ source=("http://ftp.gnome.org/pub/GNOME/sources/gobject-introspection/${pkgver%.
         "0022-change-pkg-config-invocations.mingw.patch"
         "0050-dont-load-msvcrt.patch"
         "0055-use-pkgconfig-to-detect-python.patch"
-        "http://ftp.gnome.org/pub/GNOME/sources/glib/${_glibver%.*}/glib-${_glibver}.tar.xz")
-md5sums=('4fa52f6b67367d9c1b99b98683ced202'
+        "protect-tools-substitutions.patch"
+        "disable-tests.patch"
+        "winepython")
+md5sums=('d7828d25068bdef800126da21bc45fc2'
          'f0ecde986ebf1f0e28b752f9c36fb6c1'
          '69ef34e2f57abc8afe1b9f6fa3786e97'
          '8d3589fb959a0a68ce7ce9051fa441fe'
          'e3598d539258678eef8dde2216419faf'
          '4f082b00ab2b08c1cb06a06d767d16ae'
-         '2727c4dee79c5449f364cd5e27b17099')
+         '2aeb00b6d8f504ecf00e04512f9aa319'
+         '9da0a390e3ead24cfd860e336041876d'
+         '2a8a9c3e1f72a2276db04f69e80b65b8')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 prepare() {
   cd "$srcdir"
-  tar xvf "glib-${_glibver}.tar.xz"
 
   cd "gobject-introspection-$pkgver"
   patch -p1 -i ../0018-debug-rmtree-errors.mingw.patch
@@ -42,14 +44,20 @@ prepare() {
   patch -p1 -i ../0022-change-pkg-config-invocations.mingw.patch
   patch -p1 -i ../0050-dont-load-msvcrt.patch
   patch -p1 -i ../0055-use-pkgconfig-to-detect-python.patch
+  patch -p1 -i ../protect-tools-substitutions.patch
+  patch -p1 -i ../disable-tests.patch
 
   autoreconf -if
+
+  # Clear environment trees created by wine
+  rm -fr win32 win64
 }
 
 build() {
   local tardir="$srcdir/gobject-introspection-$pkgver"
   local builddir
   local arch
+  local bits
 
   unset LDFLAGS CPPFLAGS
 
@@ -57,15 +65,27 @@ build() {
     builddir="$srcdir/$pkgname-$pkgver-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
+    [ $arch = i686-w64-mingw32 ] && bits=32 || bits=64
+    export WINEARCH=win$bits
+    export WINEPREFIX="$srcdir/$WINEARCH"
     "$tardir/configure" \
       --build="$CHOST" \
       --prefix="/usr/$arch" \
       --host="$arch" \
-      --disable-shared \
+      --enable-shared \
       --enable-static \
-      --with-glib-src="$srcdir/glib-${_glibver}" \
-      PYTHON="/usr/$arch/bin/python2"
-    make
+      PYTHON="$srcdir/winepython"
+      # The gir files are supposedly platform independent, so
+      # importing them from the gobject-instrospection package
+      # on the build platform
+      ln -sf /usr/share/gir-1.0/GIRepository-2.0.gir
+      ln -sf /usr/share/gir-1.0/GLib-2.0.gir
+      ln -sf /usr/share/gir-1.0/GModule-2.0.gir
+      ln -sf /usr/share/gir-1.0/GObject-2.0.gir
+      ln -sf /usr/share/gir-1.0/Gio-2.0.gir
+    make \
+      INTROSPECTION_GIRS= \
+      INTROSPECTION_COMPILER="DISPLAY= /usr/bin/wine $builddir/g-ir-compiler.exe"
   done
 }
 
@@ -77,7 +97,7 @@ package() {
     prefix="$pkgdir/usr/$arch"
 
     cd "$srcdir/$pkgname-$pkgver-build-$arch"
-    make DESTDIR="$pkgdir" install
+    make INTROSPECTION_GIRS= DESTDIR="$pkgdir" install
 
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
     find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +

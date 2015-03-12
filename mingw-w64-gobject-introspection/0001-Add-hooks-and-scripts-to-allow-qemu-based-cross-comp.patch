@@ -1,0 +1,236 @@
+From 99427f23bf845ed86ad37b8ad0bf4a2c3b5bf04f Mon Sep 17 00:00:00 2001
+From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
+Date: Wed, 10 Oct 2012 14:52:28 -0400
+Subject: [PATCH] Add hooks and scripts to allow qemu based cross-compilation
+
+To use this patch you need qemu-user to be installed. Edit and run
+cross-build.sh according to your architecture.
+---
+ Makefile-gir.am            | 22 +++++++++++++---------
+ Makefile-giscanner.am      |  3 ++-
+ common.mk                  |  2 +-
+ giscanner/dumper.py        |  2 +-
+ giscanner/gdumpparser.py   |  2 ++
+ giscanner/scannermain.py   |  3 ++-
+ giscanner/shlibs.py        |  4 ++--
+ giscanner/sourcescanner.py | 11 +++++++++++
+ tools/emulate.sh           | 20 ++++++++++++++++++++
+ 9 files changed, 54 insertions(+), 15 deletions(-)
+ create mode 100755 tools/emulate.sh
+
+diff --git a/Makefile-gir.am b/Makefile-gir.am
+index 52f7ee3..0f46e50 100644
+--- a/Makefile-gir.am
++++ b/Makefile-gir.am
+@@ -54,9 +54,12 @@ else
+ 
+ endif
+ 
++# Allow PKG_CONFIG overried
++PKG_CONFIG ?= pkg-config
++
+ # glib
+-GLIB_INCLUDEDIR=$(shell pkg-config --variable=includedir glib-2.0)/glib-2.0
+-GLIB_LIBDIR=$(shell pkg-config --variable=libdir glib-2.0)
++GLIB_INCLUDEDIR=$(shell $(PKG_CONFIG) --variable=includedir glib-2.0)/glib-2.0
++GLIB_LIBDIR=$(shell $(PKG_CONFIG) --variable=libdir glib-2.0)
+ 
+ GLIB_LIBRARY=glib-2.0
+ 
+@@ -92,8 +95,8 @@ GLib-2.0.gir: g-ir-scanner g-ir-compiler$(EXEEXT)
+ gir/DBusGLib-1.0.typelib: GObject-2.0.gir
+ 
+ # gobject
+-GOBJECT_INCLUDEDIR=$(shell pkg-config --variable=includedir gobject-2.0)/glib-2.0
+-GOBJECT_LIBDIR=$(shell pkg-config --variable=libdir gobject-2.0)
++GOBJECT_INCLUDEDIR=$(shell $(PKG_CONFIG) --variable=includedir gobject-2.0)/glib-2.0
++GOBJECT_LIBDIR=$(shell $(PKG_CONFIG) --variable=libdir gobject-2.0)
+ 
+ GOBJECT_LIBRARY=gobject-2.0
+ 
+@@ -120,8 +123,8 @@ GObject_2_0_gir_FILES = \
+ BUILT_GIRSOURCES += GObject-2.0.gir
+ 
+ # gmodule
+-GMODULE_INCLUDEDIR=$(shell pkg-config --variable=includedir gmodule-2.0)/glib-2.0
+-GMODULE_LIBDIR=$(shell pkg-config --variable=libdir gmodule-2.0)
++GMODULE_INCLUDEDIR=$(shell $(PKG_CONFIG) --variable=includedir gmodule-2.0)/glib-2.0
++GMODULE_LIBDIR=$(shell $(PKG_CONFIG) --variable=libdir gmodule-2.0)
+ 
+ GMODULE_LIBRARY=gmodule-2.0
+ 
+@@ -146,13 +149,13 @@ GModule_2_0_gir_FILES = $(GLIB_INCLUDEDIR)/gmodule.h \
+ BUILT_GIRSOURCES += GModule-2.0.gir
+ 
+ # gio
+-GIO_INCLUDEDIR=$(shell pkg-config --variable=includedir gio-2.0)/glib-2.0
+-GIO_LIBDIR=$(shell pkg-config --variable=libdir gio-2.0)
++GIO_INCLUDEDIR=$(shell $(PKG_CONFIG) --variable=includedir gio-2.0)/glib-2.0
++GIO_LIBDIR=$(shell $(PKG_CONFIG) --variable=libdir gio-2.0)
+ 
+ GIO_LIBRARY=gio-2.0
+ 
+ if HAVE_GIO_UNIX
+-GIO_UNIX_HDRS=$(shell pkg-config --variable=includedir gio-unix-2.0)/gio-unix-2.0/gio/*.h
++GIO_UNIX_HDRS=$(shell $(PKG_CONFIG) --variable=includedir gio-unix-2.0)/gio-unix-2.0/gio/*.h
+ GIO_UNIX_PACKAGES = gio-unix-2.0
+ else
+ GIO_UNIX_HDRS=
+@@ -201,6 +204,7 @@ GIRepository_2_0_gir_INCLUDES = GObject-2.0
+ GIRepository_2_0_gir_EXPORT_PACKAGES = gobject-introspection-1.0
+ GIRepository_2_0_gir_CFLAGS = \
+     -I$(top_srcdir)/girepository -I$(top_srcdir) \
++    -I$(GLIB_LIBDIR)/glib-2.0/include \
+     -DGI_COMPILATION
+ GIRepository_2_0_gir_FILES = \
+         $(top_srcdir)/girepository/girepository.h   \
+diff --git a/Makefile-giscanner.am b/Makefile-giscanner.am
+index c2273cd..ae9c7cd 100644
+--- a/Makefile-giscanner.am
++++ b/Makefile-giscanner.am
+@@ -16,8 +16,9 @@ noinst_LTLIBRARIES += libgiscanner.la
+ libgiscanner_la_SOURCES = \
+ 	giscanner/sourcescanner.c				\
+ 	giscanner/sourcescanner.h				\
++	giscanner/scannerparser.y				\
+ 	giscanner/scannerlexer.l				\
+-	giscanner/scannerparser.y
++	giscanner/grealpath.h
+ libgiscanner_la_CPPFLAGS = -I$(top_srcdir)/girepository -I$(top_srcdir)/giscanner
+ libgiscanner_la_LIBADD = $(GOBJECT_LIBS) $(GIO_LIBS)
+ libgiscanner_la_CFLAGS = $(GOBJECT_CFLAGS) $(GIO_CFLAGS)
+diff --git a/common.mk b/common.mk
+index 303622f..e882332 100644
+--- a/common.mk
++++ b/common.mk
+@@ -25,7 +25,7 @@ INTROSPECTION_SCANNER_ARGS = \
+ 
+ INTROSPECTION_COMPILER = \
+     env PATH=".libs:$(PATH)" \
+-        $(top_builddir)/g-ir-compiler$(EXEEXT)
++        $(EMULATOR) $(top_builddir)/g-ir-compiler$(EXEEXT)
+ 
+ INTROSPECTION_COMPILER_ARGS = \
+     --includedir=$(srcdir) \
+diff --git a/giscanner/dumper.py b/giscanner/dumper.py
+index 45a09fc..47a40bf 100644
+--- a/giscanner/dumper.py
++++ b/giscanner/dumper.py
+@@ -198,7 +198,7 @@ class DumpCompiler(object):
+         else:
+             cmd = [self._pkgconfig_cmd, flag]
+         proc = subprocess.Popen(
+-            cmd + self._packages,
++            self._pkgconfig_cmd.split() + [flag] + self._packages,
+             stdout=subprocess.PIPE)
+         return proc.communicate()[0].split()
+ 
+diff --git a/giscanner/gdumpparser.py b/giscanner/gdumpparser.py
+index e1fc935..b2425e8 100644
+--- a/giscanner/gdumpparser.py
++++ b/giscanner/gdumpparser.py
+@@ -158,6 +158,8 @@ blob containing data gleaned from GObject's primitive introspection."""
+         out_path = os.path.join(self._binary.tmpdir, 'dump.xml')
+ 
+         args = []
++        if (os.environ.get('EMULATOR')):
++            args.extend(os.environ.get('EMULATOR').split())
+         args.extend(self._binary.args)
+         args.append('--introspect-dump=%s,%s' % (in_path, out_path))
+ 
+diff --git a/giscanner/scannermain.py b/giscanner/scannermain.py
+index bca4a88..4464d11 100755
+--- a/giscanner/scannermain.py
++++ b/giscanner/scannermain.py
+@@ -280,7 +280,8 @@ def process_options(output, allowed_flags):
+ 
+ 
+ def process_packages(options, packages):
+-    args = ['pkg-config', '--cflags']
++    args = os.environ.get('PKG_CONFIG', 'pkg-config').split()
++    args.extend(['--cflags'])
+     args.extend(packages)
+     output = subprocess.Popen(args,
+                               stdout=subprocess.PIPE).communicate()[0]
+diff --git a/giscanner/shlibs.py b/giscanner/shlibs.py
+index 1ad75ee..4447f86 100644
+--- a/giscanner/shlibs.py
++++ b/giscanner/shlibs.py
+@@ -103,7 +103,7 @@ def _resolve_non_libtool(options, binary, libraries):
+         if platform_system == 'Darwin':
+             args.extend(['otool', '-L', binary.args[0]])
+         else:
+-            args.extend(['ldd', binary.args[0]])
++            args.extend(['readelf', '-d', binary.args[0]])
+         proc = subprocess.Popen(args, stdout=subprocess.PIPE)
+         patterns = {}
+         for library in libraries:
+@@ -115,7 +115,7 @@ def _resolve_non_libtool(options, binary, libraries):
+                 m = pattern.search(line)
+                 if m:
+                     del patterns[library]
+-                    shlibs.append(m.group(1))
++                    shlibs.append(m.group(1)[0:-1])
+                     break
+ 
+         if len(patterns) > 0:
+diff --git a/giscanner/sourcescanner.py b/giscanner/sourcescanner.py
+index dab1602..18eea33 100644
+--- a/giscanner/sourcescanner.py
++++ b/giscanner/sourcescanner.py
+@@ -20,6 +20,7 @@
+ 
+ from __future__ import with_statement
+ import os
++import sys
+ import subprocess
+ import tempfile
+ 
+@@ -292,8 +293,18 @@ class SourceScanner(object):
+         cpp_args += os.environ.get('CPPFLAGS', '').split()
+         cpp_args += os.environ.get('CFLAGS', '').split()
+         cpp_args += ['-E', '-C', '-I.', '-']
++
++        cflags = os.environ.get('CFLAGS')
++        if (cflags):
++            for iflag in cflags.split():
++                cpp_args.append(iflag)
++
+         cpp_args += self._cpp_options
+ 
++        print "g-ir-scanner: compile: %s" % (
++            subprocess.list2cmdline(cpp_args), )
++        sys.stdout.flush()
++
+         proc = subprocess.Popen(cpp_args,
+                                 stdin=subprocess.PIPE,
+                                 stdout=subprocess.PIPE)
+diff --git a/tools/emulate.sh b/tools/emulate.sh
+new file mode 100755
+index 0000000..c118bf5
+--- /dev/null
++++ b/tools/emulate.sh
+@@ -0,0 +1,20 @@
++#!/bin/sh
++
++program=$1
++shift
++
++if file -i $program | grep text > /dev/null
++then
++    dir=$(dirname $program)
++    name=$(basename $program)
++
++    if [ -x $dir/.libs/lt-$name ]
++    then
++        program=$dir/.libs/lt-$name
++    else
++        program=$dir/.libs/$name
++    fi
++fi
++
++echo "emulate: " $EMULATOR_CMD $program ${1+"$@"}
++$EMULATOR_CMD $program ${1+"$@"}
+-- 
+2.3.1
+
