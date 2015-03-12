@@ -8,7 +8,7 @@
 
 pkgname=mingw-w64-python2
 pkgver=2.7.9
-pkgrel=3
+pkgrel=4
 _pybasever=2.7
 pkgdesc='A high-level scripting language (mingw-w64)'
 arch=(any)
@@ -97,7 +97,8 @@ source=("http://www.python.org/ftp/python/${pkgver%rc?}/Python-${pkgver}.tar.xz"
         "1020-gdbm-module-includes.patch"
         "1030-use-gnu_printf-in-format.patch"
         "1040-install-msilib.patch"
-        "Setup.local")
+        "Setup.local"
+        "winepython")
 md5sums=('38d530f7efc373d64a8fb1637e3baaa7'
          'c3e7a686e355e0becef0cdaf3d799a73'
          '64c2d875b560491f4934b4b776b24b1f'
@@ -176,7 +177,8 @@ md5sums=('38d530f7efc373d64a8fb1637e3baaa7'
          '8b178f57df4e814590c4b599c4916043'
          '3e314df762b488ed832c147ea86c6aa5'
          '2a622921e8eafdd8bff88b9128169a2e'
-         '4ad927defae6c4a58df3805a1f3fb03b')
+         '4ad927defae6c4a58df3805a1f3fb03b'
+         'a050b2d479459cca06ee15c1d8076277')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -353,7 +355,7 @@ package() {
 
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
-    wrapper="/usr/$arch/bin/python"
+    wrapper="/usr/$arch/bin/python${_pybasever}"
     [ $arch = i686-w64-mingw32 ] && bits=32 || bits=64
 
     cd "$srcdir/$pkgname-$pkgver-build-$arch"
@@ -362,23 +364,16 @@ package() {
       install
 
     # Create wrappers for running python.exe through wine
-    # The "dummy" component is required in order to avoid platform guessing
-    # from wine: https://bugs.winehq.org/show_bug.cgi?id=29661
-    cat <<EOT > "$pkgdir$wrapper${_pybasever}"
-#!/bin/sh
-prefix=\$(mktemp -d -t wine$bits-XXXXX)
-WINEARCH=win$bits WINEPREFIX=\$prefix/dummy DISPLAY= wine /usr/$arch/bin/python${_pybasever}.exe "\$@"
-rm -fr \$prefix
-EOT
-    chmod 0755 "$pkgdir$wrapper${_pybasever}"
-    ln -sf "python${_pybasever}" "$pkgdir${wrapper}2"
-    ln -sf "python${_pybasever}" "$pkgdir$wrapper"
+    sed -e "s/@arch@/win$bits/g" "$srcdir/winepython" > "$pkgdir$wrapper"
+    chmod 0755 "$pkgdir$wrapper"
+    ln -sf "python${_pybasever}" "$prefix/bin/python2"
+    ln -sf "python${_pybasever}" "$prefix/bin/python"
 
     mv "$prefix/bin/smtpd.py" "$prefix/lib/python${_pybasever}/"
 
     # Clean up she-bangs
     find "$prefix/lib/python${_pybasever}/" -name '*.py' | \
-       xargs sed -i -e 's|#[ ]*![ ]*/usr/bin/env python$|#!/usr/bin/env python2|'
+       xargs sed -i -e "s|#[ ]*![ ]*/usr/bin/env python$|#!$wrapper|"
 
     # Clean-up references to build directory
     sed -i -e "s|$srcdir/Python-$pkgver:||" "$prefix/lib/python${_pybasever}/config/Makefile"
