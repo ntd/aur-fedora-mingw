@@ -13,9 +13,10 @@
 #     of the WINEARCH environment variable content:
 #     https://bugs.winehq.org/show_bug.cgi?id=29661
 
-tmp="$TMPDIR"
-[ -z "$tmp" ] && tmp=/tmp
+prefix="$TMPDIR"
+[ -z "$prefix" ] && prefix=/tmp
+prefix="$prefix/$(whoami)/winepython"
 [ @arch@ = win32 ] && host=i686-w64-mingw32 || host=x86_64-w64-mingw32
 
-mkdir -p "$tmp/$USER/winepython"
-WINEARCH=@arch@ WINEPREFIX="$tmp/$USER/winepython/@arch@" DISPLAY= /usr/bin/wine /usr/$host/bin/python${_pybasever}.exe "$@"
+mkdir -p "$prefix"
+WINEDEBUG=-all WINEARCH=@arch@ WINEPREFIX="$prefix/@arch@" DISPLAY= /usr/bin/wine /usr/$host/bin/python${_pybasever}.exe "$@"

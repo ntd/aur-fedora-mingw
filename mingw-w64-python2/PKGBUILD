@@ -8,7 +8,7 @@
 
 pkgname=mingw-w64-python2
 pkgver=2.7.9
-pkgrel=4
+pkgrel=5
 _pybasever=2.7
 pkgdesc='A high-level scripting language (mingw-w64)'
 arch=(any)
@@ -178,7 +178,7 @@ md5sums=('38d530f7efc373d64a8fb1637e3baaa7'
          '3e314df762b488ed832c147ea86c6aa5'
          '2a622921e8eafdd8bff88b9128169a2e'
          '4ad927defae6c4a58df3805a1f3fb03b'
-         'a050b2d479459cca06ee15c1d8076277')
+         '8042e639db6817445e85a8f4a6eb3b3f')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
