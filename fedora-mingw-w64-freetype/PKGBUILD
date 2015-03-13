@@ -5,7 +5,7 @@
 
 pkgname=fedora-mingw-w64-freetype
 pkgver=2.5.4
-pkgrel=2
+pkgrel=3
 pkgdesc='TrueType font rendering library (mingw-w64)'
 arch=(any)
 url='http://freetype.sourceforge.net/'
@@ -68,6 +68,7 @@ package() {
     find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
     rm -f  "$prefix/bin/freetype-config"
+    rm -fr "$prefix/share"
   done
 }
 
