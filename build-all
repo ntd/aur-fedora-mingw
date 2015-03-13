@@ -60,6 +60,7 @@ pkgs=(
 	mingw-w64-openssl
 	mingw-w64-python2
 	mingw-w64-gobject-introspection
+	mingw-w64-lua
 	lua-lgi
 )
 
