@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if [ $WINEARCH = win32 ]; then
+    arch=i686-w64-mingw32
+else
+    arch=x86_64-w64-mingw32
+fi
+
+# Unsetting DISPLAY avoids triggering all sort of crap from wine
+# that can request user interaction
+DISPLAY= /usr/bin/wine /usr/$arch/bin/python2.exe "$@"
