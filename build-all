@@ -22,8 +22,13 @@ function found() {
     done
 }
 
-pkgs=(	mingw-w64-gcc
+pkgs=(
+	# Cross-building tools
+	mingw-w64-gcc
 	mingw-w64-pkg-config
+	mingw-w64-tools
+
+	# GTK+2/3 toolchain
 	fedora-mingw-w64-zlib
 	fedora-mingw-w64-bzip2
 	fedora-mingw-w64-termcap
@@ -39,7 +44,6 @@ pkgs=(	mingw-w64-gcc
 	fedora-mingw-w64-fontconfig
 	fedora-mingw-w64-pixman
 	fedora-mingw-w64-icu
-	mingw-w64-tools
 	fedora-mingw-w64-cairo
 	fedora-mingw-w64-gdk-pixbuf
 	fedora-mingw-w64-atk
@@ -47,7 +51,17 @@ pkgs=(	mingw-w64-gcc
 	fedora-mingw-w64-pango
 	fedora-mingw-w64-gtk2
 	fedora-mingw-w64-gtk3
-	fedora-mingw-w64-nsis)
+
+	# Cross-compilation of Windows installers
+	fedora-mingw-w64-nsis
+
+	# LGI (dynamic Lua bindings) support
+	fedora-mingw-w64-gdbm
+	mingw-w64-openssl
+	mingw-w64-python2
+	mingw-w64-gobject-introspection
+	lua-lgi
+)
 
 for pkg in ${pkgs[@]}; do
 	found "$pkg" "$@" && continue
