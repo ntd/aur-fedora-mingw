@@ -1,0 +1,44 @@
+From 457944dbb634d9244206f7084561e8b79d81d155 Mon Sep 17 00:00:00 2001
+From: Nicola Fontana <ntd@entidi.it>
+Date: Fri, 13 Mar 2015 14:28:43 +0100
+Subject: [PATCH 3/4] Extend platform support to MSYS and MinGW
+
+Consider MSYS and MinGW platforms as Windows based and handle them
+accordingly.
+
+Credits go to Niels Nesse (https://github.com/nnesse) for highlighting
+the problem.
+---
+ lgi/Makefile   | 2 +-
+ tests/Makefile | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lgi/Makefile b/lgi/Makefile
+index 9ac8165..b3e01ef 100644
+--- a/lgi/Makefile
++++ b/lgi/Makefile
+@@ -15,7 +15,7 @@ GINAME = gobject-introspection-1.0
+ PKGS = $(GINAME) gmodule-2.0 libffi
+ VERSION_FILE = version.lua
+ 
+-ifneq ($(filter CYGWIN%, $(shell uname -s)),)
++ifneq ($(filter CYGWIN% MSYS% MINGW%, $(shell uname -s)),)
+ CORE = corelgilua51.dll
+ LIBFLAG = -shared
+ LIBS += -llua
+diff --git a/tests/Makefile b/tests/Makefile
+index 24dda8f..693f47d 100644
+--- a/tests/Makefile
++++ b/tests/Makefile
+@@ -5,7 +5,7 @@
+ # License: MIT
+ #
+ 
+-ifneq ($(filter CYGWIN%, $(shell uname -s)),)
++ifneq ($(filter CYGWIN% MSYS% MINGW%, $(shell uname -s)),)
+ EXT = .dll
+ PFX = cyg
+ LIBFLAG = -shared
+-- 
+2.3.2
+

@@ -1,0 +1,76 @@
+# Maintainer: Nicola Fontana <ntd@entidi.it>
+
+_realname=lua-lgi
+_luaver=5.2
+pkgbase=lgi
+pkgname="mingw-w64-${_realname}"
+pkgver=0.8.0
+pkgrel=1
+pkgdesc='Lua bindings for gnome/gobject using gobject-introspection library (mingw-w64)'
+arch=(any)
+url='http://www.lua.org/'
+license=(MIT)
+depends=(mingw-w64-crt mingw-w64-lua mingw-w64-gobject-introspection)
+makedepends=(mingw-w64-gcc)
+options=(!strip staticlibs !buildflags)
+source=("$pkgbase-$pkgver.tar.gz::https://github.com/pavouk/$pkgbase/archive/$pkgver.tar.gz"
+        "0001-Allow-overriding-of-pkg-config-executable.patch"
+        "0002-Export-luaopen_lgi_corelgilua51.patch"
+        "0003-Extend-platform-support-to-MSYS-and-MinGW.patch"
+        "0004-Allow-overriding-of-the-host-build-system.patch")
+md5sums=('f0a161fc07b65afabdd09aa5455390a3'
+         'e6f1496707e8ccc6edba95f5bc77774a'
+         '4eeb84f885ba8f85964dd8a5b25105ac'
+         'a6660fa55a07da149b42653fea85f2e4'
+         '600b8100486070a877dc948eec168977')
+
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
+
+prepare() {
+  cd "$srcdir/$pkgbase-$pkgver"
+
+  # The first patch does not apply cleanly because it is rebased on
+  # HEAD. Ignoring the error though, because the failing chunk is inside
+  # tests/Makefile (that it is not run)
+  patch -Np1 < ../0001-Allow-overriding-of-pkg-config-executable.patch || :
+  patch -Np1 < ../0002-Export-luaopen_lgi_corelgilua51.patch
+  patch -Np1 < ../0003-Extend-platform-support-to-MSYS-and-MinGW.patch
+  patch -Np1 < ../0004-Allow-overriding-of-the-host-build-system.patch
+}
+
+build() {
+  local tardir="$srcdir/$pkgbase-$pkgver"
+  local arch
+  local builddir
+
+  unset LDFLAGS CPPFLAGS
+
+  for arch in ${_architectures[@]}; do
+    builddir="$tardir-build-$arch"
+    # lua-lgi does not support VPATH builds
+    cp -fr "$tardir" "$builddir"
+    cd "$builddir"
+    make \
+      HOST_OS=mingw32 \
+      LUA_VERSION="${_luaver}" \
+      CFLAGS=$($arch-pkg-config --cflags lua${_luaver}) \
+      LDFLAGS=$($arch-pkg-config --libs lua${_luaver}) \
+      CC="$arch-gcc" \
+      PKG_CONFIG="$arch-pkg-config"
+  done
+}
+
+package() {
+  local arch
+  for arch in ${_architectures[@]}; do
+    cd "$srcdir/$pkgbase-$pkgver-build-$arch"
+    make \
+      HOST_OS=mingw32 \
+      LUA_VERSION="${_luaver}" \
+      PREFIX="/usr/$arch" \
+      DESTDIR="$pkgdir/" install
+    find "$pkgdir/usr/$arch" -name '*.dll' -exec $arch-strip -xg {} +
+  done
+}
+
+# vim:set ts=2 sw=2 et:
