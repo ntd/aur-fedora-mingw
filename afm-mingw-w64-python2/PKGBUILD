@@ -8,7 +8,7 @@
 
 pkgname=afm-mingw-w64-python2
 pkgver=2.7.9
-pkgrel=1
+pkgrel=2
 _pybasever=2.7
 pkgdesc='A high-level scripting language (mingw-w64)'
 arch=(any)
@@ -317,23 +317,20 @@ build() {
 
   rm -fr "$srcdir/win32" "$srcdir/win64"
 
-  unset LDFLAGS CPPFLAGS
-  MINGW32_CFLAGS='-fwrapv -D__USE_MINGW_ANSI_STDIO=1 -O2 -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4'
-  export CXXFLAGS="$CFLAGS"
   export MSYSTEM=MINGW
+  # Workaround for conftest error on 64-bit builds
+  export ac_cv_working_tzset=no
 
   for arch in ${_architectures[@]}; do
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
     [ $arch = i686-w64-mingw32 ] && bits=32 || bits=64
-    # Workaround for conftest error on 64-bit builds
-    export ac_cv_working_tzset=no
     export LIBFFI_INCLUDEDIR=$($arch-pkg-config --variable=includedir libffi)
     export WINEARCH=win$bits
     export WINEPREFIX="$srcdir/$WINEARCH"
-    MINGW_CFLAGS='-fwrapv -D__USE_MINGW_ANSI_STDIO=1 -O2 -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4' \
-    "$arch-configure" "$tardir" \
+    MINGW_EXTRA_CFLAGS='-fwrapv -D__USE_MINGW_ANSI_STDIO=1' \
+      source "$arch-configure" "$tardir" \
       --enable-shared \
       --with-threads \
       --with-system-expat \
@@ -358,7 +355,7 @@ package() {
     wrapper="/usr/$arch/bin/python${_pybasever}"
     [ $arch = i686-w64-mingw32 ] && bits=32 || bits=64
 
-    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    cd "$srcdir/Python-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" \
       MSYS2_ARG_CONV_EXCL="--prefix=;--install-scripts=;--install-platlib=" \
       install
