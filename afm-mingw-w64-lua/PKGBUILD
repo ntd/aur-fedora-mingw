@@ -5,7 +5,7 @@
 # https://github.com/Alexpux/MINGW-packages/tree/master/mingw-w64-lua
 
 _realname=lua
-pkgname="mingw-w64-${_realname}"
+pkgname="afm-mingw-w64-${_realname}"
 pkgver=5.2.4
 pkgrel=1
 pkgdesc='Powerful light-weight programming language designed for extending applications (mingw-w64)'
@@ -14,6 +14,8 @@ url='http://www.lua.org/'
 license=(MIT)
 depends=(mingw-w64-crt)
 makedepends=(mingw-w64-gcc)
+provides=("mingw-w64-lua=$pkgver")
+conflicts=(mingw-w64-lua)
 options=(!strip staticlibs !buildflags)
 source=("http://www.lua.org/ftp/${_realname}-$pkgver.tar.gz"
         "lua.pc")
@@ -22,14 +24,13 @@ md5sums=('913fdb32207046b273fdb17aad70be13'
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
-package() {
+build() {
   local tardir="$srcdir/${_realname}-$pkgver"
-  local api="${pkgver%.*}"
-  local arch
   local builddir
+  local arch
   local prefix
 
-  unset LDFLAGS CPPFLAGS
+  unset CPPFLAGS CFLAGS LDFLAGS
 
   for arch in ${_architectures[@]}; do
     builddir="$tardir-build-$arch"
@@ -37,26 +38,43 @@ package() {
 
     # Lua does not support VPATH builds
     cp -fr "$tardir" "$builddir"
-    sed -e "s|%VER%|$api|g" \
+    sed -e "s|%VER%|${pkgver%.*}|g" \
         -e "s|%REL%|$pkgver|g" \
         -e "s|/usr|/usr/$arch|g" \
         "$srcdir/lua.pc" > "$builddir/lua.pc"
 
-    # Building and installing
     cd "$builddir"
     make -j1 \
+      MYCFLAGS="-Wp,-D_FORTIFY_SOURCE=2 --param=ssp-buffer-size=4" \
       AR="$arch-ar rcu" \
       RANLIB="$arch-ranlib" \
       STRIP="$arch-strip" \
       CC="$arch-gcc" \
+      mingw
+  done
+}
+
+package() {
+  local builddir
+  local arch
+  local prefix
+
+  unset CPPFLAGS CFLAGS LDFLAGS
+
+  for arch in ${_architectures[@]}; do
+    builddir="$srcdir/${_realname}-$pkgver-build-$arch"
+    prefix="$pkgdir/usr/$arch"
+
+    cd "$builddir"
+    make \
       INSTALL_TOP="$prefix" \
       TO_BIN="lua.exe luac.exe lua52.dll" \
-      mingw install
+      install
 
     # Manually install the pkg-config file
-    install -Dm644 "$builddir/lua.pc" "$prefix/lib/pkgconfig/lua$api.pc"
+    install -Dm644 "$builddir/lua.pc" "$prefix/lib/pkgconfig/lua${pkgver%.*}"
     # This symlink should be done only for the current Lua release
-    ln -s "lua$api.pc" "$prefix/lib/pkgconfig/lua.pc"
+    ln -s "lua${pkgver%.*}" "$prefix/lib/pkgconfig/lua.pc"
   done
 }
 
