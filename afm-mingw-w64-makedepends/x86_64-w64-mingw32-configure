@@ -1,18 +1,6 @@
 #!/bin/bash
+# This file can either be executed or sourced. If sourced, environment
+# modifications are retained. See mingw-configure for documentation.
 
-# The first argument should always be the directory where configure resides
-path_to_configure="$1"
-shift
-
-arch=x86_64-w64-mingw32 \
-
-export PATH="/usr/$arch/bin:$PATH"
-"$path_to_configure/configure" \
-    CFLAGS="${MINGW_CFLAGS:--O2 -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4} $MINGW64_CFLAGS" \
-    CPPFLAGS="$MINGW_CPPFLAGS $MINGW64_CPPFLAGS" \
-    LDFLAGS="$MINGW_LDFLAGS $MINGW64_LDFLAGS" \
-    CXXFLAGS="${MINGW_CXXFLAGS:--O2 -pipe -Wall} $MINGW64_CXXFLAGS" \
-    --build="$CHOST" \
-    --host=$arch \
-    --prefix=/usr/$arch \
-    "$@"
+source "$(dirname ${BASH_SOURCE[0]})/mingw-configure"
+call_configure x86_64-w64-mingw32 64 "$@"
