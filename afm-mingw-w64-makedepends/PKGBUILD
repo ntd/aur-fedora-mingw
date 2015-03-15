@@ -16,7 +16,7 @@
 
 pkgname=afm-mingw-w64-makedepends
 pkgver=1
-pkgrel=1
+pkgrel=2
 pkgdesc='A collection of stuff needed for MinGW cross-building'
 arch=(any)
 license=(mit)
@@ -32,10 +32,10 @@ source=("i686-w64-mingw32-cmake"
         "Toolchain-i686-w64-mingw32.cmake"
         "Toolchain-x86_64-w64-mingw32.cmake")
 md5sums=('61fc4372a354d7ed016fcac41b8199ce'
-         'd02259a5a286bcf82e5578a80e29cda1'
+         '25558e4d48b30d029802e3ed8e2a0f6d'
          '2c2641547debc5d289bb85b0939e4380'
          'bcdbf13e87765a01cad3ab8594b53093'
-         'fea35ff285cf166548c8973e575eceb3'
+         'a1be275e373e06f1e4aadd70fd800000'
          '0a879bf20cd82e44b73eb49cf2484eda'
          '4149981d6bad6d15779b41a542d79295'
          '2592e08f979cd14ab65aaacab113e241')
