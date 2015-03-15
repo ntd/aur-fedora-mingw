@@ -1,0 +1,93 @@
+# Maintainer: Nicola Fontana <ntd@entidi.it>
+# Maintainer: Alexey Pavlov <alexpux@gmail.com>
+#
+# This is an adaptation of the MinGW package by Alexpux found on GitHub:
+# https://github.com/Alexpux/MINGW-packages/tree/master/mingw-w64-pkg-config
+
+_realname=pkg-config
+pkgname="afm-mingw-w64-${_realname}"
+pkgver=0.28
+pkgrel=1
+pkgdesc='A system for managing library compile/link flags (mingw-w64)'
+arch=(any)
+url='http://pkgconfig.freedesktop.org/wiki/'
+license=(GPL)
+depends=(mingw-w64-crt fedora-mingw-w64-glib2)
+makedepends=(afm-mingw-w64-makedepends)
+options=(!strip staticlibs !buildflags)
+source=("http://pkgconfig.freedesktop.org/releases/${_realname}-${pkgver}.tar.gz"
+        "0002-check-for-host.mingw.patch"
+        "0003-flush.mingw.patch"
+        "0004-expected-path-for.mingw.patch"
+        "0005-mangle.mingw.patch"
+        "0006-path-for-tests.mingw.patch"
+        "0007-sub-path-for-tests.mingw.patch"
+        "0008-check-for-wine.mingw.patch"
+        "0009-use-wine-if-present.mingw.patch"
+        "0010-expand-paths.mingw.patch"
+        "0011-platform-dependent-separator-and-adjustable-prefix.mingw.patch")
+md5sums=('aa3c86e67551adc3ac865160e34a2a0d'
+         '073729fca79eb7415a88eec68504dc92'
+         'a14107b8eb8640aac2e59798467128a3'
+         'a605f371133ea78af740109a2b690a69'
+         '2b5a8f14761eaee3ccc35d8d24aace9f'
+         '27602f99a978c28f963afe9313fd1604'
+         'e1b804a1b0a15e9af895f6fd92907f23'
+         '2ba25b1a52a48afa0d2e1b0e06aaa07c'
+         '377256964716a68e8fe170e8df157641'
+         'cb65caa60584d471aa6f76b181790ee1'
+         'd6b6acdb90f93c35378f53e34e7cd6fa')
+
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
+
+prepare() {
+  cd "$srcdir/${_realname}-$pkgver"
+
+  patch -p1 -i ../0002-check-for-host.mingw.patch
+  patch -p1 -i ../0003-flush.mingw.patch
+  patch -p1 -i ../0004-expected-path-for.mingw.patch
+  patch -p1 -i ../0005-mangle.mingw.patch
+  patch -p1 -i ../0006-path-for-tests.mingw.patch
+  patch -p1 -i ../0007-sub-path-for-tests.mingw.patch
+  patch -p1 -i ../0008-check-for-wine.mingw.patch
+  patch -p1 -i ../0009-use-wine-if-present.mingw.patch
+  patch -p1 -i ../0010-expand-paths.mingw.patch
+  patch -p1 -i ../0011-platform-dependent-separator-and-adjustable-prefix.mingw.patch
+
+  autoreconf -vfi
+}
+
+build() {
+  local tardir="$srcdir/${_realname}-$pkgver"
+  local builddir
+  local arch
+
+  for arch in ${_architectures[@]}; do
+    builddir="$tardir-build-$arch"
+    mkdir -p "$builddir"
+    cd "$builddir"
+    source "$arch-configure" "$tardir" \
+      --with-default-prefix-for-default-paths="/usr/$arch" \
+      --disable-indirect-deps
+    make
+  done
+}
+
+package() {
+  local arch
+  local prefix
+
+  for arch in ${_architectures[@]}; do
+    prefix="$pkgdir/usr/$arch"
+    cd "$srcdir/${_realname}-$pkgver-build-$arch"
+    make DESTDIR="$pkgdir" install
+
+    rm -fr "$prefix/share"
+    # Remove $arch named exe (we are already under the $arch tree)
+    rm -f "$prefix/bin/$arch-pkg-config.exe"
+
+    find "$prefix" -name '*exe' -exec $arch-strip -xg {} +
+  done
+}
+
+# vim:set ts=2 sw=2 et:
