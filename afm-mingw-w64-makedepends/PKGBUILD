@@ -1,0 +1,61 @@
+# Maintainer: Nicola Fontana <ntd@entidi.it>
+#
+# This package automatically pulls in the makedepends needed for MinGW
+# cross-building and provides the following helper stuff:
+#
+# - pkg-config wrappers
+# - CMake configurations for MinGW
+# - configure wrappers
+#
+# It borrows ideas from the mingw-filesystem Fedora package [1] and some
+# AUR packages [2] [3] that in my opinion has wrong names.
+#
+# [1] http://pkgs.fedoraproject.org/cgit/mingw-filesystem.git/
+# [2] https://aur.archlinux.org/packages/mingw-w64-pkg-config/
+# [3] https://aur.archlinux.org/packages/mingw-w64-cmake/
+
+pkgname=afm-mingw-w64-makedepends
+pkgver=1
+pkgrel=1
+pkgdesc='A collection of stuff needed for MinGW cross-building'
+arch=(any)
+license=(mit)
+depends=(mingw-w64-gcc)
+conflicts=(mingw-w64-pkgbuild mingw-w64-cmake)
+provides=(mingw-w64-pkgbuild mingw-w64-cmake)
+source=("i686-w64-mingw32-cmake"
+        "i686-w64-mingw32-configure"
+        "i686-w64-mingw32-pkg-config"
+        "x86_64-w64-mingw32-cmake"
+        "x86_64-w64-mingw32-configure"
+        "x86_64-w64-mingw32-pkg-config"
+        "Toolchain-i686-w64-mingw32.cmake"
+        "Toolchain-x86_64-w64-mingw32.cmake")
+md5sums=('61fc4372a354d7ed016fcac41b8199ce'
+         'd02259a5a286bcf82e5578a80e29cda1'
+         '2c2641547debc5d289bb85b0939e4380'
+         'bcdbf13e87765a01cad3ab8594b53093'
+         'fea35ff285cf166548c8973e575eceb3'
+         '0a879bf20cd82e44b73eb49cf2484eda'
+         '4149981d6bad6d15779b41a542d79295'
+         '2592e08f979cd14ab65aaacab113e241')
+
+_architectures="i686-w64-mingw32 x86_64-w64-mingw32"
+
+package() {
+  local arch
+  for arch in ${_architectures}; do
+    install -d "$pkgdir/usr/bin"
+    install -d "$pkgdir/usr/share/mingw"
+
+    # configure wrappers
+    install -m 755 "$arch-configure" "$pkgdir/usr/bin"
+
+    # pkg-config
+    install -m 755 "$arch-pkg-config" "$pkgdir/usr/bin"
+
+    # CMake
+    install -m 644 "Toolchain-$arch.cmake" "$pkgdir/usr/share/mingw/"
+    install -m 755 "$arch-cmake" "$pkgdir/usr/bin/"
+  done
+}

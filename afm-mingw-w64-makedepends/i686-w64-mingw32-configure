@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# The first argument should always be the directory where configure resides
+path_to_configure="$1"
+shift
+
+arch=i686-w64-mingw32 \
+
+export PATH="/usr/$arch/bin:$PATH"
+unset CFLAGS LDFLAGS CPPFLAGS CXXFLAGS
+"$path_to_configure/configure" \
+    CFLAGS="${MINGW32_CFLAGS:--O2 -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4}" \
+    CPPFLAGS="$MINGW32_CPPFLAGS" \
+    LDFLAGS="$MINGW32_LDFLAGS" \
+    CXXFLAGS="${MINGW32_CXXFLAGS:--O2 -pipe -Wall}" \
+    --build="$CHOST" \
+    --host=$arch \
+    --prefix=/usr/$arch \
