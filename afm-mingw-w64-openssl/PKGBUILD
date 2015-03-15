@@ -4,7 +4,8 @@
 # This is an adaptation of the MinGW package by Alexpux found on GitHub:
 # https://github.com/Alexpux/MINGW-packages/tree/master/mingw-w64-openssl
 
-pkgname=mingw-w64-openssl
+_realname=openssl
+pkgname="afm-mingw-w64-${_realname}"
 pkgver=1.0.2
 pkgrel=1
 pkgdesc="The Open Source toolkit for Secure Sockets Layer and Transport Layer Security (mingw-w64)"
@@ -13,12 +14,12 @@ url='https://www.openssl.org'
 license=('custom:BSD')
 groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-zlib)
-makedepends=(mingw-w64-gcc)
+makedepends=(afm-mingw-w64-makedepends)
 provides=(mingw-w64-openssl=$pkgver)
 conflicts=(mingw-w64-openssl)
 options=(!strip staticlibs !buildflags)
 # Using a mirror because the tarball is not found at the official URL
-source=("http://mirror.switch.ch/ftp/mirror/openssl/source/openssl-$pkgver.tar.gz"
+source=("http://mirror.switch.ch/ftp/mirror/openssl/source/${_realname}-$pkgver.tar.gz"
         "openssl-1.0.0a-ldflags.patch"
         "openssl-1.0.0d-windres.patch"
         "openssl-1.0.1-parallel-build.patch"
@@ -36,7 +37,7 @@ md5sums=('38373013fc85c790aabf8837969c5eba'
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 prepare() {
-  cd "$srcdir/openssl-$pkgver"
+  cd "$srcdir/${_realname}-$pkgver"
 
   patch -p1 -i ../openssl-1.0.0a-ldflags.patch
   patch -p1 -i ../openssl-1.0.0d-windres.patch
@@ -45,12 +46,12 @@ prepare() {
   patch -p1 -i ../openssl-0.9.6-x509.patch
   patch -p1 -i ../openssl-1.0.1i-relocation.patch
 
-  # Use MinGW cflags instead of hardcoded ones
+  # Use default CFLAGS instead of hardcoded ones
   sed -i -e '/^"mingw"/ s/-fomit-frame-pointer -O3 -march=i486 -Wall/-O2 -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4/' Configure
 }
 
 build() {
-  local tardir="$srcdir/${pkgname#mingw-w64-}-$pkgver"
+  local tardir="$srcdir/${_realname}-$pkgver"
   local builddir
   local arch
   local _target
