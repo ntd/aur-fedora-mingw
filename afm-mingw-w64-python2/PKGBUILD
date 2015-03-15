@@ -6,9 +6,9 @@
 # This is an adaptation of the MinGW package by Alexpux found on GitHub:
 # https://github.com/Alexpux/MINGW-packages/tree/master/mingw-w64-python2
 
-pkgname=mingw-w64-python2
+pkgname=afm-mingw-w64-python2
 pkgver=2.7.9
-pkgrel=5
+pkgrel=1
 _pybasever=2.7
 pkgdesc='A high-level scripting language (mingw-w64)'
 arch=(any)
@@ -17,7 +17,9 @@ license=(PSF)
 depends=(mingw-w64-crt fedora-mingw-w64-zlib fedora-mingw-w64-bzip2
          fedora-mingw-w64-expat fedora-mingw-w64-gdbm fedora-mingw-w64-libffi
          mingw-w64-openssl)
-makedepends=(mingw-w64-gcc mingw-w64-pkg-config wine "python2>=$pkgver")
+makedepends=(afm-mingw-w64-makedepends wine)
+provides=(mingw-w64-python2=$pkgver)
+conflicts=(mingw-w64-python2)
 options=(!strip staticlibs !buildflags)
 source=("http://www.python.org/ftp/python/${pkgver%rc?}/Python-${pkgver}.tar.xz"
         "0000-make-_sysconfigdata.py-relocatable.patch"
@@ -316,7 +318,7 @@ build() {
   rm -fr "$srcdir/win32" "$srcdir/win64"
 
   unset LDFLAGS CPPFLAGS
-  export CFLAGS='-fwrapv -D__USE_MINGW_ANSI_STDIO=1'
+  MINGW32_CFLAGS='-fwrapv -D__USE_MINGW_ANSI_STDIO=1 -O2 -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4'
   export CXXFLAGS="$CFLAGS"
   export MSYSTEM=MINGW
 
@@ -330,10 +332,8 @@ build() {
     export LIBFFI_INCLUDEDIR=$($arch-pkg-config --variable=includedir libffi)
     export WINEARCH=win$bits
     export WINEPREFIX="$srcdir/$WINEARCH"
-    "$tardir/configure" \
-      --build="$CHOST" \
-      --prefix="/usr/$arch" \
-      --host="$arch" \
+    MINGW_CFLAGS='-fwrapv -D__USE_MINGW_ANSI_STDIO=1 -O2 -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4' \
+    "$arch-configure" "$tardir" \
       --enable-shared \
       --with-threads \
       --with-system-expat \
@@ -363,7 +363,7 @@ package() {
       MSYS2_ARG_CONV_EXCL="--prefix=;--install-scripts=;--install-platlib=" \
       install
 
-    # Create wrappers for running python.exe through wine
+    # Create wrapper and its symlinks for running python.exe through wine
     sed -e "s/@arch@/win$bits/g" "$srcdir/winepython" > "$pkgdir$wrapper"
     chmod 0755 "$pkgdir$wrapper"
     ln -sf "python${_pybasever}" "$prefix/bin/python2"
@@ -373,14 +373,14 @@ package() {
 
     # Clean up she-bangs
     find "$prefix/lib/python${_pybasever}/" -name '*.py' | \
-       xargs sed -i -e "s|#[ ]*![ ]*/usr/bin/env python$|#!$wrapper|"
+       xargs sed -i -e "1s|#!.*|#!$wrapper|"
 
     # Clean-up references to build directory
     sed -i -e "s|$srcdir/Python-$pkgver:||" "$prefix/lib/python${_pybasever}/config/Makefile"
 
     # Use the wrapper also for the helper tools
-    for f in 2to3 idle pydoc python-config; do
-      sed -i -e "s|#! */usr/bin/python.*$|#!$wrapper|" "$prefix/bin/$f"
+    for f in 2to3 idle pydoc "python${_pybasever}-config"; do
+      sed -i -e "1s|#!.*|#!$wrapper|" "$prefix/bin/$f"
     done
 
     # Replace paths in sysconfig
@@ -388,9 +388,9 @@ package() {
       "$prefix/lib/python${_pybasever}/_sysconfigdata.py" \
       "$prefix/lib/python${_pybasever}/smtpd.py"
 
-    # Copy python import library to $prefix/lib because
-    # some programs can't find it in other locations
-    cp -a "$prefix/lib/python${_pybasever}/config/libpython${_pybasever}.dll.a" "$prefix/lib/"
+    # Put a link to the python import library inside $prefix/lib
+    # because some program can't find it in other locations
+    ln -sf "python${_pybasever}/config/libpython${_pybasever}.dll.a" "$prefix/lib/"
 
     find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
