@@ -1,0 +1,28 @@
+From 87a1bfe484afedba1caedf76500a3cb69d6e155b Mon Sep 17 00:00:00 2001
+From: Nicola Fontana <ntd@entidi.it>
+Date: Mon, 16 Mar 2015 21:37:55 +0100
+Subject: [PATCH 04/10] Directly use file descriptor on MinGW platform
+
+In MinGW, msvcr*.dll are just placeholders and cannot be opened. No idea
+what the skipped code does but without skipping it the scanner fails
+with "No msvcr70.dll loaded.".
+---
+ giscanner/giscannermodule.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/giscanner/giscannermodule.c b/giscanner/giscannermodule.c
+index b951227..d5ca5dc 100644
+--- a/giscanner/giscannermodule.c
++++ b/giscanner/giscannermodule.c
+@@ -454,7 +454,7 @@ pygi_source_scanner_parse_file (PyGISourceScanner *self,
+ #endif
+ #endif
+ 
+-#ifndef MSVC_USE_FD_DIRECTLY
++#if !defined(MSVC_USE_FD_DIRECTLY) && !defined(__MINGW64_VERSION_MAJOR)
+   {
+ #if defined(PY_MAJOR_VERSION) && PY_MAJOR_VERSION==2 && PY_MINOR_VERSION==5
+ #define PYTHON_MSVCRXX_DLL "msvcr71.dll"
+-- 
+2.3.3
+

@@ -1,0 +1,60 @@
+From 59c4619d7d80bf9c872379958c6a88a23de80eca Mon Sep 17 00:00:00 2001
+From: Nicola Fontana <ntd@entidi.it>
+Date: Mon, 23 Mar 2015 15:57:14 +0100
+Subject: [PATCH 05/10] Avoid hard-coded programs in scanner
+
+Check the standard environment variables before using hardcoded values
+for programs such as pkg-config and dlltool. This is especially useful
+during cross-compilations.
+---
+ giscanner/ccompiler.py   | 3 +--
+ giscanner/scannermain.py | 2 +-
+ giscanner/shlibs.py      | 4 ++--
+ 3 files changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/giscanner/ccompiler.py b/giscanner/ccompiler.py
+index 1c66aac..a78c8f6 100644
+--- a/giscanner/ccompiler.py
++++ b/giscanner/ccompiler.py
+@@ -140,8 +140,7 @@ class CCompiler(object):
+                 args.append(utils.which(os.environ.get('SHELL', 'sh.exe')))
+                 args.extend(libtool)
+                 args.append('--mode=execute')
+-            # FIXME: it could have prefix (i686-w64-mingw32-dlltool.exe)
+-            args.extend(['dlltool.exe', '--identify'])
++            args.extend([os.environ.get('DLLTOOL', 'dlltool.exe'), '--identify'])
+             proc = subprocess.Popen([compiler_cmd, '-print-search-dirs'],
+                                     stdout=subprocess.PIPE)
+             o, e = proc.communicate()
+diff --git a/giscanner/scannermain.py b/giscanner/scannermain.py
+index bca4a88..b36284d 100755
+--- a/giscanner/scannermain.py
++++ b/giscanner/scannermain.py
+@@ -280,7 +280,7 @@ def process_options(output, allowed_flags):
+ 
+ 
+ def process_packages(options, packages):
+-    args = ['pkg-config', '--cflags']
++    args = [os.environ.get('PKG_CONFIG', 'pkg-config'), '--cflags']
+     args.extend(packages)
+     output = subprocess.Popen(args,
+                               stdout=subprocess.PIPE).communicate()[0]
+diff --git a/giscanner/shlibs.py b/giscanner/shlibs.py
+index 1ad75ee..a8e0bb9 100644
+--- a/giscanner/shlibs.py
++++ b/giscanner/shlibs.py
+@@ -101,9 +101,9 @@ def _resolve_non_libtool(options, binary, libraries):
+             args.append('--mode=execute')
+         platform_system = platform.system()
+         if platform_system == 'Darwin':
+-            args.extend(['otool', '-L', binary.args[0]])
++            args.extend([os.environ.get('OTOOL', 'otool'), '-L', binary.args[0]])
+         else:
+-            args.extend(['ldd', binary.args[0]])
++            args.extend([os.environ.get('LDD', 'ldd'), binary.args[0]])
+         proc = subprocess.Popen(args, stdout=subprocess.PIPE)
+         patterns = {}
+         for library in libraries:
+-- 
+2.3.3
+

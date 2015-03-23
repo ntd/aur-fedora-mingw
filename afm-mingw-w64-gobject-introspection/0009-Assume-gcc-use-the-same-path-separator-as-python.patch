@@ -1,0 +1,25 @@
+From 1f589ded072b4e13db49edd87e503436dddb7724 Mon Sep 17 00:00:00 2001
+From: Nicola Fontana <ntd@entidi.it>
+Date: Mon, 23 Mar 2015 19:29:56 +0100
+Subject: [PATCH 09/10] Assume gcc use the same path separator as python
+
+---
+ giscanner/ccompiler.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/giscanner/ccompiler.py b/giscanner/ccompiler.py
+index b17521f..9edddd2 100644
+--- a/giscanner/ccompiler.py
++++ b/giscanner/ccompiler.py
+@@ -145,7 +145,7 @@ class CCompiler(object):
+             o, e = proc.communicate()
+             for line in o.splitlines():
+                 if line.startswith('libraries: '):
+-                    libsearch = line[len('libraries: '):].split(';')
++                    libsearch = line[len('libraries: '):].split(os.pathsep)
+ 
+         shlibs = []
+         not_resolved = []
+-- 
+2.3.3
+

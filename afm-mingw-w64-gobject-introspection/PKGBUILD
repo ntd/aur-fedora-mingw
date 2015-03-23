@@ -1,0 +1,120 @@
+# Maintainer: Nicola Fontana <ntd@entidi.it>
+
+_realname=gobject-introspection
+pkgname="afm-mingw-w64-${_realname}"
+pkgver=1.43.3
+pkgrel=2
+pkgdesc='Introspection system for GObject-based libraries (mingw-w64)'
+arch=(any)
+url='https://live.gnome.org/GObjectIntrospection'
+license=(LGPL GPL)
+depends=(mingw-w64-crt fedora-mingw-w64-glib2 python2)
+makedepends=(afm-mingw-w64-makedepends wine)
+options=(!strip staticlibs !buildflags)
+source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
+        "0001-Use-pkg-config-to-get-python2-flags.patch"
+        "0002-Pass-to-python-the-proper-path-separator.patch"
+        "0003-Use-PKG_CONFIG-instead-of-pkg-config.patch"
+        "0004-Directly-use-file-descriptor-on-MinGW-platform.patch"
+        "0005-Avoid-hard-coded-programs-in-scanner.patch"
+        "0006-Do-not-hardcode-.exe-extension-for-nt.patch"
+        "0007-Allow-overriding-of-os.name.patch"
+        "0008-Remove-leading-SHELL-in-libtool-call.patch"
+        "0009-Assume-gcc-use-the-same-path-separator-as-python.patch"
+        "0010-Use-a-launcher-to-execute-g-ir-scanner.patch")
+md5sums=('d7828d25068bdef800126da21bc45fc2'
+         '79adec9b998f122e52db5821f4369610'
+         '6f1a6a3b97eb1a356af270d97affc29d'
+         '97c6c3ae8dc35c0730ff388f5f5d0797'
+         'ffd48c1939dde52ccf240d75f4319e6c'
+         'ad83086be0a7037b1ad52df0d943d38e'
+         'cbce1977de9552b49fdfbd69a5035871'
+         'a9c06d8ed389045657db35e55f25c316'
+         '013c08822387b984ce13f33dedb9c175'
+         '51ad3bd5150a5f8128e43117e4a89d26'
+         '974a5364fc5c85689e992bee6fdcc187')
+
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
+
+prepare() {
+  cd "$srcdir/${_realname}-$pkgver"
+
+  patch -Np1 < ../0001-Use-pkg-config-to-get-python2-flags.patch
+  patch -Np1 < ../0002-Pass-to-python-the-proper-path-separator.patch
+  patch -Np1 < ../0003-Use-PKG_CONFIG-instead-of-pkg-config.patch
+  patch -Np1 < ../0004-Directly-use-file-descriptor-on-MinGW-platform.patch
+  patch -Np1 < ../0005-Avoid-hard-coded-programs-in-scanner.patch
+  patch -Np1 < ../0006-Do-not-hardcode-.exe-extension-for-nt.patch
+  patch -Np1 < ../0007-Allow-overriding-of-os.name.patch
+  patch -Np1 < ../0008-Remove-leading-SHELL-in-libtool-call.patch
+  patch -Np1 < ../0009-Assume-gcc-use-the-same-path-separator-as-python.patch
+  patch -Np1 < ../0010-Use-a-launcher-to-execute-g-ir-scanner.patch
+
+  autoreconf -ivf
+
+  # Clear environment trees created by wine
+  rm -fr "$srcdir/win32" "$srcdir/win64"
+}
+
+build() {
+  local tardir="$srcdir/${_realname}-$pkgver"
+  local builddir
+  local arch
+  local bits
+
+  unset LDFLAGS CPPFLAGS
+
+  for arch in ${_architectures[@]}; do
+    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    mkdir -p "$builddir"
+    cd "$builddir"
+
+    # Build the python module with build == host
+    unset PYTHON PKG_CONFIG DLLTOOL GI_OS_NAME INTROSPECTION_LAUNCHER
+    "$tardir/configure" \
+      --disable-silent-rules \
+      --enable-shared \
+      --enable-static
+    make scannerparser.c _giscanner.la
+
+    # Cross-compile the rest of the package
+    export PYTHON=/usr/bin/python2
+    export PKG_CONFIG=/usr/bin/$arch-pkg-config
+    export DLLTOOL=/usr/bin/$arch-dlltool
+    export GI_OS_NAME=nt
+    [ $arch = i686-w64-mingw32 ] && bits=32 || bits=64
+    export INTROSPECTION_LAUNCHER="/usr/bin/env WINEARCH=win$bits WINEPREFIX=$srcdir/win$bits DISPLAY= /usr/bin/wine"
+    "$tardir/configure" \
+      --build="$CHOST" \
+      --prefix="/usr/$arch" \
+      --host="$arch" \
+      --disable-silent-rules \
+      --enable-shared \
+      --enable-static \
+      --disable-doctool
+
+    # Avoid overriding what built with build == host
+    make -t scannerparser.c _giscanner.la
+
+    make INTROSPECTION_LAUNCHER="$INTROSPECTION_LAUNCHER"
+  done
+}
+
+package() {
+  local arch
+  local prefix
+
+  for arch in ${_architectures[@]}; do
+    prefix="$pkgdir/usr/$arch"
+
+    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    make DESTDIR="$pkgdir" install
+
+    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+    #rm -fr "$prefix/share"
+  done
+}
+
+# vim:set ts=2 sw=2 et:

@@ -1,0 +1,83 @@
+From a53cc8da3242ad0d862431279e1e60f9ef7aaece Mon Sep 17 00:00:00 2001
+From: Nicola Fontana <ntd@entidi.it>
+Date: Mon, 23 Mar 2015 18:13:47 +0100
+Subject: [PATCH 06/10] Do not hardcode .exe extension for 'nt'
+
+Allow overriding of the extension of the executables by using the EXEEXT
+environment variable (the name comes from autoconf).
+
+The utils.which code has been refactored and modified to use the newly
+utils.exeext() API.
+---
+ giscanner/dumper.py |  7 +------
+ giscanner/utils.py  | 26 ++++++++++++++------------
+ 2 files changed, 15 insertions(+), 18 deletions(-)
+
+diff --git a/giscanner/dumper.py b/giscanner/dumper.py
+index 45a09fc..564be52 100644
+--- a/giscanner/dumper.py
++++ b/giscanner/dumper.py
+@@ -160,12 +160,7 @@ class DumpCompiler(object):
+         else:
+             o_path = self._generate_tempfile(tmpdir, '.o')
+ 
+-        if os.name == 'nt':
+-            ext = '.exe'
+-        else:
+-            ext = ''
+-
+-        bin_path = self._generate_tempfile(tmpdir, ext)
++        bin_path = self._generate_tempfile(tmpdir, utils.exeext())
+ 
+         try:
+             self._compile(o_path, c_path)
+diff --git a/giscanner/utils.py b/giscanner/utils.py
+index 537109c..0c6662f 100644
+--- a/giscanner/utils.py
++++ b/giscanner/utils.py
+@@ -184,28 +184,30 @@ def cflag_real_include_path(cflag):
+     return "-I" + os.path.realpath(cflag[2:])
+ 
+ 
++def exeext():
++    if os.name == "nt":
++        exeext = ".exe"
++    else:
++        exeext = ""
++    return os.environ.get("EXEEXT", exeext)
++
+ def which(program):
+     def is_exe(fpath):
+         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+ 
+-    def is_nt_exe(fpath):
+-        return not fpath.lower().endswith('.exe') and \
+-            os.path.isfile(fpath + '.exe') and \
+-            os.access(fpath + '.exe', os.X_OK)
++    if is_exe(program):
++        return program
++    if is_exe(program + exeext()):
++        return program + exeext()
+ 
+     fpath, fname = os.path.split(program)
+-    if fpath:
+-        if is_exe(program):
+-            return program
+-        if os.name == 'nt' and is_nt_exe(program):
+-            return program + '.exe'
+-    else:
++    if not fpath:
+         for path in os.environ["PATH"].split(os.pathsep):
+             path = path.strip('"')
+             exe_file = os.path.join(path, program)
+             if is_exe(exe_file):
+                 return exe_file
+-            if os.name == 'nt' and is_nt_exe(exe_file):
+-                return exe_file + '.exe'
++            if is_exe(exe_file + exeext()):
++                return exe_file + exeext()
+ 
+     return None
+-- 
+2.3.3
+

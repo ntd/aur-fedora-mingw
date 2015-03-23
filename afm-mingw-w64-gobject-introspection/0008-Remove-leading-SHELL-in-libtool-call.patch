@@ -1,0 +1,27 @@
+From 6f4b86c5c15b836189fc4b809d0a6cb3e31dfc2e Mon Sep 17 00:00:00 2001
+From: Nicola Fontana <ntd@entidi.it>
+Date: Mon, 23 Mar 2015 19:15:11 +0100
+Subject: [PATCH 08/10] Remove leading $SHELL in libtool call
+
+The function looking for libtool already prepend a shell: it splits the
+string defined by automake that by default is:
+LIBTOOL = $(SHELL) $(top_builddir)/libtool
+---
+ giscanner/ccompiler.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/giscanner/ccompiler.py b/giscanner/ccompiler.py
+index a78c8f6..b17521f 100644
+--- a/giscanner/ccompiler.py
++++ b/giscanner/ccompiler.py
+@@ -137,7 +137,6 @@ class CCompiler(object):
+             is_msvc = False
+             libtool = utils.get_libtool_command(options)
+             if libtool:
+-                args.append(utils.which(os.environ.get('SHELL', 'sh.exe')))
+                 args.extend(libtool)
+                 args.append('--mode=execute')
+             args.extend([os.environ.get('DLLTOOL', 'dlltool.exe'), '--identify'])
+-- 
+2.3.3
+
