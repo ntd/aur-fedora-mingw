@@ -3,7 +3,7 @@
 _realname=gobject-introspection
 pkgname="afm-mingw-w64-${_realname}"
 pkgver=1.43.3
-pkgrel=2
+pkgrel=3
 pkgdesc='Introspection system for GObject-based libraries (mingw-w64)'
 arch=(any)
 url='https://live.gnome.org/GObjectIntrospection'
@@ -65,7 +65,7 @@ build() {
   unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
 
@@ -107,13 +107,14 @@ package() {
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
 
-    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    cd "$srcdir/${_realname}-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
 
-    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
+    find "$prefix" -regex '.*\.\(bat\|def\|exp\)' -exec rm -f {} +
     find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
-    #rm -fr "$prefix/share"
+    rm -fr "$prefix/share/man"
+    rm -fr "$prefix/share/aclocal"
   done
 }
 
