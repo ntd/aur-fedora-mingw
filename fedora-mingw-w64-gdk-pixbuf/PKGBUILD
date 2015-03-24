@@ -7,9 +7,10 @@
 # jasper (JPEG2000 image support) dependencies are dropped
 # and gdiplus support is not enabled.
 
-pkgname=fedora-mingw-w64-gdk-pixbuf
+_realname=gdk-pixbuf
+pkgname="fedora-mingw-w64-${_realname}"
 pkgver=2.31.1
-pkgrel=2
+pkgrel=3
 pkgdesc='An image loading library (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -17,8 +18,7 @@ license=(LGPL)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-glib2 fedora-mingw-w64-freetype
          mingw-w64-libjpeg mingw-w64-libpng)
-makedepends=(mingw-w64-gcc mingw-w64-tools mingw-w64-pkg-config
-             autoconf automake libtool)
+makedepends=(afm-mingw-w64-makedepends afm-mingw-w64-gobject-introspection wine)
 provides=(mingw-w64-gdk-pixbuf2=$pkgver)
 conflicts=(mingw-w64-gdk-pixbuf2)
 options=(!strip staticlibs !buildflags)
@@ -30,16 +30,24 @@ md5sums=('74cde211f5b7ac1015d1a7c9feee037c'
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
-  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
+  local tardir="$srcdir/${_realname}-$pkgver"
   local builddir
   local arch
 
   unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
+
+    # Prepare environment needed by gobject-introspection
+    export PKG_CONFIG=/usr/bin/$arch-pkg-config
+    export DLLTOOL=/usr/bin/$arch-dlltool
+    export GI_OS_NAME=nt
+    [ $arch = i686-w64-mingw32 ] && bits=32 || bits=64
+    export INTROSPECTION_LAUNCHER="/usr/bin/env WINEARCH=win$bits WINEPREFIX=$srcdir/win$bits DISPLAY= /usr/bin/wine"
+
     "$tardir/configure" \
       --build="$CHOST" \
       --prefix="/usr/$arch" \
@@ -57,7 +65,7 @@ package() {
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
 
-    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    cd "$srcdir/${_realname}-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
 
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
