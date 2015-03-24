@@ -3,7 +3,7 @@
 _realname=gobject-introspection
 pkgname="afm-mingw-w64-${_realname}"
 pkgver=1.43.3
-pkgrel=3
+pkgrel=4
 pkgdesc='Introspection system for GObject-based libraries (mingw-w64)'
 arch=(any)
 url='https://live.gnome.org/GObjectIntrospection'
@@ -21,7 +21,9 @@ source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_rea
         "0007-Allow-overriding-of-os.name.patch"
         "0008-Remove-leading-SHELL-in-libtool-call.patch"
         "0009-Assume-gcc-use-the-same-path-separator-as-python.patch"
-        "0010-Use-a-launcher-to-execute-g-ir-scanner.patch")
+        "0010-Use-a-launcher-to-execute-g-ir-scanner.patch"
+        "0011-Allow-to-skip-the-check-for-Python-headers.patch"
+        "winewrapper")
 md5sums=('d7828d25068bdef800126da21bc45fc2'
          '79adec9b998f122e52db5821f4369610'
          '6f1a6a3b97eb1a356af270d97affc29d'
@@ -32,7 +34,9 @@ md5sums=('d7828d25068bdef800126da21bc45fc2'
          'a9c06d8ed389045657db35e55f25c316'
          '013c08822387b984ce13f33dedb9c175'
          '51ad3bd5150a5f8128e43117e4a89d26'
-         '974a5364fc5c85689e992bee6fdcc187')
+         '974a5364fc5c85689e992bee6fdcc187'
+         '66375f7720185afd6388436e5e186266'
+         'ee07cea6a2f3b351ea5f873c8a569fd6')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -49,6 +53,7 @@ prepare() {
   patch -Np1 < ../0008-Remove-leading-SHELL-in-libtool-call.patch
   patch -Np1 < ../0009-Assume-gcc-use-the-same-path-separator-as-python.patch
   patch -Np1 < ../0010-Use-a-launcher-to-execute-g-ir-scanner.patch
+  patch -Np1 < ../0011-Allow-to-skip-the-check-for-Python-headers.patch
 
   autoreconf -ivf
 
@@ -84,19 +89,22 @@ build() {
     export GI_OS_NAME=nt
     [ $arch = i686-w64-mingw32 ] && bits=32 || bits=64
     export INTROSPECTION_LAUNCHER="/usr/bin/env WINEARCH=win$bits WINEPREFIX=$srcdir/win$bits DISPLAY= /usr/bin/wine"
-    "$tardir/configure" \
-      --build="$CHOST" \
-      --prefix="/usr/$arch" \
-      --host="$arch" \
-      --disable-silent-rules \
-      --enable-shared \
-      --enable-static \
-      --disable-doctool
+    # Compile inside a subshell so there will not be environment
+    # variable leaks (defined by $arch-configure)
+    (
+      source "$arch-configure" "$tardir" \
+        --host="$arch" \
+        --disable-silent-rules \
+        --enable-shared \
+        --enable-static \
+        --disable-doctool \
+        --disable-giscanner
 
-    # Avoid overriding what built with build == host
-    make -t scannerparser.c _giscanner.la
+      # Avoid overriding what built with build == host
+      make -t scannerparser.c _giscanner.la
 
-    make INTROSPECTION_LAUNCHER="$INTROSPECTION_LAUNCHER"
+      make INTROSPECTION_LAUNCHER="$INTROSPECTION_LAUNCHER"
+    )
   done
 }
 
@@ -109,6 +117,24 @@ package() {
 
     cd "$srcdir/${_realname}-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
+
+    # Wrappers for running g-ir-compiler and g-ir-generate with wine
+    sed \
+      -e "s|@arch@|win$bits|g" \
+      -e "s|@exe@|/usr/$arch/bin/g-ir-compiler.exe|g" \
+      "$srcdir/winewrapper" > "$prefix/bin/g-ir-compiler"
+    chmod 0755 "$prefix/bin/g-ir-compiler"
+    sed \
+      -e "s|@arch@|win$bits|g" \
+      -e "s|@exe@|/usr/$arch/bin/g-ir-compiler.exe|g" \
+      "$srcdir/winewrapper" > "$prefix/bin/g-ir-generate"
+    chmod 0755 "$prefix/bin/g-ir-generate"
+
+    # Substitute the wrappers to the exe in the pkg-config files
+    sed -i \
+      -e 's|g-ir-compiler.exe|g-ir-compiler|g' \
+      -e 's|g-ir-generate.exe|g-ir-generate|g' \
+      $prefix/lib/pkgconfig/gobject-introspection-1.0.pc
 
     find "$prefix" -regex '.*\.\(bat\|def\|exp\)' -exec rm -f {} +
     find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
