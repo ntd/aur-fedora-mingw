@@ -3,42 +3,50 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-atk.git/
 
-pkgname=fedora-mingw-w64-atk
-pkgver=2.15.3
-pkgrel=2
+_realname=atk
+pkgname="fedora-mingw-w64-${_realname}"
+pkgver=2.16.0
+pkgrel=1
 pkgdesc='A library providing a set of interfaces for accessibility (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
 license=(LGPL)
 groups=(fedora-mingw)
-depends=(mingw-w64-crt fedora-mingw-w64-win-iconv fedora-mingw-w64-gettext fedora-mingw-w64-glib2)
-makedepends=(mingw-w64-gcc mingw-w64-pkg-config
-             gnome-common autoconf automake libtool gtk-doc gobject-introspection)
-provides=(mingw-w64-atk=$pkgver)
-conflicts=(mingw-w64-atk)
+depends=(mingw-w64-crt fedora-mingw-w64-win-iconv
+         fedora-mingw-w64-gettext fedora-mingw-w64-glib2)
+makedepends=(afm-mingw-w64-makedepends afm-mingw-w64-gobject-introspection)
+provides=("mingw-w64-${_realname}=$pkgver")
+conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
-source=("http://ftp.gnome.org/pub/GNOME/sources/atk/${pkgver%.*}/atk-$pkgver.tar.xz")
-md5sums=('4dc8f00682eeb6bcab3b9b2fd1f2378c')
+source=("http://ftp.gnome.org/pub/GNOME/sources/atk/${pkgver%.*}/${_realname}-$pkgver.tar.xz")
+md5sums=('c7c5002bd6e58b4723a165f1bf312116')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
-  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
+  local tardir="$srcdir/${_realname}-$pkgver"
   local builddir
   local arch
 
   unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    "$tardir/configure" \
-      --build="$CHOST" \
-      --prefix="/usr/$arch" \
-      --host="$arch" \
+
+    # Prepare environment needed by gobject-introspection
+    export PKG_CONFIG=/usr/bin/$arch-pkg-config
+    export DLLTOOL=/usr/bin/$arch-dlltool
+    export GI_OS_NAME=nt
+    [ $arch = i686-w64-mingw32 ] && bits=32 || bits=64
+    export INTROSPECTION_LAUNCHER="/usr/bin/env WINEARCH=win$bits WINEPREFIX=$srcdir/win$bits DISPLAY= /usr/bin/wine"
+
+    source "$arch-configure" "$tardir" \
+      --enable-static \
       --enable-shared \
-      --enable-static
+      --disable-silent-rules \
+      --enable-introspection
     make
   done
 }
@@ -50,13 +58,12 @@ package() {
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
 
-    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    cd "$srcdir/${_realname}-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
 
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
     find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
-    rm -fr "$prefix/share"
   done
 }
 
