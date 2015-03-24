@@ -6,7 +6,7 @@
 _realname=harfbuzz
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=0.9.40
-pkgrel=1
+pkgrel=2
 pkgdesc='OpenType text shaping engine (mingw-w64)'
 arch=(any)
 url='http://www.harfbuzz.org/'
@@ -14,7 +14,7 @@ license=(MIT)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-glib2 fedora-mingw-w64-freetype
          fedora-mingw-w64-cairo mingw-w64-icu)
-makedepends=(afm-mingw-w64-makedepends)
+makedepends=(afm-mingw-w64-makedepends afm-mingw-w64-gobject-introspection)
 provides=("mingw-w64-${_realname}=$pkgver")
 conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
@@ -34,10 +34,20 @@ build() {
     builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
+
+    # Prepare environment needed by gobject-introspection
+    export PKG_CONFIG=/usr/bin/$arch-pkg-config
+    export DLLTOOL=/usr/bin/$arch-dlltool
+    export GI_OS_NAME=nt
+    [ $arch = i686-w64-mingw32 ] && bits=32 || bits=64
+    export INTROSPECTION_LAUNCHER="/usr/bin/env WINEARCH=win$bits WINEPREFIX=$srcdir/win$bits DISPLAY= /usr/bin/wine"
+
     source "$arch-configure" "$tardir" \
       --enable-static \
       --enable-shared \
-      --disable-silent-rules
+      --disable-silent-rules \
+      --with-gobject \
+      --enable-introspection
     make
   done
 }
@@ -55,7 +65,6 @@ package() {
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
     find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
-    rm -fr "$prefix/share"
   done
 }
 
