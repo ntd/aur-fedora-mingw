@@ -3,35 +3,33 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/
 
+_realname=glib
 pkgname=fedora-mingw-w64-glib2
-pkgver=2.43.3
-pkgrel=5
+pkgver=2.44.0
+pkgrel=1
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
 license=(LGPL)
 groups=(fedora-mingw)
 depends=('mingw-w64-crt>=4' mingw-w64-libffi mingw-w64-zlib mingw-w64-gettext)
-makedepends=(mingw-w64-gcc mingw-w64-pkg-config 'glib2>=2.31.20')
+makedepends=(afm-mingw-w64-makedepends 'glib2>=2.31.20' 'python2>=2.5.0')
 provides=(mingw-w64-glib2=$pkgver)
 conflicts=(mingw-w64-glib2)
 options=(!strip staticlibs !buildflags)
-source=("http://ftp.gnome.org/pub/GNOME/sources/glib/${pkgver%.*}/glib-$pkgver.tar.xz"
+source=("http://ftp.gnome.org/pub/GNOME/sources/glib/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-send-log-messages-to-correct-stdout-and-stderr.patch?id=d2262b6ca2230b2dc169aa4798b59e645859a195"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-prefer-constructors-over-DllMain.patch?id=10ce51e70078f0c5b76d3ee1582d75e43f7f3363")
-md5sums=('2727c4dee79c5449f364cd5e27b17099'
+md5sums=('74cf7b4ea200b76e42a4c22c8daf0f93'
          'c08c41118f5318d10f326c7c30e1a33a'
          '7b065f9bc154bf996523974a698b24de'
          '46969e815f3ab19582ba33667a52048b')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
-build() {
-  # glib2 != glib, so hardcoding it in $tardir
-  local tardir="$srcdir/glib-$pkgver"
-  local builddir
-  local arch
+prepare() {
+  cd "$srcdir/${_realname}-$pkgver"
 
   # Apply patches from fedora repository
   cd "$tardir"
@@ -49,33 +47,37 @@ build() {
   # This prevents having to depend on DllMain in static libraries
   # http://lists.fedoraproject.org/pipermail/fedora-mingw/2013-March/006429.html
   patch -Np1 < '../glib-prefer-constructors-over-DllMain.patch?id=10ce51e70078f0c5b76d3ee1582d75e43f7f3363'
+}
 
-  export CFLAGS='-O2 -pipe'
-  export CXXFLAGS="$CFLAGS"
+build() {
+  local tardir="$srcdir/${_realname}-$pkgver"
+  local builddir
+  local arch
+
   unset  LDFLAGS
   unset  CPPFLAGS
 
   for arch in ${_architectures[@]}; do
+    builddir="$tardir-build-$arch"
+
     # GLib can't build static and shared libraries in one go, so we build GLib twice
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
     mkdir -p "$builddir-static"
     cd "$builddir-static"
-    "$tardir/configure" \
-      --build="$CHOST" \
-      --prefix="/usr/$arch" \
-      --host="$arch" \
+    source "$arch-configure" "$tardir" \
       --disable-shared \
-      --enable-static
+      --enable-static \
+      --disable-silent-rules \
+      --with-python=/usr/bin/python2
     make V=1
+
     mkdir -p "$builddir-shared"
     cd "$builddir-shared"
-    "$tardir/configure" \
-      --build="$CHOST" \
-      --prefix="/usr/$arch" \
-      --host="$arch" \
+    source "$arch-configure" "$tardir" \
       --enable-shared \
-      --disable-static
-    make
+      --disable-static \
+      --disable-silent-rules \
+      --with-python=/usr/bin/python2
+    make V=1
   done
 }
 
@@ -88,7 +90,7 @@ package() {
   # Developers using the static build of GLib need to add -DGLIB_STATIC_COMPILATION
   # and -DGOBJECT_STATIC_COMPILATION to their CFLAGS to avoid compile failures.
   for arch in ${_architectures[@]}; do
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$srcdir/${_realname}-$pkgver-build-$arch"
     prefix="$pkgdir/usr/$arch"
     cd "$builddir-static"
     make DESTDIR="$pkgdir" install
