@@ -10,7 +10,7 @@
 _realname=gdk-pixbuf
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=2.31.1
-pkgrel=3
+pkgrel=4
 pkgdesc='An image loading library (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -48,12 +48,11 @@ build() {
     [ $arch = i686-w64-mingw32 ] && bits=32 || bits=64
     export INTROSPECTION_LAUNCHER="/usr/bin/env WINEARCH=win$bits WINEPREFIX=$srcdir/win$bits DISPLAY= /usr/bin/wine"
 
-    "$tardir/configure" \
-      --build="$CHOST" \
-      --prefix="/usr/$arch" \
-      --host="$arch" \
+    source "$arch-configure" "$tardir" \
       --with-included-loaders=png \
-      --without-libjasper
+      --without-libjasper \
+      --disable-silent-rules \
+      --enable-introspection
     make
   done
 }
