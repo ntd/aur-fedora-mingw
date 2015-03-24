@@ -3,9 +3,10 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-harfbuzz.git/
 
-pkgname=fedora-mingw-w64-harfbuzz
-pkgver=0.9.37
-pkgrel=2
+_realname=harfbuzz
+pkgname="fedora-mingw-w64-${_realname}"
+pkgver=0.9.40
+pkgrel=1
 pkgdesc='OpenType text shaping engine (mingw-w64)'
 arch=(any)
 url='http://www.harfbuzz.org/'
@@ -13,32 +14,30 @@ license=(MIT)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-glib2 fedora-mingw-w64-freetype
          fedora-mingw-w64-cairo mingw-w64-icu)
-makedepends=(mingw-w64-gcc mingw-w64-pkg-config)
-provides=(mingw-w64-harfbuzz=$pkgver)
-conflicts=(mingw-w64-harfbuzz)
+makedepends=(afm-mingw-w64-makedepends)
+provides=("mingw-w64-${_realname}=$pkgver")
+conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
-source=("http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-$pkgver.tar.bz2")
-md5sums=('bfe733250e34629a188d82e3b971bc1e')
+source=("http://www.freedesktop.org/software/harfbuzz/release/${_realname}-$pkgver.tar.bz2")
+md5sums=('0e27e531f4c4acff601ebff0957755c2')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
-  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
+  local tardir="$srcdir/${_realname}-$pkgver"
   local builddir
   local arch
 
   unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    "$tardir/configure" \
-      --build="$CHOST" \
-      --prefix="/usr/$arch" \
-      --host="$arch" \
+    source "$arch-configure" "$tardir" \
       --enable-static \
-      --enable-shared
+      --enable-shared \
+      --disable-silent-rules
     make
   done
 }
@@ -50,7 +49,7 @@ package() {
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
 
-    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    cd "$srcdir/${_realname}-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
 
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
