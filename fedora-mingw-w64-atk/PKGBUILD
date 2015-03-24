@@ -6,7 +6,7 @@
 _realname=atk
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=2.16.0
-pkgrel=1
+pkgrel=2
 pkgdesc='A library providing a set of interfaces for accessibility (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -14,7 +14,7 @@ license=(LGPL)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-win-iconv
          fedora-mingw-w64-gettext fedora-mingw-w64-glib2)
-makedepends=(afm-mingw-w64-makedepends afm-mingw-w64-gobject-introspection)
+makedepends=(afm-mingw-w64-makedepends afm-mingw-w64-gobject-introspection wine)
 provides=("mingw-w64-${_realname}=$pkgver")
 conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
