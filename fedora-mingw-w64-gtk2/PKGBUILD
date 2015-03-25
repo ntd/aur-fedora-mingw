@@ -3,24 +3,24 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/
 
+_realname=gtk+
 pkgname=fedora-mingw-w64-gtk2
-pkgver=2.24.25
-pkgrel=2
+pkgver=2.24.27
+pkgrel=1
 pkgdesc='GTK+2 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
 license=(LGPL)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-atk fedora-mingw-w64-cairo
-         fedora-mingw-w64-gettext fedora-mingw-w64-glib2
-         fedora-mingw-w64-win-iconv fedora-mingw-w64-pango
-         fedora-mingw-w64-gdk-pixbuf fedora-mingw-w64-pixman mingw-w64-zlib)
-makedepends=(mingw-w64-gcc mingw-w64-pkg-config
-             autoconf automake libtool gtk-doc gobject-introspection)
+         fedora-mingw-w64-gdk-pixbuf fedora-mingw-w64-gettext
+         fedora-mingw-w64-glib2 fedora-mingw-w64-win-iconv
+         fedora-mingw-w64-pango fedora-mingw-w64-pixman mingw-w64-zlib)
+makedepends=(afm-mingw-w64-makedepends afm-mingw-w64-gobject-introspection wine)
 provides=(mingw-w64-gtk2=$pkgver)
 conflicts=(mingw-w64-gtk2)
 options=(!strip staticlibs !buildflags)
-source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.tar.xz"
+source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/mingw32-gtk2-2.15.0-xbuttons.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/mingw32-gtk2-enable_static_build.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/gtk-fix-out-of-source-build.patch?h=f18"
@@ -28,8 +28,9 @@ source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.t
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/tooltip-positioning.patch?id=95be474adc76e60caa692330cf2706b90848146f"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/window-dragging.patch?id=95be474adc76e60caa692330cf2706b90848146f"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/gtk-combo-box-dont-use-invalidated-iter.patch?id=1296c449f78d4ef378541311bb4a4833c6a26fe6"
+        "0011-gir-for-gdkwin32.mingw.patch"
         "gtk.immodules")
-md5sums=('612350704dd3aacb95355a4981930c6f'
+md5sums=('b1e890e15602c5bcb40d85b13fe046fd'
          '44ca5d1ce91f5364182c6ea2614c7688'
          '396835720e308acaa0372e5a45c463d4'
          '8231dd2b7484574968d5faa57262af2a'
@@ -37,52 +38,76 @@ md5sums=('612350704dd3aacb95355a4981930c6f'
          '86159ea0934b25a7bbda9aa436ffc551'
          '147a90540b678b941e7d5d71054b2447'
          '1cef826891d79b06ae69cf632b358d73'
+         '91d12fc6da9026deb0f94f38ab22a3ec'
          '9967ded27c0eb3b615acae7539621607')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
-build() {
-  # gtk2 != gtk+, so hardcoding it in $tardir
-  local tardir="$srcdir/gtk+-$pkgver"
-  local builddir
-  local arch
+prepare() {
+  cd "$srcdir/${_realname}-$pkgver"
 
-  # Apply patches from fedora repository
-  cd "$tardir"
+  # Fix use of extended buttons in gtkstatusicon.
   patch -Np1 < '../mingw32-gtk2-2.15.0-xbuttons.patch?h=f18'
+
   # https://bugzilla.gnome.org/show_bug.cgi?id=583273
   patch -Np1 < '../icon-padding.patch?id=95be474adc76e60caa692330cf2706b90848146f'
+
   # https://bugzilla.gnome.org/show_bug.cgi?id=599618
   patch -Np1 < '../tooltip-positioning.patch?id=95be474adc76e60caa692330cf2706b90848146f'
+
   # https://bugzilla.gnome.org/show_bug.cgi?id=611313
   patch -Np1 < '../window-dragging.patch?id=95be474adc76e60caa692330cf2706b90848146f'
+
   # Don't use invalidated iter in GtkComboBox
   # Resolves segfaults in GtkFileChooserButton
   # https://bugzilla.redhat.com/show_bug.cgi?id=985559
   # https://bugzilla.gnome.org/show_bug.cgi?id=704508
   patch -Np1 < '../gtk-combo-box-dont-use-invalidated-iter.patch?id=1296c449f78d4ef378541311bb4a4833c6a26fe6'
 
+  # Enable introspection, patch from LRN:
+  patch -Np1 < '../0011-gir-for-gdkwin32.mingw.patch'
+
   autoreconf -if
 
+  # Enable building a static library of GTK
   patch -Np0 < '../mingw32-gtk2-enable_static_build.patch?h=f18'
+
+  # GTK doesn't support out-of-source builds
   patch -Np0 < '../gtk-fix-out-of-source-build.patch?h=f18'
 
   # The pre-generated gtk.def file can't be used for MinGW-W64
   # Force a regeneration of this file by removing the bundled copy
   rm -f gtk/gtk.def
+}
+
+build() {
+  local tardir="$srcdir/${_realname}-$pkgver"
+  local builddir
+  local arch
 
   unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    "$tardir/configure" \
-      --build="$CHOST" \
-      --prefix="/usr/$arch" \
-      --host="$arch" \
-      --disable-cups \
+
+    # Prepare environment needed by gobject-introspection
+    export CC=$arch-gcc
+    export PKG_CONFIG=/usr/bin/$arch-pkg-config
+    export DLLTOOL=/usr/bin/$arch-dlltool
+    export GI_OS_NAME=nt
+    [ $arch = i686-w64-mingw32 ] && bits=32 || bits=64
+    export INTROSPECTION_LAUNCHER="/usr/bin/env WINEARCH=win$bits WINEPREFIX=$srcdir/win$bits DISPLAY= /usr/bin/wine"
+    export XDG_DATA_DIRS="/usr/$arch/share:$XDG_DATA_DIRS"
+    export GI_TYPELIB_PATH="/usr/$arch/lib/girepository-1.0"
+
+    source "$arch-configure" "$tardir" \
       --enable-static \
+      --enable-shared \
+      --disable-silent-rules \
+      --enable-introspection \
+      --disable-cups \
       --disable-gtk-doc
     make
   done
@@ -95,14 +120,19 @@ package() {
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
 
-    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    cd "$srcdir/${_realname}-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
 
-    # Do not remove exe files (leave gtk2-demo.exe for testing purpose)
+    # Remove all the exe files that do not have gtk2 or 2.0 inside their
+    # names, hence possibly conflicting with GTK+3
+    find "$prefix" -name '*.exe' -a ! -name '*gtk2*' -a ! -name '*2.0*' -exec rm -f {} +
+
     find "$prefix" -regex '.*\.\(bat\|def\|exp\)' -exec rm -f {} +
     find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
-    #rm -fr "$prefix/share"
+
+    rm -fr "$prefix/share/aclocal"
+    rm -fr "$prefix/share/man"
   done
 }
 
