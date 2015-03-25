@@ -3,9 +3,10 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/
 
-pkgname=fedora-mingw-w64-gtk3
-pkgver=3.14.9
-pkgrel=2
+_realname=gtk+
+pkgname="fedora-mingw-w64-gtk3"
+pkgver=3.14.10
+pkgrel=1
 pkgdesc='GTK+3 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -15,57 +16,65 @@ depends=(mingw-w64-crt fedora-mingw-w64-atk fedora-mingw-w64-cairo
          fedora-mingw-w64-gdk-pixbuf fedora-mingw-w64-gettext
          fedora-mingw-w64-glib2 fedora-mingw-w64-win-iconv
          fedora-mingw-w64-pango fedora-mingw-w64-pixman mingw-w64-zlib)
-makedepends=(mingw-w64-gcc mingw-w64-pkg-config
-             glib2 gobject-introspection)
-# Upstream packaging has gone wrong:
-#
-# make[2]: Entering directory `/builddir/build/BUILD/gtk+-3.9.8/build_win32/gdk'
-# cd ../.. && /bin/sh /builddir/build/BUILD/gtk+-3.9.8/build-aux/missing automake-1.13 --gnu gdk/Makefile
-# /builddir/build/BUILD/gtk+-3.9.8/build-aux/missing: line 81: automake-1.13: command not found
-# WARNING: 'automake-1.13' is missing on your system.
-#
-# Workaround this for now
-makedepends+=(autoconf automake libtool)
+makedepends=(afm-mingw-w64-makedepends afm-mingw-w64-gobject-introspection wine)
 provides=(mingw-w64-gtk3=$pkgver)
 conflicts=(mingw-w64-gtk3)
 options=(!strip staticlibs !buildflags)
-source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.tar.xz"
-        "https://bug731013.bugzilla-attachments.gnome.org/attachment.cgi?id=287100"
+source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
+        "0001-Fix-cross-compilation.patch"
+        "0001-Remove-crash-while-cross-compiling-in-VPATH-mode.patch"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk.immodules?id=3028da05cb7e088b4477a5b30262c7c4ca1e7937")
-md5sums=('40902a0b035277011095946e1c61290d'
-         '7e245b38b9e1d2bb6682922cabd11f64'
+md5sums=('5e28574da0c73df8c4417ce351a5051c'
+         '926405b31c6f86ed6775c9d1ccce803e'
+         '95905ce584012180da0b60335fc678bb'
          'df8ad196a274f9e0d91bfb0078a0f9bd')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
-build() {
-  # gtk3 != gtk+, so hardcoding it in $tardir
-  local tardir="$srcdir/gtk+-$pkgver"
-  local builddir
-  local arch
-
-  cd "$tardir"
+prepare() {
+  cd "$srcdir/${_realname}-$pkgver"
 
   # Cross-compilation is broken as of gtk+ 3.13.2
   # Apply a work-in-progress patch to fix compilation
   # https://bugzilla.gnome.org/show_bug.cgi?id=731013
-  patch -Np1 < '../attachment.cgi?id=287100'
+  patch -Np1 < ../0001-Fix-cross-compilation.patch
 
-  autoreconf -if
+  patch -Np1 < ../0001-Remove-crash-while-cross-compiling-in-VPATH-mode.patch
+
+  autoreconf -ivf
+
+  # Clear environment trees created by wine
+  rm -fr "$srcdir/win32" "$srcdir/win64"
+}
+
+build() {
+  local tardir="$srcdir/${_realname}-$pkgver"
+  local builddir
+  local arch
 
   unset LDFLAGS CPPFLAGS
+
   for arch in ${_architectures[@]}; do
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    "$tardir/configure" \
-      --build="$CHOST" \
-      --prefix="/usr/$arch" \
-      --host="$arch" \
-      --enable-gtk2-dependency \
-      --disable-cups \
+
+    # Prepare environment needed by gobject-introspection
+    export PKG_CONFIG=/usr/bin/$arch-pkg-config
+    export DLLTOOL=/usr/bin/$arch-dlltool
+    export GI_OS_NAME=nt
+    [ $arch = i686-w64-mingw32 ] && bits=32 || bits=64
+    export INTROSPECTION_LAUNCHER="/usr/bin/env WINEARCH=win$bits WINEPREFIX=$srcdir/win$bits DISPLAY= /usr/bin/wine"
+
+    source "$arch-configure" "$tardir" \
       --enable-static \
-      --disable-gtk-doc
+      --enable-shared \
+      --disable-silent-rules \
+      --enable-introspection \
+      --enable-win32-backend \
+      --disable-gtk2-dependency \
+      --disable-cups \
+      --with-included-immodules
     make
   done
 }
@@ -77,7 +86,7 @@ package() {
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
 
-    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    cd "$srcdir/${_realname}-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
 
     # Install the gtk.immodules file
@@ -88,14 +97,17 @@ package() {
     find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
 
+    # Compile the basic schemas, a requirement to have working
+    # GtkFileChooser (and possibly GtkColorChooser) widgets.
+    glib-compile-schemas "$prefix/share/glib-2.0/schemas"
+
     # Remove desktop files and corresponding icons as they aren't
     # useful for win32
     rm -f "$prefix"/share/applications/*.desktop
     rm -f "$prefix"/share/icons/hicolor/*/apps/*.png
 
-    # Compile the basic schemas, a requirement to have working
-    # GtkFileChooser (and possibly GtkColorChooser) widgets.
-    glib-compile-schemas "$prefix/share/glib-2.0/schemas"
+    rm -fr "$prefix/share/aclocal"
+    rm -fr "$prefix/share/man"
   done
 }
 
