@@ -3,13 +3,16 @@
 _realname=gobject-introspection
 pkgname="afm-mingw-w64-${_realname}"
 pkgver=1.43.3
-pkgrel=5
+pkgrel=6
 pkgdesc='Introspection system for GObject-based libraries (mingw-w64)'
 arch=(any)
 url='https://live.gnome.org/GObjectIntrospection'
 license=(LGPL GPL)
+groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-glib2 python2)
 makedepends=(afm-mingw-w64-makedepends wine)
+provides=("mingw-w64-${_realname}=$pkgver")
+conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
         "0001-Use-pkg-config-to-get-python2-flags.patch"
