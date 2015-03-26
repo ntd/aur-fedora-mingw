@@ -6,7 +6,7 @@
 _realname=gtk+
 pkgname=fedora-mingw-w64-gtk2
 pkgver=2.24.27
-pkgrel=1
+pkgrel=2
 pkgdesc='GTK+2 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -20,7 +20,7 @@ makedepends=(afm-mingw-w64-makedepends afm-mingw-w64-gobject-introspection wine)
 provides=(mingw-w64-gtk2=$pkgver)
 conflicts=(mingw-w64-gtk2)
 options=(!strip staticlibs !buildflags)
-source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
+source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/mingw32-gtk2-2.15.0-xbuttons.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/mingw32-gtk2-enable_static_build.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/gtk-fix-out-of-source-build.patch?h=f18"
@@ -91,17 +91,6 @@ build() {
     builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-
-    # Prepare environment needed by gobject-introspection
-    export CC=$arch-gcc
-    export PKG_CONFIG=/usr/bin/$arch-pkg-config
-    export DLLTOOL=/usr/bin/$arch-dlltool
-    export GI_OS_NAME=nt
-    [ $arch = i686-w64-mingw32 ] && bits=32 || bits=64
-    export INTROSPECTION_LAUNCHER="/usr/bin/env WINEARCH=win$bits WINEPREFIX=$srcdir/win$bits DISPLAY= /usr/bin/wine"
-    export XDG_DATA_DIRS="/usr/$arch/share:$XDG_DATA_DIRS"
-    export GI_TYPELIB_PATH="/usr/$arch/lib/girepository-1.0"
-
     source "$arch-configure" "$tardir" \
       --enable-static \
       --enable-shared \
