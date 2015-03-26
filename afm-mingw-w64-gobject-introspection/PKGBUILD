@@ -3,7 +3,7 @@
 _realname=gobject-introspection
 pkgname="afm-mingw-w64-${_realname}"
 pkgver=1.43.3
-pkgrel=4
+pkgrel=5
 pkgdesc='Introspection system for GObject-based libraries (mingw-w64)'
 arch=(any)
 url='https://live.gnome.org/GObjectIntrospection'
@@ -69,28 +69,24 @@ build() {
 
   unset LDFLAGS CPPFLAGS
 
+  # Force the use of the python-2 interpreter
+  export PYTHON=/usr/bin/python2
+
   for arch in ${_architectures[@]}; do
     builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
 
     # Build the python module with build == host
-    unset PYTHON PKG_CONFIG DLLTOOL GI_OS_NAME INTROSPECTION_LAUNCHER
     "$tardir/configure" \
       --disable-silent-rules \
       --enable-shared \
       --enable-static
     make scannerparser.c _giscanner.la
 
-    # Cross-compile the rest of the package
-    export PYTHON=/usr/bin/python2
-    export PKG_CONFIG=/usr/bin/$arch-pkg-config
-    export DLLTOOL=/usr/bin/$arch-dlltool
-    export GI_OS_NAME=nt
-    [ $arch = i686-w64-mingw32 ] && bits=32 || bits=64
-    export INTROSPECTION_LAUNCHER="/usr/bin/env WINEARCH=win$bits WINEPREFIX=$srcdir/win$bits DISPLAY= /usr/bin/wine"
-    # Compile inside a subshell so there will not be environment
-    # variable leaks (defined by $arch-configure)
+    # Cross-compile the rest of the package inside a subshell so
+    # there will not be environment variable leaks from $arch-configure.
+    # The "$arch-configure" script comes from afm-mingw-w64-makedepends.
     (
       source "$arch-configure" "$tardir" \
         --host="$arch" \
