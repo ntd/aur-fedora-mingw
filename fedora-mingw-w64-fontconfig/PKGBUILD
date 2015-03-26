@@ -3,47 +3,41 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-fontconfig.git/
 
-pkgname=fedora-mingw-w64-fontconfig
+_realname=fontconfig
+pkgname="fedora-mingw-w64-${_realname}"
 pkgver=2.11.1
-pkgrel=3
+pkgrel=4
 pkgdesc='A library for configuring and customizing font access (mingw-w64)'
 arch=(any)
 url='http://fontconfig.org/'
 license=(custom)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt mingw-w64-expat mingw-w64-freetype mingw-w64-win-iconv)
-makedepends=(mingw-w64-gcc mingw-w64-pkg-config)
-provides=(mingw-w64-fontconfig=$pkgver)
-conflicts=(mingw-w64-fontconfig)
-replaces=()
+makedepends=(afm-mingw-w64-makedepends)
+provides=("mingw-w64-${_realname}=$pkgver")
+conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
-source=("http://www.fontconfig.org/release/fontconfig-$pkgver.tar.bz2")
+source=("http://www.fontconfig.org/release/${_realname}-$pkgver.tar.bz2")
 md5sums=('824d000eb737af6e16c826dd3b2d6c90')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
-  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
+  local tardir="$srcdir/${_realname}-$pkgver"
   local builddir
   local arch
-
-  # Apply patches from fedora repository
-  cd "$tardir"
 
   unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    "$tardir/configure" \
-      --build="$CHOST" \
-      --prefix="/usr/$arch" \
-      --host="$arch" \
-      --with-arch="${arch%%-*}" \
-      --disable-docs \
+    source "$arch-configure" "$tardir" \
+      --enable-static \
       --enable-shared \
-      --enable-static
+      --with-arch="${arch%%-*}" \
+      --disable-docs
     make
   done
 }
@@ -55,7 +49,7 @@ package() {
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
 
-    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    cd "$srcdir/${_realname}-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
 
     # Executable files must be preseved for cache management on the host
