@@ -13,7 +13,7 @@ PATH="$prefix/bin:$PATH" cmake \
     -DSYSCONF_INSTALL_DIR="$prefix/etc" \
     -DSHARE_INSTALL_DIR="$prefix/share" \
     -DBUILD_SHARED_LIBS=ON \
-    -DCMAKE_TOOLCHAIN_FILE="/usr/share/mingw/toolchain-$arch.cmake" \
+    -DCMAKE_TOOLCHAIN_FILE="/usr/share/mingw/Toolchain-$arch.cmake" \
     $MINGW_CMAKE_ARGS \
     $MINGW32_CMAKE_ARGS \
     "$@"
