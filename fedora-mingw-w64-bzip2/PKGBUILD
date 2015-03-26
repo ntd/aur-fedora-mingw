@@ -3,20 +3,21 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-bzip2.git/
 
-pkgname=fedora-mingw-w64-bzip2
+_realname=bzip2
+pkgname="fedora-mingw-w64-${_realname}"
 pkgver=1.0.6
-pkgrel=10
+pkgrel=11
 pkgdesc='A high-quality data compression program (mingw-w64)'
 arch=(any)
 url='http://www.bzip.org/'
 license=(custom)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt)
-makedepends=(mingw-w64-gcc autoconf automake libtool)
-provides=(mingw-w64-bzip2=$pkgver)
-conflicts=(mingw-w64-bzip2)
+makedepends=(afm-mingw-w64-makedepends)
+provides=("mingw-w64-${_realname}=$pkgver")
+conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
-source=("http://www.bzip.org/$pkgver/bzip2-$pkgver.tar.gz"
+source=("http://www.bzip.org/$pkgver/${_realname}-$pkgver.tar.gz"
         "http://pkgs.fedoraproject.org/cgit/mingw-bzip2.git/plain/bzip2-1.0.4-bzip2recover.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-bzip2.git/plain/mingw32-bzip2-1.0.5-slash.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-bzip2.git/plain/bzip2-1.0.5-autoconfiscated.patch?h=f18"
@@ -29,31 +30,29 @@ md5sums=('00b516f4704d4a7cb50a1d97e6e8e15b'
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
-build() {
-  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
-  local builddir
-  local arch
+prepare() {
+  cd "$srcdir/${_realname}-$pkgver"
 
-  # Apply patches from fedora repository
-  cd "$tardir"
   patch -Np1 < '../bzip2-1.0.4-bzip2recover.patch?h=f18'
   patch -Np1 < '../mingw32-bzip2-1.0.5-slash.patch?h=f18'
   patch -Np1 < '../bzip2-1.0.5-autoconfiscated.patch?h=f18'
   patch -Np1 < '../bzip2-use-cdecl-calling-convention.patch?h=f18'
 
-  # Generate the autotools scripts
   sh ./autogen.sh
+}
+
+build() {
+  local tardir="$srcdir/${_realname}-$pkgver"
+  local builddir
+  local arch
 
   unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    "$tardir/configure" \
-      --build="$CHOST" \
-      --prefix="/usr/$arch" \
-      --host="$arch"
+    source "$arch-configure" "$tardir"
     make
   done
 }
@@ -65,7 +64,7 @@ package() {
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
 
-    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    cd "$srcdir/${_realname}-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
 
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
