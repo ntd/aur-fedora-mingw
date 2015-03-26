@@ -3,43 +3,44 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-gettext.git/
 
-pkgname=fedora-mingw-w64-gettext
+_realname=gettext
+pkgname="fedora-mingw-w64-${_realname}"
 pkgver=0.19.4
-pkgrel=2
+pkgrel=3
 pkgdesc='GNU internationalization library (mingw-w64)'
 arch=(any)
 url='http://www.gnu.org/software/gettext/'
 license=(GPL)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-win-iconv fedora-mingw-w64-termcap)
-makedepends=(mingw-w64-gcc autoconf automake libtool)
-provides=(mingw-w64-gettext=$pkgver)
-conflicts=(mingw-w64-gettext)
+makedepends=(afm-mingw-w64-makedepends)
+provides=("mingw-w64-${_realname}=$pkgver")
+conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
-source=("http://ftp.gnu.org/pub/gnu/gettext/gettext-$pkgver.tar.gz")
+source=("http://ftp.gnu.org/pub/gnu/${_realname}/${_realname}-$pkgver.tar.gz")
 md5sums=('d3511af1e604a3478900d2c2b4a4a48e')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
-  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
+  local tardir="$srcdir/${_realname}-$pkgver"
   local builddir
   local arch
 
   unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    "$tardir/configure" \
-      --build="$CHOST" \
-      --prefix="/usr/$arch" \
-      --host="$arch" \
+    MINGW_CPPFLAGS=-I../../gettext-runtime/intl \
+    source "$arch-configure" "$tardir" \
+      --enable-static \
+      --enable-shared \
+      --disable-silent-rules \
       --disable-java \
       --disable-native-java \
       --disable-csharp \
-      --enable-static \
       --enable-threads=win32 \
       --without-emacs \
       --disable-openmp
@@ -54,7 +55,7 @@ package() {
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
 
-    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    cd "$srcdir/${_realname}-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
 
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
