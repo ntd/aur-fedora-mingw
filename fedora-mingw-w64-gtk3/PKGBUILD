@@ -6,7 +6,7 @@
 _realname=gtk+
 pkgname="fedora-mingw-w64-gtk3"
 pkgver=3.14.10
-pkgrel=2
+pkgrel=3
 pkgdesc='GTK+3 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -20,7 +20,7 @@ makedepends=(afm-mingw-w64-makedepends afm-mingw-w64-gobject-introspection wine)
 provides=(mingw-w64-gtk3=$pkgver)
 conflicts=(mingw-w64-gtk3)
 options=(!strip staticlibs !buildflags)
-source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
+source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
         "0001-Fix-cross-compilation.patch"
         "0001-Remove-crash-while-cross-compiling-in-VPATH-mode.patch"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk.immodules?id=3028da05cb7e088b4477a5b30262c7c4ca1e7937")
