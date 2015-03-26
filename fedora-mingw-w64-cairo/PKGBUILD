@@ -3,9 +3,10 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-cairo.git/
 
-pkgname=fedora-mingw-w64-cairo
+_realname=cairo
+pkgname="fedora-mingw-w64-${_realname}"
 pkgver=1.14.0
-pkgrel=2
+pkgrel=3
 pkgdesc='Cairo vector graphics library (mingw-w64)'
 arch=(any)
 url='http://cairographics.org/'
@@ -14,9 +15,9 @@ groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-fontconfig fedora-mingw-w64-freetype
          mingw-w64-libxml2 fedora-mingw-w64-pixman mingw-w64-libpng
          fedora-mingw-w64-win-iconv mingw-w64-zlib fedora-mingw-w64-glib2)
-makedepends=(mingw-w64-gcc mingw-w64-tools mingw-w64-pkg-config)
-provides=(mingw-w64-cairo=$pkgver)
-conflicts=(mingw-w64-cairo)
+makedepends=(afm-mingw-w64-makedepends mingw-w64-tools)
+provides=("mingw-w64-${_realname}=$pkgver")
+conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
 source=("http://cairographics.org/releases/cairo-$pkgver.tar.xz")
 md5sums=('fc3a5edeba703f906f2241b394f0cced')
@@ -24,12 +25,9 @@ md5sums=('fc3a5edeba703f906f2241b394f0cced')
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
-  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
+  local tardir="$srcdir/${_realname}-$pkgver"
   local builddir
   local arch
-
-  # Apply patches from fedora repository
-  cd "$tardir"
 
   # Function to generate an import library for delay-loading
   gen_delay_lib() {
@@ -44,7 +42,7 @@ build() {
   unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
 
@@ -53,10 +51,10 @@ build() {
     gen_delay_lib "/usr/$arch/bin/libfreetype-6.dll" libfreetype-delayed.dll.a
 
     ax_cv_c_float_words_bigendian=no \
-    "$tardir/configure" \
-      --build="$CHOST" \
-      --prefix="/usr/$arch" \
-      --host="$arch" \
+    source "$arch-configure" "$tardir" \
+      --enable-static \
+      --enable-shared \
+      --disable-silent-rules \
       --disable-pthread \
       --disable-xlib \
       --disable-xcb \
@@ -64,7 +62,6 @@ build() {
       --enable-fc \
       --enable-ft \
       --enable-png \
-      --enable-static \
       --enable-gobject \
       --enable-tee \
       FONTCONFIG_LIBS="-L$builddir -lfontconfig-delayed" \
@@ -80,7 +77,7 @@ package() {
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
 
-    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    cd "$srcdir/${_realname}-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
 
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
