@@ -10,7 +10,7 @@
 _realname=gdk-pixbuf
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=2.31.1
-pkgrel=4
+pkgrel=5
 pkgdesc='An image loading library (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -22,7 +22,7 @@ makedepends=(afm-mingw-w64-makedepends afm-mingw-w64-gobject-introspection wine)
 provides=(mingw-w64-gdk-pixbuf2=$pkgver)
 conflicts=(mingw-w64-gdk-pixbuf2)
 options=(!strip staticlibs !buildflags)
-source=("http://ftp.gnome.org/pub/GNOME/sources/gdk-pixbuf/${pkgver%.*}/gdk-pixbuf-$pkgver.tar.xz"
+source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
         "gdk-pixbuf.loaders")
 md5sums=('74cde211f5b7ac1015d1a7c9feee037c'
          'ff9e0cc33a8f5b1889b624ab2bae3337')
@@ -40,14 +40,6 @@ build() {
     builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-
-    # Prepare environment needed by gobject-introspection
-    export PKG_CONFIG=/usr/bin/$arch-pkg-config
-    export DLLTOOL=/usr/bin/$arch-dlltool
-    export GI_OS_NAME=nt
-    [ $arch = i686-w64-mingw32 ] && bits=32 || bits=64
-    export INTROSPECTION_LAUNCHER="/usr/bin/env WINEARCH=win$bits WINEPREFIX=$srcdir/win$bits DISPLAY= /usr/bin/wine"
-
     source "$arch-configure" "$tardir" \
       --with-included-loaders=png \
       --without-libjasper \
