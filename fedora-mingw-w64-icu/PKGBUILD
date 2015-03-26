@@ -6,7 +6,7 @@
 _realname=icu
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=50.1.2
-pkgrel=9
+pkgrel=10
 pkgdesc='International Components for Unicode library (mingw-w64)'
 arch=(any)
 url='http://www.icu-project.org/'
@@ -16,8 +16,8 @@ depends=(mingw-w64-crt mingw-w64-fontconfig mingw-w64-freetype
          mingw-w64-libxml2 mingw-w64-pixman mingw-w64-libpng
          mingw-w64-win-iconv mingw-w64-zlib mingw-w64-glib2)
 makedepends=(afm-mingw-w64-makedepends)
-provides=(mingw-w64-gtk2=$pkgver)
-conflicts=(mingw-w64-gtk2)
+provides=(mingw-w64-icu=$pkgver)
+conflicts=(mingw-w64-icu)
 options=(!strip staticlibs !buildflags)
 source=("http://download.icu-project.org/files/icu4c/$pkgver/icu4c-${pkgver//./_}-src.tgz"
         "http://pkgs.fedoraproject.org/cgit/mingw-icu.git/plain/icu4c-4_6_1-crossbuild.patch?id=f7a0fef35cf370c8c0add164e72499f05817cc79"
