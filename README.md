@@ -13,15 +13,15 @@ Motivation
 I badly needed a MinGW environment for cross-compiling my GTK+ applications on
 Windows platforms but the PKGBUILDs found in [AUR](http://aur.archlinux.org/)
 at that time were a mess, i.e. the toolchain was not working out of the box and
-required a lot of manual work to be put on the road. It has been clear nobody
+required a lot of manual work to be put on the road. It was clear nobody
 was really using it.
 
 Submitting patches and waiting them to be accepted was feasible but really slow
 and time consuming, so I decided to develop my own PKGBUILDs basing the code on
 the [Fedora MinGW](http://pkgs.fedoraproject.org/cgit/) environment as it seems
-to be the best maintained win32 / win64 toolchain available. As far as I know,
-[OpenSUSE](http://build.opensuse.org/project/show?project=windows:mingw) also
-based its toolchain on the Fedora one.
+to be the best maintained MinGW toolchain available. As far as I know, also
+[OpenSUSE](http://build.opensuse.org/project/show?project=windows:mingw) based
+its toolchain on the Fedora one.
 
 I am trying to keep these packages in sync with Fedora and, although not mapped
 exactly 1:1, they are quite close.
@@ -53,7 +53,25 @@ Here is the list of (potential) packages provided by this project:
 * fedora-mingw-w64-pango
 * fedora-mingw-w64-gtk2
 * fedora-mingw-w64-gtk3
-* fedora-mingw-w64-nsis)
+* fedora-mingw-w64-nsis
+
+Some additional package are not based on the Fedora ones. They are
+developed internally and prefixed with afm (*A*UR *F*edora *M*inGW) to
+differentiate them from the others:
+
+* afm-mingw-w64-makedepends
+* afm-mingw-w64-gobject-introspection
+* afm-mingw-w64-lua
+* afm-mingw-w64-lua-lgi
+
+These additional packages have been added while trying to cross compile
+gobject-introspection but they are no more used. The build script is
+fully functional though:
+
+* fedora-mingw-w64-gdbm
+* afm-mingw-w64-openssl
+* afm-mingw-w64-python2
+* afm-mingw-w64-pkg-config
 
 The `build-all` helper script can be used as a one-line solution to build all
 from scratch. It uses [yaourt](https://wiki.archlinux.org/index.php/Yaourt) for
@@ -73,15 +91,10 @@ External dependencies
 The following dependencies need to be pulled in directly from the Archlinux
 community repository:
 
-* mingw-w64-headers
-* mingw-w64-binutils
-* mingw-w64-crt
-* mingw-w64-winpthreads
 * mingw-w64-gcc
 
 The following dependencies need to be compiled from AUR:
 
-* mingw-w64-pkg-config
 * mingw-w64-tools (required for building cairo)
 
 License
