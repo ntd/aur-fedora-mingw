@@ -3,20 +3,21 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-icu.git/
 
-pkgname=fedora-mingw-w64-icu
+_realname=icu
+pkgname="fedora-mingw-w64-${_realname}"
 pkgver=50.1.2
-pkgrel=8
+pkgrel=9
 pkgdesc='International Components for Unicode library (mingw-w64)'
 arch=(any)
 url='http://www.icu-project.org/'
-license=(custom:"icu")
+license=(custom:icu)
 groups=(fedora-mingw)
-depends=(mingw-w64-crt fedora-mingw-w64-fontconfig fedora-mingw-w64-freetype
-         mingw-w64-libxml2 fedora-mingw-w64-pixman mingw-w64-libpng
-         fedora-mingw-w64-win-iconv mingw-w64-zlib fedora-mingw-w64-glib2)
-makedepends=(mingw-w64-gcc)
-provides=(mingw-w64-icu=$pkgver)
-conflicts=(mingw-w64-icu)
+depends=(mingw-w64-crt mingw-w64-fontconfig mingw-w64-freetype
+         mingw-w64-libxml2 mingw-w64-pixman mingw-w64-libpng
+         mingw-w64-win-iconv mingw-w64-zlib mingw-w64-glib2)
+makedepends=(afm-mingw-w64-makedepends)
+provides=(mingw-w64-gtk2=$pkgver)
+conflicts=(mingw-w64-gtk2)
 options=(!strip staticlibs !buildflags)
 source=("http://download.icu-project.org/files/icu4c/$pkgver/icu4c-${pkgver//./_}-src.tgz"
         "http://pkgs.fedoraproject.org/cgit/mingw-icu.git/plain/icu4c-4_6_1-crossbuild.patch?id=f7a0fef35cf370c8c0add164e72499f05817cc79"
@@ -31,43 +32,48 @@ md5sums=('beb98aa972219c9fcd9c8a71314943c9'
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
-build() {
-  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}"
-  local builddir
-  local arch
+prepare() {
+  cd "$srcdir/${_realname}"
 
-  # Apply patches from fedora repository
-  cd "$tardir"
   patch -Np1 < '../icu4c-4_6_1-crossbuild.patch?id=f7a0fef35cf370c8c0add164e72499f05817cc79'
   patch -Np1 < '../icu4c-4_6_1-use-correct-genccode-assembly-on-win32-and-win64.patch?h=f18'
   patch -Np1 < '../icu4c-4_6_1-mingw-w64-mkdir-compatibility.patch?id=b942c392347ba1b68c4aa0603a774cecf5035915'
   patch -Np1 < '../icu.10318.CVE-2013-2924_changeset_34076.patch?id=ecbc40f40b154a47ea82410d86ef580907338ef1'
 
   # Needed by genccode patch
-  tardir="$tardir/source"
-  cd $tardir
+  cd source
   autoconf -f
+}
+
+build() {
+  local tardir="$srcdir/${_realname}/source"
+  local builddir
+  local arch
 
   unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$srcdir/${_realname}-$pkgver-build-$arch"
+
+    # First pass: native build
     mkdir -p "$builddir-native"
     cd "$builddir-native"
     "$tardir/configure" \
       --disable-shared \
       --enable-static
     make
+
+    # Second pass: cross compilation. Enclose it in a subshell so
+    # there will be no environment variable leaks from $arch-configure.
     mkdir -p "$builddir"
     cd "$builddir"
-    "$tardir/configure" \
-      --build="$CHOST" \
-      --prefix="/usr/$arch" \
-      --host="$arch" \
-      --enable-shared \
-      --disable-static \
-      --with-cross-build="$builddir-native" \
-      --with-data-packaging=library
+    (
+      source "$arch-configure" "$tardir" \
+        --disable-static \
+        --enable-shared \
+        --with-cross-build="$builddir-native" \
+        --with-data-packaging=library
+    )
     make
   done
 }
@@ -82,7 +88,7 @@ package() {
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
 
-    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    cd "$srcdir/${_realname}-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
 
     find "$pkgdir" -name '*.dll' -type l -delete
@@ -91,6 +97,7 @@ package() {
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
     find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+
     rm -f "$prefix/bin/icu-config"
     rm -fr "$prefix/share"
     rm -fr "$prefix/lib/icu"
