@@ -3,19 +3,19 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-pixman.git/
 
-pkgname=fedora-mingw-w64-pixman
+_realname=pixman
+pkgname="fedora-mingw-w64-${_realname}"
 pkgver=0.32.6
-pkgrel=2
+pkgrel=3
 pkgdesc='The pixel-manipulation library for X and cairo (mingw-w64)'
 arch=(any)
 url='http://pixman.org/'
 license=(LGPL MPL custom)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt)
-# pkg-config is not used because of --disable-gtk but is checked anyway
-makedepends=(mingw-w64-gcc mingw-w64-pkg-config)
-provides=(mingw-w64-pixman=$pkgver)
-conflicts=(mingw-w64-pixman)
+makedepends=(afm-mingw-w64-makedepends)
+provides=("mingw-w64-${_realname}=$pkgver")
+conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
 source=("http://cairographics.org/releases/pixman-$pkgver.tar.gz")
 md5sums=('3a30859719a41bd0f5cccffbfefdd4c2')
@@ -23,24 +23,22 @@ md5sums=('3a30859719a41bd0f5cccffbfefdd4c2')
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
-  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
+  local tardir="$srcdir/${_realname}-$pkgver"
   local builddir
   local arch
 
   unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    "$tardir/configure" \
-      --build="$CHOST" \
-      --prefix="/usr/$arch" \
-      --host="$arch" \
-      --disable-sse2 \
-      --disable-gtk \
+    source "$arch-configure" "$tardir" \
+      --enable-static \
       --enable-shared \
-      --enable-static
+      --disable-silent-rules \
+      --disable-sse2 \
+      --disable-gtk
     make
   done
 }
@@ -52,7 +50,7 @@ package() {
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
 
-    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    cd "$srcdir/${_realname}-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
 
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
