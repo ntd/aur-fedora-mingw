@@ -49,6 +49,18 @@ call_configure() {
     export LDFLAGS="${!ldflags:-${MINGW_LDFLAGS:-$fallback_ldflags}} ${!extra_ldflags:-$MINGW_EXTRA_LDFLAGS}"
     export CXXFLAGS="${!cxxflags:-${MINGW_CXXFLAGS:-$fallback_cxxflags}} ${!extra_cxxflags:-$MINGW_EXTRA_CXXFLAGS}"
 
+    # The following variables are already defined in the Makefile
+    # but they need to be exported for gobject-introspection
+    export CC=$arch-gcc
+    export PKG_CONFIG=$arch-pkg-config
+    export DLLTOOL=$arch-dlltool
+
+    # Other gobject-introspection specific variables
+    export GI_OS_NAME=nt
+    export INTROSPECTION_LAUNCHER="/usr/bin/env WINEARCH=win$bits WINEPREFIX=$srcdir/win$bits DISPLAY= /usr/bin/wine"
+    export XDG_DATA_DIRS="/usr/$arch/share:$XDG_DATA_DIRS"
+    export GI_TYPELIB_PATH="/usr/$arch/lib/girepository-1.0:$GI_TYPELIB_PATH"
+
     "$path_to_configure/configure" \
 	--build="$CHOST" \
 	--host=$arch \
