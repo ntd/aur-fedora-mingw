@@ -6,7 +6,7 @@
 _realname=gtk+
 pkgname=fedora-mingw-w64-gtk2
 pkgver=2.24.27
-pkgrel=2
+pkgrel=3
 pkgdesc='GTK+2 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -67,7 +67,7 @@ prepare() {
   # Enable introspection, patch from LRN:
   patch -Np1 < '../0011-gir-for-gdkwin32.mingw.patch'
 
-  autoreconf -if
+  autoreconf -ivf
 
   # Enable building a static library of GTK
   patch -Np0 < '../mingw32-gtk2-enable_static_build.patch?h=f18'
