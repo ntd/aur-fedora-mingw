@@ -3,39 +3,37 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-libpng.git/
 
-pkgname=fedora-mingw-w64-libpng
+_realname="libpng"
+pkgname="fedora-mingw-w64-${_realname}"
 pkgver=1.6.10
-pkgrel=3
+pkgrel=4
 pkgdesc='A collection of routines used to create PNG format graphics (mingw-w64)'
 arch=(any)
 url='http://www.libpng.org/pub/png/libpng.html'
 license=(custom)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt mingw-w64-zlib)
-makedepends=(mingw-w64-gcc)
+makedepends=(afm-mingw-w64-makedepends)
 provides=(mingw-w64-libpng=$pkgver)
 conflicts=(mingw-w64-libpng)
 options=(!strip staticlibs !buildflags)
-source=("http://downloads.sourceforge.net/sourceforge/libpng/libpng-$pkgver.tar.xz")
+source=("http://downloads.sourceforge.net/sourceforge/${_realname}/${_realname}-$pkgver.tar.xz")
 md5sums=('5f414b20f683b1d96b163c89e3eff768')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
-  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
+  local tardir="$srcdir/${_realname}-$pkgver"
   local builddir
   local arch
 
   unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    "$tardir/configure" \
-      --build="$CHOST" \
-      --prefix="/usr/$arch" \
-      --host="$arch"
+    source "$arch-configure" "$tardir"
     make
   done
 }
@@ -47,12 +45,13 @@ package() {
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
 
-    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    cd "$srcdir/${_realname}-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
 
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
     find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+
     rm -fr "$prefix/share"
   done
 }
