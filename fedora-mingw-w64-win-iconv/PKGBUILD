@@ -3,19 +3,19 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-win-iconv.git/
 
-pkgname=fedora-mingw-w64-win-iconv
+_realname=win-iconv
+pkgname="fedora-mingw-w64-${_realname}"
 pkgver=0.0.6
-pkgrel=3
+pkgrel=4
 pkgdesc='Iconv implementation using Win32 API (mingw-w64)'
 arch=(any)
 url='http://code.google.com/p/win-iconv/'
 license=(BSD)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt)
-makedepends=(mingw-w64-gcc mingw-w64-cmake)
-provides=(mingw-w64-win-iconv=$pkgver)
-conflicts=(mingw-w64-win-iconv)
-replaces=(mingw-w64-libiconv)
+makedepends=(afm-mingw-w64-makedepends cmake)
+provides=("mingw-w64-${_realname}=$pkgver")
+conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
 source=("http://win-iconv.googlecode.com/files/win-iconv-$pkgver.tar.bz2")
 md5sums=('1e97ed4d9e7379ff0ee22077256e8c58')
@@ -23,14 +23,14 @@ md5sums=('1e97ed4d9e7379ff0ee22077256e8c58')
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
-  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
+  local tardir="$srcdir/${_realname}-$pkgver"
   local builddir
   local arch
 
   unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
     $arch-cmake -DBUILD_STATIC=1 "$tardir"
@@ -45,7 +45,7 @@ package() {
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
 
-    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    cd "$srcdir/${_realname}-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
 
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
