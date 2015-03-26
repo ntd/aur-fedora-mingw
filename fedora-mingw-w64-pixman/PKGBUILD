@@ -6,7 +6,7 @@
 _realname=pixman
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=0.32.6
-pkgrel=3
+pkgrel=4
 pkgdesc='The pixel-manipulation library for X and cairo (mingw-w64)'
 arch=(any)
 url='http://pixman.org/'
