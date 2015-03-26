@@ -3,21 +3,21 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-freetype.git/
 
-pkgname=fedora-mingw-w64-freetype
+_realname=freetype
+pkgname="fedora-mingw-w64-${_realname}"
 pkgver=2.5.4
-pkgrel=3
+pkgrel=4
 pkgdesc='TrueType font rendering library (mingw-w64)'
 arch=(any)
 url='http://freetype.sourceforge.net/'
 license=(GPL)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt mingw-w64-zlib mingw-w64-bzip2)
-makedepends=(mingw-w64-gcc mingw-w64-libpng)
-provides=(mingw-w64-freetype=$pkgver)
-conflicts=(mingw-w64-freetype)
-replaces=()
+makedepends=(afm-mingw-w64-makedepends mingw-w64-libpng)
+provides=("mingw-w64-${_realname}=$pkgver")
+conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
-source=("http://downloads.sourceforge.net/sourceforge/freetype/freetype-$pkgver.tar.bz2"
+source=("http://downloads.sourceforge.net/sourceforge/${_realname}/${_realname}-$pkgver.tar.bz2"
         "http://pkgs.fedoraproject.org/cgit/mingw-freetype.git/plain/freetype-2.2.1-enable-valid.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-freetype.git/plain/freetype-2.5.3-enable-spr.patch?id=e994213133a3c10acd7a8e6cf6b8a4a191744ef2")
 md5sums=('438585445a2f1f71c77590155fd96616'
@@ -26,22 +26,26 @@ md5sums=('438585445a2f1f71c77590155fd96616'
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
-build() {
-  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
-  local builddir
-  local arch
+prepare() {
+  cd "$srcdir/${_realname}-$pkgver"
 
-  # Apply patches from fedora repository
-  cd "$tardir"
   patch -Np1 < '../freetype-2.2.1-enable-valid.patch?h=f18'
   patch -Np1 < '../freetype-2.5.3-enable-spr.patch?id=e994213133a3c10acd7a8e6cf6b8a4a191744ef2'
+}
+
+build() {
+  local tardir="$srcdir/${_realname}-$pkgver"
+  local builddir
+  local arch
 
   unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
+    # FreeType mimics the typical autotools behavior
+    # but it is *not* autotools based
     "$tardir/configure" \
       --build="$CHOST" \
       --prefix="/usr/$arch" \
@@ -61,12 +65,13 @@ package() {
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
 
-    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    cd "$srcdir/${_realname}-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
 
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
     find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+
     rm -f  "$prefix/bin/freetype-config"
     rm -fr "$prefix/share"
   done
