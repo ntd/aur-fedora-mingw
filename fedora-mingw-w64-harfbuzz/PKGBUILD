@@ -6,7 +6,7 @@
 _realname=harfbuzz
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=0.9.40
-pkgrel=3
+pkgrel=4
 pkgdesc='OpenType text shaping engine (mingw-w64)'
 arch=(any)
 url='http://www.harfbuzz.org/'
@@ -18,7 +18,7 @@ makedepends=(afm-mingw-w64-makedepends afm-mingw-w64-gobject-introspection wine)
 provides=("mingw-w64-${_realname}=$pkgver")
 conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
-source=("http://www.freedesktop.org/software/harfbuzz/release/${_realname}-$pkgver.tar.bz2")
+source=("http://www.freedesktop.org/software/${_realname}/release/${_realname}-$pkgver.tar.bz2")
 md5sums=('0e27e531f4c4acff601ebff0957755c2')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
@@ -34,14 +34,6 @@ build() {
     builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-
-    # Prepare environment needed by gobject-introspection
-    export PKG_CONFIG=/usr/bin/$arch-pkg-config
-    export DLLTOOL=/usr/bin/$arch-dlltool
-    export GI_OS_NAME=nt
-    [ $arch = i686-w64-mingw32 ] && bits=32 || bits=64
-    export INTROSPECTION_LAUNCHER="/usr/bin/env WINEARCH=win$bits WINEPREFIX=$srcdir/win$bits DISPLAY= /usr/bin/wine"
-
     source "$arch-configure" "$tardir" \
       --enable-static \
       --enable-shared \
