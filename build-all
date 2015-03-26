@@ -25,8 +25,8 @@ function found() {
 pkgs=(
 	# Cross-building tools
 	mingw-w64-gcc
-	mingw-w64-pkg-config
 	mingw-w64-tools
+	afm-mingw-w64-makedepends
 
 	# GTK+2/3 toolchain
 	fedora-mingw-w64-zlib
@@ -40,6 +40,11 @@ pkgs=(
 	fedora-mingw-w64-libjpeg-turbo
 	fedora-mingw-w64-libffi
 	fedora-mingw-w64-glib2
+
+	# Let us compile introspection early in order
+	# to be able to enable it on other projects
+	afm-mingw-w64-gobject-introspection
+
 	fedora-mingw-w64-freetype
 	fedora-mingw-w64-fontconfig
 	fedora-mingw-w64-pixman
@@ -56,12 +61,14 @@ pkgs=(
 	fedora-mingw-w64-nsis
 
 	# LGI (dynamic Lua bindings) support
-	fedora-mingw-w64-gdbm
-	mingw-w64-openssl
-	mingw-w64-python2
-	mingw-w64-gobject-introspection
-	mingw-w64-lua
-	lua-lgi
+	afm-mingw-w64-lua
+	afm-mingw-w64-lua-lgi
+
+	# No more used
+	#fedora-mingw-w64-gdbm
+	#afm-mingw-w64-openssl
+	#afm-mingw-w64-python2
+	#afm-mingw-w64-pkg-config
 )
 
 for pkg in ${pkgs[@]}; do
