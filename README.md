@@ -83,6 +83,7 @@ The following dependencies need to be pulled in directly from the Archlinux
 community repository:
 
 * mingw-w64-gcc
+* wine
 
 The following dependencies need to be compiled from AUR:
 
