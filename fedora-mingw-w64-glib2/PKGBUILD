@@ -6,7 +6,7 @@
 _realname=glib
 pkgname=fedora-mingw-w64-glib2
 pkgver=2.44.0
-pkgrel=1
+pkgrel=2
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -17,7 +17,7 @@ makedepends=(afm-mingw-w64-makedepends 'glib2>=2.31.20' 'python2>=2.5.0')
 provides=(mingw-w64-glib2=$pkgver)
 conflicts=(mingw-w64-glib2)
 options=(!strip staticlibs !buildflags)
-source=("http://ftp.gnome.org/pub/GNOME/sources/glib/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
+source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-send-log-messages-to-correct-stdout-and-stderr.patch?id=d2262b6ca2230b2dc169aa4798b59e645859a195"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-prefer-constructors-over-DllMain.patch?id=10ce51e70078f0c5b76d3ee1582d75e43f7f3363")
