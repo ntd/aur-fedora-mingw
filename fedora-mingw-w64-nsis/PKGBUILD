@@ -6,7 +6,7 @@
 _realname=nsis
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=2.46
-pkgrel=4
+pkgrel=5
 pkgdesc='A professional open source system to create Windows installers'
 arch=(i686 x86_64)
 url='http://nsis.sourceforge.net/'
