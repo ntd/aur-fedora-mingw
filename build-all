@@ -63,12 +63,6 @@ pkgs=(
 	# LGI (dynamic Lua bindings) support
 	afm-mingw-w64-lua
 	afm-mingw-w64-lua-lgi
-
-	# No more used
-	#fedora-mingw-w64-gdbm
-	#afm-mingw-w64-openssl
-	#afm-mingw-w64-python2
-	#afm-mingw-w64-pkg-config
 )
 
 for pkg in ${pkgs[@]}; do

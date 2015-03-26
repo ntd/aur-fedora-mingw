@@ -64,15 +64,6 @@ differentiate them from the others:
 * afm-mingw-w64-lua
 * afm-mingw-w64-lua-lgi
 
-These additional packages have been added while trying to cross compile
-gobject-introspection but they are no more used. The build script is
-fully functional though:
-
-* fedora-mingw-w64-gdbm
-* afm-mingw-w64-openssl
-* afm-mingw-w64-python2
-* afm-mingw-w64-pkg-config
-
 The `build-all` helper script can be used as a one-line solution to build all
 from scratch. It uses [yaourt](https://wiki.archlinux.org/index.php/Yaourt) for
 pulling it the required dependencies either from Archlinux community or from
