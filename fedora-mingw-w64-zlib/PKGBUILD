@@ -3,18 +3,19 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-zlib.git/
 
-pkgname=fedora-mingw-w64-zlib
+_realname=zlib
+pkgname="fedora-mingw-w64-${_realname}"
 pkgver=1.2.8
-pkgrel=7
+pkgrel=8
 pkgdesc='A compression/decompression Library (mingw-w64)'
 arch=(any)
 url='http://www.zlib.net/'
 license=(custom)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt)
-makedepends=(mingw-w64-gcc autoconf automake libtool)
-provides=(mingw-w64-zlib=$pkgver)
-conflicts=(mingw-w64-zlib)
+makedepends=(afm-mingw-w64-makedepends)
+provides=("mingw-w64-${_realname}=$pkgver")
+conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
 source=("http://zlib.net/zlib-$pkgver.tar.gz"
         "http://pkgs.fedoraproject.org/cgit/mingw-zlib.git/plain/mingw32-zlib-1.2.7-autotools.patch?id=2333169c09a99a357b0aaa58e0bd7dfda0932685"
@@ -27,36 +28,37 @@ md5sums=('44d667c142d7cda120332623eab69f40'
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
-build() {
-  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
-  local builddir
-  local arch
+prepare() {
+  cd "$srcdir/${_realname}-$pkgver"
 
-  # Apply patches from fedora repository
-  cd "$tardir"
   # Replace the zlib build system with an autotools based one
   patch -Np1 < '../mingw32-zlib-1.2.7-autotools.patch?id=2333169c09a99a357b0aaa58e0bd7dfda0932685'
+
   # The .def file contains an empty LIBRARY line which is not valid
   patch -Np1 < '../zlib-1.2.7-use-correct-def-file.patch?id=2333169c09a99a357b0aaa58e0bd7dfda0932685'
+
   # patch cannot create an empty dir
   mkdir m4
 
-  autoreconf -if
+  autoreconf -ivf
 
   # Libtool tries to make a libz-1.dll while we expect zlib1.dll
   # Force this by hacking the ltmain.sh
   patch -Np0 < '../mingw32-zlib-create-zlib1-dll.patch?id=945b6d9ff9992a5d209a2bdb58aa27701786e423'
+}
+
+build() {
+  local tardir="$srcdir/${_realname}-$pkgver"
+  local builddir
+  local arch
 
   unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    "$tardir/configure" \
-      --build="$CHOST" \
-      --prefix="/usr/$arch" \
-      --host="$arch"
+    source "$arch-configure" "$tardir"
     make
   done
 }
@@ -68,7 +70,7 @@ package() {
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
 
-    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    cd "$srcdir/${_realname}-$pkgver-build-$arch"
 
     # Libtool tries to install a file called libz-1.dll
     # but this isn't created anymore due to a patch applied in build().
@@ -83,6 +85,7 @@ package() {
 
     find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+
     rm -fr "$prefix/share"
   done
 }
