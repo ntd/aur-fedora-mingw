@@ -3,9 +3,10 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-expat.git/
 
-pkgname=fedora-mingw-w64-expat
+_realname=expat
+pkgname="fedora-mingw-w64-${_realname}"
 pkgver=2.1.0
-pkgrel=10
+pkgrel=11
 pkgdesc='An XML parser library (mingw-w64)'
 arch=(any)
 url='http://expat.sourceforge.net/'
@@ -13,29 +14,27 @@ license=(custom)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt)
 makedepends=(mingw-w64-gcc)
-provides=(mingw-w64-expat=$pkgver)
-conflicts=(mingw-w64-expat)
+makedepends=(afm-mingw-w64-makedepends)
+provides=("mingw-w64-${_realname}=$pkgver")
+conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
-source=("http://downloads.sourceforge.net/sourceforge/expat/expat-$pkgver.tar.gz")
+source=("http://downloads.sourceforge.net/sourceforge/${_realname}/${_realname}-$pkgver.tar.gz")
 md5sums=('dd7dab7a5fea97d2a6a43f511449b7cd')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
-  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
+  local tardir="$srcdir/${_realname}-$pkgver"
   local builddir
   local arch
 
   unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    "$tardir/configure" \
-      --build="$CHOST" \
-      --prefix="/usr/$arch" \
-      --host="$arch"
+    source "$arch-configure" "$tardir"
     make
   done
 }
@@ -47,7 +46,7 @@ package() {
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
 
-    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    cd "$srcdir/${_realname}-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
 
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
