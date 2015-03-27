@@ -7,7 +7,7 @@
 _realname=lua
 pkgname="afm-mingw-w64-${_realname}"
 pkgver=5.2.4
-pkgrel=2
+pkgrel=3
 pkgdesc='Powerful light-weight programming language designed for extending applications (mingw-w64)'
 arch=(any)
 url='http://www.lua.org/'
@@ -72,9 +72,9 @@ package() {
       install
 
     # Manually install the pkg-config file
-    install -Dm644 "$builddir/lua.pc" "$prefix/lib/pkgconfig/lua${pkgver%.*}"
+    install -Dm644 "$builddir/lua.pc" "$prefix/lib/pkgconfig/lua${pkgver%.*}.pc"
     # This symlink should be done only for the current Lua release
-    ln -s "lua${pkgver%.*}" "$prefix/lib/pkgconfig/lua.pc"
+    ln -s "lua${pkgver%.*}.pc" "$prefix/lib/pkgconfig/lua.pc"
   done
 }
 
