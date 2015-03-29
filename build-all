@@ -67,6 +67,13 @@ pkgs=(
 	afm-mingw-w64-lua-lgi
 )
 
+# Avoid using the common flags (too easy to rebuild everything with
+# the wrong flags) but allow overriding via AFM_... custom variables
+export CFLAGS=AFM_CFLAGS
+export CPPFLAGS=AFM_CPPFLAGS
+export LDFLAGS=AFM_LDFLAGS
+export CXXFLAGS=AFM_CXXFLAGS
+
 for pkg in ${pkgs[@]}; do
 	found "$pkg" "$@" && continue
 	if [ ! -d "$pkg" ]; then
