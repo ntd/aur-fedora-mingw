@@ -3,10 +3,10 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-libpng.git/
 
-_realname="libpng"
+_realname=libpng
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=1.6.10
-pkgrel=5
+pkgrel=6
 pkgdesc='A collection of routines used to create PNG format graphics (mingw-w64)'
 arch=(any)
 url='http://www.libpng.org/pub/png/libpng.html'
@@ -27,13 +27,11 @@ build() {
   local builddir
   local arch
 
-  unset LDFLAGS CPPFLAGS
-
   for arch in ${_architectures[@]}; do
     builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    source "$arch-configure" "$tardir"
+    source $arch-configure "$tardir"
     make
   done
 }
@@ -49,7 +47,7 @@ package() {
     make DESTDIR="$pkgdir" install
 
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
 
     rm -fr "$prefix/share"
