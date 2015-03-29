@@ -1,19 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
-arch=x86_64-w64-mingw32
-prefix="/usr/$arch"
-export PKG_CONFIG_LIBDIR="$prefix/lib/pkgconfig"
-
-PATH="$prefix/bin:$PATH" cmake \
-    -DCMAKE_VERBOSE_MAKEFILE=ON \
-    -DCMAKE_INSTALL_PREFIX="$prefix" \
-    -DCMAKE_INSTALL_LIBDIR="$prefix/lib" \
-    -DINCLUDE_INSTALL_DIR="$prefix/include" \
-    -DLIB_INSTALL_DIR="$prefix/lib" \
-    -DSYSCONF_INSTALL_DIR="$prefix/etc" \
-    -DSHARE_INSTALL_DIR="$prefix/share" \
-    -DBUILD_SHARED_LIBS=ON \
-    -DCMAKE_TOOLCHAIN_FILE="/usr/share/mingw/Toolchain-$arch.cmake" \
-    $MINGW_CMAKE_ARGS \
-    $MINGW32_CMAKE_ARGS \
-    "$@"
+source "$(dirname ${BASH_SOURCE[0]})/mingw-configure"
+call_cmake x86_64-w64-mingw32 64 "$@"

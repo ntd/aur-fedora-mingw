@@ -33,15 +33,15 @@ source=("i686-w64-mingw32-cmake"
         "x86_64-w64-mingw32-pkg-config"
         "Toolchain-i686-w64-mingw32.cmake"
         "Toolchain-x86_64-w64-mingw32.cmake")
-md5sums=('61fc4372a354d7ed016fcac41b8199ce'
+md5sums=('76d24f33081e428a11e8cb20e6067c25'
          '677ddd6208dfaa02db5d9a1449edf05e'
          '2c2641547debc5d289bb85b0939e4380'
-         '94f72ef0086e1e52664f16905e04452e'
-         '750e6f10c8c2851c60c5e40b3009cce1'
+         'deb690cb4cf89f94d03c5c8a94eaed82'
+         '5fcedae7d788c4fd9100d139bf80f5aa'
          '4ce073a3b299d6491dc180def6e9fc25'
          '0a879bf20cd82e44b73eb49cf2484eda'
-         '4149981d6bad6d15779b41a542d79295'
-         '2592e08f979cd14ab65aaacab113e241')
+         '4704995815374af7b3b853b139d04ad5'
+         'cdb9f76c5ab95038df1c03755e9119e7')
 
 _architectures="i686-w64-mingw32 x86_64-w64-mingw32"
 
@@ -56,13 +56,13 @@ package() {
 
   for arch in ${_architectures}; do
     # configure wrappers
-    install -m 755 "$arch-configure" "$pkgdir/usr/bin"
+    install -m 755 $arch-configure "$pkgdir/usr/bin"
 
     # pkg-config
-    install -m 755 "$arch-pkg-config" "$pkgdir/usr/bin"
+    install -m 755 $arch-pkg-config "$pkgdir/usr/bin"
 
     # CMake
-    install -m 644 "Toolchain-$arch.cmake" "$pkgdir/usr/share/mingw/"
-    install -m 755 "$arch-cmake" "$pkgdir/usr/bin/"
+    install -m 644 Toolchain-$arch.cmake "$pkgdir/usr/share/mingw/"
+    install -m 755 $arch-cmake "$pkgdir/usr/bin/"
   done
 }

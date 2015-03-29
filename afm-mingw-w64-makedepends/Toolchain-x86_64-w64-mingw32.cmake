@@ -4,6 +4,10 @@ SET(CMAKE_SYSTEM_NAME Windows)
 SET(CMAKE_C_COMPILER /usr/bin/x86_64-w64-mingw32-gcc)
 SET(CMAKE_CXX_COMPILER /usr/bin/x86_64-w64-mingw32-g++)
 
+# pkg-config architeture specific
+SET(PKG_CONFIG_FOUND ON)
+SET(PKG_CONFIG_EXECUTABLE /usr/bin/x86_64-w64-mingw32-pkg-config)
+
 # where is the target environment
 SET(CMAKE_FIND_ROOT_PATH /usr/x86_64-w64-mingw32)
 
