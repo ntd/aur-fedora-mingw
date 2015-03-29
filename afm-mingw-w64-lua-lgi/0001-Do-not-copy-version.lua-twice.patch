@@ -1,0 +1,27 @@
+From c470ccb6b1775858c16ecf4d6367624967e88c06 Mon Sep 17 00:00:00 2001
+From: Nicola Fontana <ntd@entidi.it>
+Date: Sun, 29 Mar 2015 19:49:28 +0200
+Subject: [PATCH] Do not copy version.lua twice
+
+version.lua is specified twice during the copy: one in VERSION_FILE and
+one in CORESOURCES (make uses lazy evaluation so CORESOURCES is expanded
+only when used, i.e. during the copy).
+---
+ lgi/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lgi/Makefile b/lgi/Makefile
+index 72a43be..6517602 100644
+--- a/lgi/Makefile
++++ b/lgi/Makefile
+@@ -81,6 +81,6 @@ install : $(CORE) $(VERSION_FILE)
+ 	mkdir -p $(DESTDIR)$(LUA_SHAREDIR)
+ 	cp ../lgi.lua $(DESTDIR)$(LUA_SHAREDIR)
+ 	mkdir -p $(DESTDIR)$(LUA_SHAREDIR)/lgi
+-	cp $(CORESOURCES) $(VERSION_FILE) $(DESTDIR)$(LUA_SHAREDIR)/lgi
++	cp $(CORESOURCES) $(DESTDIR)$(LUA_SHAREDIR)/lgi
+ 	mkdir -p $(DESTDIR)$(LUA_SHAREDIR)/lgi/override
+ 	cp $(OVERRIDES) $(DESTDIR)$(LUA_SHAREDIR)/lgi/override
+-- 
+2.3.4
+

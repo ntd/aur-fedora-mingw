@@ -4,7 +4,7 @@ _realname=lua-lgi
 _luaver=5.2
 pkgname="afm-mingw-w64-${_realname}"
 pkgver=0.8.0
-pkgrel=3
+pkgrel=4
 pkgdesc='Lua bindings for gnome/gobject using gobject-introspection library (mingw-w64)'
 arch=(any)
 url='http://www.lua.org/'
@@ -16,12 +16,14 @@ source=("${_realname}-$pkgver.tar.gz::https://github.com/pavouk/lgi/archive/$pkg
         "0001-Allow-overriding-of-pkg-config-executable.patch"
         "0002-Export-luaopen_lgi_corelgilua51.patch"
         "0003-Extend-platform-support-to-MSYS-and-MinGW.patch"
-        "0004-Allow-overriding-of-the-host-build-system.patch")
+        "0004-Allow-overriding-of-the-host-build-system.patch"
+        "0001-Do-not-copy-version.lua-twice.patch")
 md5sums=('f0a161fc07b65afabdd09aa5455390a3'
          'e6f1496707e8ccc6edba95f5bc77774a'
          '4eeb84f885ba8f85964dd8a5b25105ac'
          'a6660fa55a07da149b42653fea85f2e4'
-         '600b8100486070a877dc948eec168977')
+         '600b8100486070a877dc948eec168977'
+         '7688457a774d8ca306d4f59655887c9b')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -40,27 +42,28 @@ prepare() {
   patch -Np1 < ../0002-Export-luaopen_lgi_corelgilua51.patch
   patch -Np1 < ../0003-Extend-platform-support-to-MSYS-and-MinGW.patch
   patch -Np1 < ../0004-Allow-overriding-of-the-host-build-system.patch
+  patch -Np1 < ../0001-Do-not-copy-version.lua-twice.patch
 }
 
 build() {
   local tardir="$srcdir/${_realname}-$pkgver"
   local builddir
   local arch
-  local deps="gobject-introspection-1.0 gmodule-2.0 libffi"
-
-  unset LDFLAGS CPPFLAGS
+  local deps="lua${_luaver} gobject-introspection-1.0 gmodule-2.0 libffi"
 
   for arch in ${_architectures[@]}; do
     builddir="$tardir-build-$arch"
     # lua-lgi does not support VPATH builds
     cp -fr "$tardir" "$builddir"
     cd "$builddir"
-    # Do not use pkg-config to get the Lua libraries because the result
-    # will be suitable only for static linking
+    # -no-undefined seems to be required for Windows, see e.g.
+    # https://sourceware.org/autobook/autobook/autobook_253.html#SEC253
     make \
       HOST_OS=mingw32 \
-      CFLAGS="$($arch-pkg-config --cflags lua${_luaver} $deps)" \
-      LIBS="-L/usr/$arch/bin -llua${_luaver/./} $($arch-pkg-config --libs $deps)" \
+      COPTFLAGS="-O2 -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 --param=ssp-buffer-size=4" \
+      LDFLAGS=-Wl,-no-undefined \
+      CFLAGS="$($arch-pkg-config --cflags $deps)" \
+      LIBS="$($arch-pkg-config --libs $deps)" \
       LUA_VERSION="${_luaver}" \
       CC="$arch-gcc" \
       PKG_CONFIG="$arch-pkg-config"
@@ -79,9 +82,10 @@ package() {
       HOST_OS=mingw32 \
       LUA_VERSION="${_luaver}" \
       PREFIX="/usr/$arch" \
-      DESTDIR="$pkgdir/" install
+      DESTDIR="$pkgdir/" \
+      install
 
-    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
   done
 }
 
