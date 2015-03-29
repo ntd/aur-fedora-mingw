@@ -6,7 +6,7 @@
 _realname=icu
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=50.1.2
-pkgrel=11
+pkgrel=12
 pkgdesc='International Components for Unicode library (mingw-w64)'
 arch=(any)
 url='http://www.icu-project.org/'
@@ -50,8 +50,6 @@ build() {
   local builddir
   local arch
 
-  unset LDFLAGS CPPFLAGS
-
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/${_realname}-$pkgver-build-$arch"
 
@@ -68,7 +66,7 @@ build() {
     mkdir -p "$builddir"
     cd "$builddir"
     (
-      source "$arch-configure" "$tardir" \
+      source $arch-configure "$tardir" \
         --disable-static \
         --enable-shared \
         --with-cross-build="$builddir-native" \
@@ -95,7 +93,7 @@ package() {
     mv -f "$prefix/lib/libicudata$api.dll" "$prefix/lib/icudata$api.dll"
     mv "$prefix"/lib/*.dll "$prefix/bin/"
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
 
     rm -f "$prefix/bin/icu-config"
