@@ -3,9 +3,10 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-libxml2.git/
 
-pkgname=fedora-mingw-w64-libxml2
+_realname=libxml2
+pkgname="fedora-mingw-w64-${_realname}"
 pkgver=2.9.2
-pkgrel=3
+pkgrel=4
 pkgdesc='XML parsing library, version 2 (mingw-w64)'
 arch=(any)
 url='http://www.xmlsoft.org/'
@@ -25,12 +26,8 @@ md5sums=('9e6a9aca9d155737868b3dc5fd82f788'
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
-build() {
-  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
-  local builddir
-  local arch
-
-  cd "$tardir"
+prepare() {
+  cd "$srcdir/${_realname}-$pkgver"
 
   # Avoid corrupting the xml catalogs
   # https://bugzilla.redhat.com/show_bug.cgi?id=1153753
@@ -38,44 +35,40 @@ build() {
 
   # MinGW-specific patches
   patch -Np0 < '../mingw32-libxml2-static-build-compile-fix.patch?id=b2ef773d9a92f507605e3fa6bb52c91a0119d16c'
+}
 
-  unset LDFLAGS CPPFLAGS
+build() {
+  local tardir="$srcdir/${_realname}-$pkgver"
+  local builddir
+  local arch
 
+  # XXX: disabling zlib for now (--without-zlib) because the
+  # compilation fails otherwise with undefined references.
+  # Not sure if this is an issue of zlib of libxml2 though.
   for arch in ${_architectures[@]}; do
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$tardir-build-$arch"
 
     # LibXML2 can't build static and shared libraries in one go, so we
     # build LibXML2 twice here
-
-    # XXX: disabling zlib for now (--without-zlib) because the
-    # compilation fails otherwise with undefined references.
-    # Not sure if this is an issue of zlib of libxml2 though.
-
     mkdir -p "$builddir-static"
     cd "$builddir-static"
-    "$tardir/configure" \
-      CPPFLAGS='-DLIBXML_STATIC_FOR_DLL' \
-      --build="$CHOST" \
-      --prefix="/usr/$arch" \
-      --host="$arch" \
-      --without-python \
-      --with-modules \
+    source $arch-configure "$tardir" \
       --enable-static \
       --disable-shared \
+      CPPFLAGS='-DLIBXML_STATIC_FOR_DLL' \
+      --without-python \
+      --with-modules \
       --with-threads=win32 \
       --without-zlib
     make
 
     mkdir -p "$builddir-shared"
     cd "$builddir-shared"
-    "$tardir/configure" \
-      --build="$CHOST" \
-      --prefix="/usr/$arch" \
-      --host="$arch" \
-      --without-python \
-      --with-modules \
+    source $arch-configure "$tardir" \
       --disable-static \
       --enable-shared \
+      --without-python \
+      --with-modules \
       --with-threads=win32 \
       --without-zlib
     make
@@ -89,7 +82,7 @@ package() {
 
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$srcdir/${_realname}-$pkgver-build-$arch"
 
     # First install all the files belonging to the shared build
     cd "$builddir-shared"
@@ -98,8 +91,9 @@ package() {
     # Then manually install the static library
     install -t "$prefix/lib" "$builddir-static/.libs/libxml2.a"
 
-    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
     find "$prefix" -name '*.a'   -exec $arch-strip -g {} +
+
     rm -fr "$prefix/share"
   done
 }
