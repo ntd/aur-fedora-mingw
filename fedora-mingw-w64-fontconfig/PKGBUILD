@@ -6,7 +6,7 @@
 _realname=fontconfig
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=2.11.1
-pkgrel=5
+pkgrel=6
 pkgdesc='A library for configuring and customizing font access (mingw-w64)'
 arch=(any)
 url='http://fontconfig.org/'
@@ -27,13 +27,11 @@ build() {
   local builddir
   local arch
 
-  unset LDFLAGS CPPFLAGS
-
   for arch in ${_architectures[@]}; do
     builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    source "$arch-configure" "$tardir" \
+    source $arch-configure "$tardir" \
       --enable-static \
       --enable-shared \
       --with-arch="${arch%%-*}" \
@@ -53,10 +51,11 @@ package() {
     make DESTDIR="$pkgdir" install
 
     # Executable files must be preseved for cache management on the host
-    find "$prefix" -regex '.*\.\(bat\|def\|exp\)' -exec rm -f           {} +
-    find "$prefix" -name '*.exe'                  -exec $arch-strip     {} +
-    find "$prefix" -name '*.dll'                  -exec $arch-strip -xg {} +
-    find "$prefix" -name '*.a'                    -exec $arch-strip -g  {} +
+    find "$prefix" -regex '.*\.\(bat\|def\|exp\)' -exec rm -f {} +
+    find "$prefix" -name '*.exe' -exec $arch-strip {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
+    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+
     rm -fr "$prefix/share/man"
   done
 
