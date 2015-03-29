@@ -6,7 +6,7 @@
 _realname=freetype
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=2.5.4
-pkgrel=5
+pkgrel=6
 pkgdesc='TrueType font rendering library (mingw-w64)'
 arch=(any)
 url='http://freetype.sourceforge.net/'
@@ -30,6 +30,7 @@ prepare() {
   cd "$srcdir/${_realname}-$pkgver"
 
   patch -Np1 < '../freetype-2.2.1-enable-valid.patch?h=f18'
+
   patch -Np1 < '../freetype-2.5.3-enable-spr.patch?id=e994213133a3c10acd7a8e6cf6b8a4a191744ef2'
 }
 
@@ -37,8 +38,6 @@ build() {
   local tardir="$srcdir/${_realname}-$pkgver"
   local builddir
   local arch
-
-  unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
     builddir="$tardir-build-$arch"
@@ -69,7 +68,7 @@ package() {
     make DESTDIR="$pkgdir" install
 
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
 
     rm -f  "$prefix/bin/freetype-config"
