@@ -3,7 +3,7 @@
 _realname=gobject-introspection
 pkgname="afm-mingw-w64-${_realname}"
 pkgver=1.43.3
-pkgrel=7
+pkgrel=8
 pkgdesc='Introspection system for GObject-based libraries (mingw-w64)'
 arch=(any)
 url='https://live.gnome.org/GObjectIntrospection'
@@ -70,8 +70,6 @@ build() {
   local arch
   local bits
 
-  unset LDFLAGS CPPFLAGS
-
   # Force the use of the python-2 interpreter
   export PYTHON=/usr/bin/python2
 
@@ -89,9 +87,9 @@ build() {
 
     # Cross-compile the rest of the package inside a subshell so
     # there will not be environment variable leaks from $arch-configure.
-    # The "$arch-configure" script comes from afm-mingw-w64-makedepends.
+    # The $arch-configure script comes from afm-mingw-w64-makedepends.
     (
-      source "$arch-configure" "$tardir" \
+      source $arch-configure "$tardir" \
         --host="$arch" \
         --disable-silent-rules \
         --enable-shared \
@@ -136,7 +134,7 @@ package() {
       $prefix/lib/pkgconfig/gobject-introspection-1.0.pc
 
     find "$prefix" -regex '.*\.\(bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
     rm -fr "$prefix/share/man"
     rm -fr "$prefix/share/aclocal"
