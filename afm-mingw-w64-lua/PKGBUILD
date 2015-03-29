@@ -7,7 +7,7 @@
 _realname=lua
 pkgname="afm-mingw-w64-${_realname}"
 pkgver=5.2.4
-pkgrel=3
+pkgrel=4
 pkgdesc='Powerful light-weight programming language designed for extending applications (mingw-w64)'
 arch=(any)
 url='http://www.lua.org/'
@@ -18,11 +18,22 @@ provides=("mingw-w64-lua=$pkgver")
 conflicts=(mingw-w64-lua)
 options=(!strip staticlibs !buildflags)
 source=("http://www.lua.org/ftp/${_realname}-$pkgver.tar.gz"
-        "lua.pc")
+        "lua.pc"
+        "implib.patch"
+        "searchpath.patch")
 md5sums=('913fdb32207046b273fdb17aad70be13'
-         'e7ba6c2b695b0b84a5ea0cbff5fc9067')
+         'e7ba6c2b695b0b84a5ea0cbff5fc9067'
+         '39ed0d1e9eece585f7c0f2c49136dd01'
+         '201ee806b08404749770214296be1fa4')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
+
+prepare() {
+  cd "$srcdir/${_realname}-$pkgver"
+
+  patch -Np0 < ../implib.patch
+  patch -Np0 < ../searchpath.patch
+}
 
 build() {
   local tardir="$srcdir/${_realname}-$pkgver"
@@ -69,6 +80,7 @@ package() {
     make \
       INSTALL_TOP="$prefix" \
       TO_BIN="lua.exe luac.exe lua52.dll" \
+      TO_LIB="liblua.a liblua.dll.a" \
       install
 
     # Manually install the pkg-config file
