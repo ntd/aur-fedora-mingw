@@ -6,7 +6,7 @@
 _realname=nsis
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=2.46
-pkgrel=5
+pkgrel=6
 pkgdesc='A professional open source system to create Windows installers'
 arch=(i686 x86_64)
 url='http://nsis.sourceforge.net/'
@@ -46,8 +46,6 @@ prepare() {
 }
 
 build() {
-  unset LDFLAGS CPPFLAGS
-
   cd "$srcdir/${_realname}-$pkgver-src"
 
   scons "${_sconsopts[@]}"
@@ -58,7 +56,7 @@ package() {
 
   scons PREFIX_DEST="$pkgdir" "${_sconsopts[@]}" install
 
-  find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+  find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
   find "$prefix" -name '*.a' -exec $arch-strip -g {} +
 }
 
