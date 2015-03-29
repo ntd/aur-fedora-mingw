@@ -6,7 +6,7 @@
 _realname=glib
 pkgname=fedora-mingw-w64-glib2
 pkgver=2.44.0
-pkgrel=2
+pkgrel=3
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -54,30 +54,27 @@ build() {
   local builddir
   local arch
 
-  unset  LDFLAGS
-  unset  CPPFLAGS
-
   for arch in ${_architectures[@]}; do
     builddir="$tardir-build-$arch"
 
     # GLib can't build static and shared libraries in one go, so we build GLib twice
     mkdir -p "$builddir-static"
     cd "$builddir-static"
-    source "$arch-configure" "$tardir" \
+    source $arch-configure "$tardir" \
       --disable-shared \
       --enable-static \
       --disable-silent-rules \
       --with-python=/usr/bin/python2
-    make V=1
+    make
 
     mkdir -p "$builddir-shared"
     cd "$builddir-shared"
-    source "$arch-configure" "$tardir" \
+    source $arch-configure "$tardir" \
       --enable-shared \
       --disable-static \
       --disable-silent-rules \
       --with-python=/usr/bin/python2
-    make V=1
+    make
   done
 }
 
@@ -98,8 +95,9 @@ package() {
     make DESTDIR="$pkgdir" install
 
     find "$prefix" -regex '.*\.\(bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+
     rm -fr "$prefix/share/bash-completion"
     rm -fr "$prefix/share/gdb"
     rm -fr "$prefix/share/man"
