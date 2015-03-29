@@ -7,7 +7,7 @@
 _realname=lua
 pkgname="afm-mingw-w64-${_realname}"
 pkgver=5.2.4
-pkgrel=4
+pkgrel=5
 pkgdesc='Powerful light-weight programming language designed for extending applications (mingw-w64)'
 arch=(any)
 url='http://www.lua.org/'
@@ -32,6 +32,7 @@ prepare() {
   cd "$srcdir/${_realname}-$pkgver"
 
   patch -Np0 < ../implib.patch
+
   patch -Np0 < ../searchpath.patch
 }
 
@@ -40,8 +41,6 @@ build() {
   local builddir
   local arch
   local prefix
-
-  unset CPPFLAGS CFLAGS LDFLAGS
 
   for arch in ${_architectures[@]}; do
     builddir="$tardir-build-$arch"
@@ -69,8 +68,6 @@ package() {
   local builddir
   local arch
   local prefix
-
-  unset CPPFLAGS CFLAGS LDFLAGS
 
   for arch in ${_architectures[@]}; do
     builddir="$srcdir/${_realname}-$pkgver-build-$arch"
