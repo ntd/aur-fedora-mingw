@@ -3,9 +3,10 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-libjpeg-turbo.git/
 
-pkgname=fedora-mingw-w64-libjpeg-turbo
+_realname=libjpeg-turbo
+pkgname="fedora-mingw-w64-${_realname}"
 pkgver=1.3.1
-pkgrel=6
+pkgrel=7
 pkgdesc='libjpeg derivative with accelerated baseline JPEG compression and decompression (mingw-w64)'
 arch=(any)
 url='http://libjpeg-turbo.virtualgl.org/'
@@ -29,15 +30,8 @@ md5sums=('2c3a68129dac443a72815ff5bb374b05'
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
-build() {
-  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
-  local builddir
-  local arch
-
-  unset LDFLAGS CPPFLAGS
-
-  # Apply patches from fedora repository
-  cd "$tardir"
+prepare() {
+  cd "$srcdir/${_realname}-$pkgver"
 
   # Make jconfig.h more autoconf friendly
   # https://bugzilla.redhat.com/show_bug.cgi?id=843193
@@ -49,9 +43,15 @@ build() {
   # Fix CVE-2014-9092 (RHBZ #1169851 #1169853)
   patch -Np1 < '../libjpeg-turbo-commit-1365.patch?id=e968c5631e81a4a7fb9e267bb628675168fb48fd'
   patch -Np1 < '../libjpeg-turbo-commit-1367.patch?id=e968c5631e81a4a7fb9e267bb628675168fb48fd'
+}
+
+build() {
+  local tardir="$srcdir/${_realname}-$pkgver"
+  local builddir
+  local arch
 
   for arch in ${_architectures[@]}; do
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
     $arch-cmake "$tardir"
@@ -66,11 +66,11 @@ package() {
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
 
-    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    cd "$srcdir/${_realname}-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
 
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
     rm -fr "$prefix/doc"
   done
