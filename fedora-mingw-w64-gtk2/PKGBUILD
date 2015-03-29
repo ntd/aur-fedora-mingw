@@ -6,7 +6,7 @@
 _realname=gtk+
 pkgname=fedora-mingw-w64-gtk2
 pkgver=2.24.27
-pkgrel=3
+pkgrel=4
 pkgdesc='GTK+2 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -85,13 +85,11 @@ build() {
   local builddir
   local arch
 
-  unset LDFLAGS CPPFLAGS
-
   for arch in ${_architectures[@]}; do
     builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    source "$arch-configure" "$tardir" \
+    source $arch-configure "$tardir" \
       --enable-static \
       --enable-shared \
       --disable-silent-rules \
@@ -117,7 +115,7 @@ package() {
     find "$prefix" -name '*.exe' -a ! -name '*gtk2*' -a ! -name '*2.0*' -exec rm -f {} +
 
     find "$prefix" -regex '.*\.\(bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
 
     rm -fr "$prefix/share/aclocal"
