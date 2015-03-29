@@ -3,9 +3,10 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-libffi.git/
 
-pkgname=fedora-mingw-w64-libffi
+_realname=libffi
+pkgname="fedora-mingw-w64-${_realname}"
 pkgver=3.0.13
-pkgrel=8
+pkgrel=9
 pkgdesc='A portable, high level programming interface to various calling conventions (mingw-w64)'
 arch=(any)
 url='http://sourceware.org/libffi/'
@@ -22,14 +23,12 @@ md5sums=('45f3b6dbc9ee7c7dfbbbc5feba571529')
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
-  local tardir="$srcdir/${pkgname#fedora-mingw-w64-}-$pkgver"
+  local tardir="$srcdir/${_realname}-$pkgver"
   local builddir
   local arch
 
-  unset LDFLAGS CPPFLAGS
-
   for arch in ${_architectures[@]}; do
-    builddir="$srcdir/$pkgname-$pkgver-build-$arch"
+    builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
     "$tardir/configure" \
@@ -48,12 +47,13 @@ package() {
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
 
-    cd "$srcdir/$pkgname-$pkgver-build-$arch"
+    cd "$srcdir/${_realname}-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
 
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+
     rm -fr "$prefix/share"
   done
 }
