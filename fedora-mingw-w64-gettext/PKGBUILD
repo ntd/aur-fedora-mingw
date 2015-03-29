@@ -6,7 +6,7 @@
 _realname=gettext
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=0.19.4
-pkgrel=4
+pkgrel=5
 pkgdesc='GNU internationalization library (mingw-w64)'
 arch=(any)
 url='http://www.gnu.org/software/gettext/'
@@ -27,14 +27,12 @@ build() {
   local builddir
   local arch
 
-  unset LDFLAGS CPPFLAGS
-
   for arch in ${_architectures[@]}; do
     builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
     MINGW_CPPFLAGS=-I../../gettext-runtime/intl \
-    source "$arch-configure" "$tardir" \
+    source $arch-configure "$tardir" \
       --enable-static \
       --enable-shared \
       --disable-silent-rules \
@@ -59,7 +57,7 @@ package() {
     make DESTDIR="$pkgdir" install
 
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
 
     # Remove components selectively
