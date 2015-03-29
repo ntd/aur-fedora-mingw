@@ -6,7 +6,7 @@
 _realname=expat
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=2.1.0
-pkgrel=12
+pkgrel=13
 pkgdesc='An XML parser library (mingw-w64)'
 arch=(any)
 url='http://expat.sourceforge.net/'
@@ -28,13 +28,11 @@ build() {
   local builddir
   local arch
 
-  unset LDFLAGS CPPFLAGS
-
   for arch in ${_architectures[@]}; do
     builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    source "$arch-configure" "$tardir"
+    source $arch-configure "$tardir"
     make
   done
 }
@@ -50,8 +48,9 @@ package() {
     make DESTDIR="$pkgdir" install
 
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+
     rm -fr "$prefix/share"
   done
 }
