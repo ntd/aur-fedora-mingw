@@ -6,7 +6,7 @@
 _realname=zlib
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=1.2.8
-pkgrel=9
+pkgrel=10
 pkgdesc='A compression/decompression Library (mingw-w64)'
 arch=(any)
 url='http://www.zlib.net/'
@@ -52,13 +52,11 @@ build() {
   local builddir
   local arch
 
-  unset LDFLAGS CPPFLAGS
-
   for arch in ${_architectures[@]}; do
     builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    source "$arch-configure" "$tardir"
+    source $arch-configure "$tardir"
     make
   done
 }
@@ -83,7 +81,7 @@ package() {
     rm -f "$prefix/bin/libz-1.dll"
     install -m 0644 .libs/zlib1.dll "$prefix/bin"
 
-    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
 
     rm -fr "$prefix/share"
