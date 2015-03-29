@@ -10,7 +10,7 @@
 _realname=gdk-pixbuf
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=2.31.1
-pkgrel=6
+pkgrel=7
 pkgdesc='An image loading library (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -34,13 +34,11 @@ build() {
   local builddir
   local arch
 
-  unset LDFLAGS CPPFLAGS
-
   for arch in ${_architectures[@]}; do
     builddir="$tardir-build-$arch"
     mkdir -p "$builddir"
     cd "$builddir"
-    source "$arch-configure" "$tardir" \
+    source $arch-configure "$tardir" \
       --with-included-loaders=png \
       --without-libjasper \
       --disable-silent-rules \
@@ -60,8 +58,9 @@ package() {
     make DESTDIR="$pkgdir" install
 
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+
     rm -fr "$prefix/share/man"
   done
 }
