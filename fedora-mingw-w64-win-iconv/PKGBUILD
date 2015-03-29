@@ -6,7 +6,7 @@
 _realname=win-iconv
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=0.0.6
-pkgrel=5
+pkgrel=6
 pkgdesc='Iconv implementation using Win32 API (mingw-w64)'
 arch=(any)
 url='http://code.google.com/p/win-iconv/'
@@ -26,8 +26,6 @@ build() {
   local tardir="$srcdir/${_realname}-$pkgver"
   local builddir
   local arch
-
-  unset LDFLAGS CPPFLAGS
 
   for arch in ${_architectures[@]}; do
     builddir="$tardir-build-$arch"
@@ -49,7 +47,7 @@ package() {
     make DESTDIR="$pkgdir" install
 
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip -xg {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
   done
 }
