@@ -1,0 +1,13 @@
+--- lgi.orig/lgi/override/Gdk.lua	2015-03-31 16:53:42.233505677 +0200
++++ lgi/lgi/override/Gdk.lua	2015-03-31 16:54:38.143297697 +0200
+@@ -19,10 +19,6 @@
+ local Gdk = lgi.Gdk
+ local cairo = lgi.cairo
+ 
+--- Take over internal GDK synchronization lock.
+-core.registerlock(core.gi.Gdk.resolve.gdk_threads_set_lock_functions)
+-Gdk.threads_init()
+-
+ -- Gdk.Rectangle does not exist at all, because it is aliased to
+ -- cairo.RectangleInt.  Make sure that we have it exists, because it
+ -- is very commonly used in API documentation.

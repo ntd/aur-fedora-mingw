@@ -4,7 +4,7 @@ _realname=lua-lgi
 _luaver=5.2
 pkgname="afm-mingw-w64-${_realname}"
 pkgver=0.9.0
-pkgrel=1
+pkgrel=2
 pkgdesc='Lua bindings for gnome/gobject using gobject-introspection library (mingw-w64)'
 arch=(any)
 url='http://www.lua.org/'
@@ -17,13 +17,15 @@ source=("${_realname}-$pkgver.tar.gz::https://github.com/pavouk/lgi/archive/$pkg
         "0002-Export-luaopen_lgi_corelgilua51.patch"
         "0003-Extend-platform-support-to-MSYS-and-MinGW.patch"
         "0004-Allow-overriding-of-the-host-build-system.patch"
-        "0001-Do-not-copy-version.lua-twice.patch")
+        "0001-Do-not-copy-version.lua-twice.patch"
+        "Disable-GDK-lock.patch")
 md5sums=('cc433a597f23cfabdfc905c6c2cd3d7c'
          'e6f1496707e8ccc6edba95f5bc77774a'
          '4eeb84f885ba8f85964dd8a5b25105ac'
          'a6660fa55a07da149b42653fea85f2e4'
          '600b8100486070a877dc948eec168977'
-         '7688457a774d8ca306d4f59655887c9b')
+         '7688457a774d8ca306d4f59655887c9b'
+         '3de38470e6238a2b190a9f54c551f74e')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -43,6 +45,10 @@ prepare() {
   patch -Np1 < ../0003-Extend-platform-support-to-MSYS-and-MinGW.patch
   patch -Np1 < ../0004-Allow-overriding-of-the-host-build-system.patch
   patch -Np1 < ../0001-Do-not-copy-version.lua-twice.patch
+
+  # Temporary disable the GDK lock automatically operated by lgi:
+  # https://github.com/pavouk/lgi/issues/98
+  patch -Np1 < ../Disable-GDK-lock.patch
 }
 
 build() {
