@@ -16,11 +16,12 @@ set_flags() {
     local bits=$2
     shift 2
 
-    # Fallback flags used by AUR Fedora MinGW packages
-    local fallback_cflags='-O2 -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4'
+    # Fallback flags common to AUR Fedora MinGW packages
+    # The hardening flags are directly borrowed from Fedora 23
     local fallback_cppflags=
-    local fallback_ldflags=
-    local fallback_cxxflags="$fallback_cflags"
+    local fallback_cflags='-O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches -specs=/usr/share/mingw/redhat-hardened-cc1'
+    local fallback_ldflags='-Wl,-z,relro,now -specs=/usr/share/mingw/redhat-hardened-ld'
+    local fallback_cxxflags=$fallback_cflags
 
     local cflags="MINGW${bits}_CFLAGS"
     local extra_cflags="MINGW${bits}_EXTRA_CFLAGS"
@@ -66,6 +67,14 @@ call_configure() {
     export INTROSPECTION_LAUNCHER="/usr/bin/env WINEARCH=win$bits WINEPREFIX=$srcdir/win$bits DISPLAY= /usr/bin/wine"
     export XDG_DATA_DIRS="/usr/$arch/share:$XDG_DATA_DIRS"
     export GI_TYPELIB_PATH="/usr/$arch/lib/girepository-1.0:$GI_TYPELIB_PATH"
+
+    # Old libtool has a bug when dealing with hardening flags:
+    # https://bugzilla.redhat.com/show_bug.cgi?id=978949
+    # The proposed workaround is to modify ltmain.sh *in the source tree*
+    # before calling configure. There is nothing I can do about it...
+    for i in $(find "$path_to_configure" -name ltmain.sh) ; do
+	sed -i.backup -e 's~compiler_flags=$~compiler_flags="-specs=/usr/share/mingw/redhat-hardened-ld"~' $i
+    done
 
     "$path_to_configure/configure" \
 	--build="$CHOST" \

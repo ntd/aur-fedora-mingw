@@ -6,6 +6,7 @@
 # - pkg-config wrappers
 # - CMake configurations for MinGW
 # - configure wrappers
+# - hardening specs
 #
 # It borrows ideas from the mingw-filesystem Fedora package [1] and some
 # AUR packages [2] [3] that in my opinion has wrong names.
@@ -16,7 +17,7 @@
 
 pkgname=afm-mingw-w64-makedepends
 pkgver=1
-pkgrel=6
+pkgrel=7
 pkgdesc='A collection of stuff needed for MinGW cross-building'
 arch=(any)
 url='http://dev.entidi.com/p/aur-fedora-mingw/'
@@ -32,16 +33,20 @@ source=("i686-w64-mingw32-cmake"
         "x86_64-w64-mingw32-configure"
         "x86_64-w64-mingw32-pkg-config"
         "Toolchain-i686-w64-mingw32.cmake"
-        "Toolchain-x86_64-w64-mingw32.cmake")
+        "Toolchain-x86_64-w64-mingw32.cmake"
+        "http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/redhat-hardened-cc1"
+        "http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/redhat-hardened-ld")
 md5sums=('76d24f33081e428a11e8cb20e6067c25'
          '677ddd6208dfaa02db5d9a1449edf05e'
          '2c2641547debc5d289bb85b0939e4380'
-         'deb690cb4cf89f94d03c5c8a94eaed82'
+         'c8d0091c4337155eb5917fa4efc6cca5'
          '5fcedae7d788c4fd9100d139bf80f5aa'
          '4ce073a3b299d6491dc180def6e9fc25'
          '0a879bf20cd82e44b73eb49cf2484eda'
          '4704995815374af7b3b853b139d04ad5'
-         'cdb9f76c5ab95038df1c03755e9119e7')
+         'cdb9f76c5ab95038df1c03755e9119e7'
+         '966a1bc27d8b416bbdb8f73e0ad99bbc'
+         '9ad3ca1b809a1f893cae26ccd3625dcc')
 
 _architectures="i686-w64-mingw32 x86_64-w64-mingw32"
 
@@ -65,4 +70,8 @@ package() {
     install -m 644 Toolchain-$arch.cmake "$pkgdir/usr/share/mingw/"
     install -m 755 $arch-cmake "$pkgdir/usr/bin/"
   done
+
+  # Hardening specs
+  install -m 644 redhat-hardened-cc1 "$pkgdir/usr/share/mingw/"
+  install -m 644 redhat-hardened-ld  "$pkgdir/usr/share/mingw/"
 }
