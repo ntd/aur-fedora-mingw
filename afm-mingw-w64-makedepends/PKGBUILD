@@ -17,7 +17,7 @@
 
 pkgname=afm-mingw-w64-makedepends
 pkgver=1
-pkgrel=7
+pkgrel=8
 pkgdesc='A collection of stuff needed for MinGW cross-building'
 arch=(any)
 url='http://dev.entidi.com/p/aur-fedora-mingw/'
