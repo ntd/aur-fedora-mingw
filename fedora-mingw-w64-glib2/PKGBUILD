@@ -5,7 +5,7 @@
 
 _realname=glib
 pkgname=fedora-mingw-w64-glib2
-pkgver=2.45.3
+pkgver=2.45.6
 pkgrel=1
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
@@ -22,24 +22,23 @@ source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_rea
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-send-log-messages-to-correct-stdout-and-stderr.patch?id=d2262b6ca2230b2dc169aa4798b59e645859a195"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/glib-prefer-constructors-over-DllMain.patch?id=10ce51e70078f0c5b76d3ee1582d75e43f7f3363"
         "http://pkgs.fedoraproject.org/cgit/rpms/mingw-glib2.git/plain/0002-GNetworkMonitorBase-don-t-fail-when-IPv6-support-is-.patch?id=1853c99683008edb12d1f88f8a8e292eca95d3af"
-        "http://pkgs.fedoraproject.org/cgit/rpms/mingw-glib2.git/plain/0001-gapplication-Initialize-backend-before-withdrawing-n.patch?id=796a07219dc1fbfa06957f7f6607e836947b3f92"
-        "http://pkgs.fedoraproject.org/cgit/rpms/mingw-glib2.git/plain/glib-win64-compile.patch?id=9430f723946a51db9a87488a53435ea7c0957101")
-md5sums=('fa6273d970d8f1026cbd47f4649349e0'
+        "http://pkgs.fedoraproject.org/cgit/rpms/mingw-glib2.git/plain/glib-win64-compile.patch?id=9430f723946a51db9a87488a53435ea7c0957101"
+        "http://pkgs.fedoraproject.org/cgit/rpms/mingw-glib2.git/plain/0001-gdbus-Add-a-missing-include.patch?id=3c56a7c3b471c6d282c6e11328abcb471a9b1c05")
+md5sums=('d6c3aef029c872c0b21109ec01efadec'
          'c08c41118f5318d10f326c7c30e1a33a'
          '7b065f9bc154bf996523974a698b24de'
          '46969e815f3ab19582ba33667a52048b'
          '17dd5bee7eaea2ff881b7b879c494484'
-         '1a7689e5dd5de203dafe9c5e6460d3f0'
-         '2db47bc64e62a326a5c5617880551fb6')
+         '2db47bc64e62a326a5c5617880551fb6'
+         '861ae8c198fe0c62b80a5da765a3f009')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 prepare() {
   cd "$srcdir/${_realname}-$pkgver"
 
-  # gapplication: Initialize backend before withdrawing notifications
-  # https://bugzilla.gnome.org/show_bug.cgi?id=750625
-  patch -Np1 < '../0001-gapplication-Initialize-backend-before-withdrawing-n.patch?id=796a07219dc1fbfa06957f7f6607e836947b3f92'
+  # Backported from upstream
+  patch -Np1 < '../0001-gdbus-Add-a-missing-include.patch?id=3c56a7c3b471c6d282c6e11328abcb471a9b1c05'
 
   # https://bugzilla.gnome.org/show_bug.cgi?id=674214
   patch -Np1 < '../0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch?h=f18'
