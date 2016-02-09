@@ -1,0 +1,138 @@
+# Maintainer: Nicola Fontana <ntd@entidi.it>
+#
+# Port of the Fedora package found at
+# http://pkgs.fedoraproject.org/cgit/mingw-pcre.git/
+
+_realname=pcre
+pkgname="fedora-mingw-w64-${_realname}"
+pkgver=8.38
+pkgrel=1
+pkgdesc='A library that implements Perl 5-style regular expressions'
+arch=(any)
+license=(BSD)
+url='http://www.pcre.org/'
+groups=(fedora-mingw)
+depends=(mingw-w64-crt)
+makedepends=(mingw-w64-gcc)
+provides=("mingw-w64-${_realname}=$pkgver")
+conflicts=("mingw-w64-${_realname}")
+options=(!strip staticlibs !buildflags)
+source=("ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-$pkgver.tar.bz2"
+        "http://pkgs.fedoraproject.org/cgit/rpms/mingw-pcre.git/plain/pcre-8.21-multilib.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec"
+        "http://pkgs.fedoraproject.org/cgit/rpms/mingw-pcre.git/plain/pcre-8.32-refused_spelling_terminated.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec"
+        "http://pkgs.fedoraproject.org/cgit/rpms/mingw-pcre.git/plain/pcre-8.38-Allow-for-up-to-32-bit-numbers-in-the-ordin-function.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec"
+        "http://pkgs.fedoraproject.org/cgit/rpms/mingw-pcre.git/plain/pcre-8.38-Fix-Q-E-before-qualifier-bug-when-auto-callouts-are-.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec"
+        "http://pkgs.fedoraproject.org/cgit/rpms/mingw-pcre.git/plain/pcre-8.38-Fix-auto-callout-comment-bug.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec"
+        "http://pkgs.fedoraproject.org/cgit/rpms/mingw-pcre.git/plain/pcre-8.38-Fix-bug-for-isolated-E-between-an-item-and-its-quali.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec"
+        "http://pkgs.fedoraproject.org/cgit/rpms/mingw-pcre.git/plain/pcre-8.38-Fix-by-hacking-another-length-computation-issue.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec"
+        "http://pkgs.fedoraproject.org/cgit/rpms/mingw-pcre.git/plain/pcre-8.38-Fix-copy-named-substring-bug.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec"
+        "http://pkgs.fedoraproject.org/cgit/rpms/mingw-pcre.git/plain/pcre-8.38-Fix-get_substring_list-bug-when-K-is-used-in-an-asse.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec"
+        "http://pkgs.fedoraproject.org/cgit/rpms/mingw-pcre.git/plain/pcre-8.38-Fix-negated-POSIX-class-within-negated-overall-class.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec"
+        "http://pkgs.fedoraproject.org/cgit/rpms/mingw-pcre.git/plain/pcre-8.38-Fix-x-bug-when-pattern-starts-with-white-space-and-x.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec"
+        "http://pkgs.fedoraproject.org/cgit/rpms/mingw-pcre.git/plain/pcre-8.38-Give-error-for-regexec-with-pmatch-NULL-and-REG_STAR.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec")
+md5sums=('00aabbfe56d5a48b270f999b508c5ad2'
+         'e4f80a6e38764d3de8e4b280f0f14f00'
+         '73f6b7b7866c5306a8e2e043380555f0'
+         '247e4675f2e2fa25441dccff137ae214'
+         'edcf0a1c750686016fbeaf4ba23a7106'
+         'e4fe40b38ab2f500925d48703b8bf5ce'
+         'b57930f048deece3bac159cbc4d8d68b'
+         '059db0c8232c20b71f3df65c5ef49ba8'
+         '7adbc57c5ccf63a9231579faaac5fbde'
+         '72e285d5a38928d7fa88c5e92af9ac90'
+         '7da5ec0bcce0de711d802c26741a7b05'
+         'be48618ebdf7c1fef2a73b666cba3f0f'
+         '338c0a7604e714b414afe64a354587d9')
+
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
+
+prepare() {
+  cd "$srcdir/${_realname}-$pkgver"
+
+  # Refused by upstream, bug #675477
+  patch -Np1 < '../pcre-8.32-refused_spelling_terminated.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec'
+
+  # Fix compiling comments with auto-callouts, upstream bug #1725,
+  # fixed in upstream after 8.38
+  patch -Np1 < '../pcre-8.38-Fix-auto-callout-comment-bug.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec'
+
+  # Fix compiling expressions with negated classes in UCP mode,
+  # upstream bug #1732, fixed in upstream after 8.38
+  patch -Np1 < '../pcre-8.38-Fix-negated-POSIX-class-within-negated-overall-class.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec'
+
+  # Fix compiling expressions with an isolated \E between an item and its
+  # qualifier with auto-callouts, upstream bug #1724,
+  # fixed in upstream after 8.38
+  patch -Np1 < '../pcre-8.38-Fix-bug-for-isolated-E-between-an-item-and-its-quali.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec'
+
+  # Fix crash in regexec() if REG_STARTEND option is set and pmatch argument is
+  # NULL, upstream bug #1727, fixed in upstream after 8.38
+  patch -Np1 < '../pcre-8.38-Give-error-for-regexec-with-pmatch-NULL-and-REG_STAR.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec'
+
+  # Fix a stack overflow when formatting a 32-bit integer in pcregrep tool,
+  # upstream bug #1728, fixed in upstream after 8.38
+  patch -Np1 < '../pcre-8.38-Allow-for-up-to-32-bit-numbers-in-the-ordin-function.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec'
+
+  # Fix compiling expressions with an empty \Q\E sequence between an item and
+  # its qualifier with auto-callouts, upstream bug #1735,
+  # fixed in upstream after 8.38
+  patch -Np1 < '../pcre-8.38-Fix-Q-E-before-qualifier-bug-when-auto-callouts-are-.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec'
+
+  # Fix compiling expressions with global extended modifier that is disabled by
+  # local no-extended option at the start of the expression just after
+  # a whitespace, in upstream after 8.38
+  patch -Np1 < '../pcre-8.38-Fix-x-bug-when-pattern-starts-with-white-space-and-x.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec'
+
+  # Fix possible crash in pcre_copy_named_substring() if a named substring has
+  # number greater than the space in the ovector, upstream bug #1741,
+  # in fixed in upstream after 8.38
+  patch -Np1 < '../pcre-8.38-Fix-copy-named-substring-bug.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec'
+
+  # Fix a buffer overflow when compiling an expression with named groups with
+  # a group that reset capture numbers, upstream bug #1742,
+  # fixed in upstream after 8.38
+  patch -Np1 < '../pcre-8.38-Fix-by-hacking-another-length-computation-issue.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec'
+
+  # Fix a crash in pcre_get_substring_list() if the use of \K caused the start
+  # of the match to be earlier than the end, upstream bug #1744,
+  # fixed in upstream after 8.38
+  patch -Np1 < '../pcre-8.38-Fix-get_substring_list-bug-when-K-is-used-in-an-asse.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec'
+}
+
+build() {
+  local tardir="$srcdir/${_realname}-$pkgver"
+  local builddir
+  local arch
+
+  for arch in ${_architectures[@]}; do
+    builddir="$tardir-build-$arch"
+    mkdir -p "$builddir"
+    cd "$builddir"
+    "$tardir/configure" \
+      --build="$CHOST" \
+      --prefix="/usr/$arch" \
+      --host="$arch" \
+      --enable-shared
+    make
+  done
+}
+
+package() {
+  local arch
+  local prefix
+
+  for arch in ${_architectures[@]}; do
+    prefix="$pkgdir/usr/$arch"
+
+    cd "$srcdir/${_realname}-$pkgver-build-$arch"
+    make DESTDIR="$pkgdir" install
+
+    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
+    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+
+    rm -fr "$prefix/share"
+  done
+}
+
+# vim:set ts=2 sw=2 et:
