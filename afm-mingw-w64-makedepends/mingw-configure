@@ -20,7 +20,7 @@ set_flags() {
     # The hardening flags are directly borrowed from Fedora 23
     local fallback_cppflags=
     local fallback_cflags='-O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches -specs=/usr/share/mingw/redhat-hardened-cc1'
-    local fallback_ldflags='-Wl,-z,relro,now -specs=/usr/share/mingw/redhat-hardened-ld'
+    local fallback_ldflags='-specs=/usr/share/mingw/redhat-hardened-ld'
     local fallback_cxxflags=$fallback_cflags
 
     local cflags="MINGW${bits}_CFLAGS"
