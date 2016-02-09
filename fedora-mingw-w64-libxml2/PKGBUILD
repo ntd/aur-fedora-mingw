@@ -5,8 +5,8 @@
 
 _realname=libxml2
 pkgname="fedora-mingw-w64-${_realname}"
-pkgver=2.9.2
-pkgrel=4
+pkgver=2.9.3
+pkgrel=1
 pkgdesc='XML parsing library, version 2 (mingw-w64)'
 arch=(any)
 url='http://www.xmlsoft.org/'
@@ -18,10 +18,8 @@ provides=(mingw-w64-libxml2=$pkgver)
 conflicts=(mingw-w64-libxml2)
 options=(!strip staticlibs !buildflags)
 source=("ftp://ftp.xmlsoft.org/libxml2/libxml2-$pkgver.tar.gz"
-        "http://pkgs.fedoraproject.org/cgit/mingw-libxml2.git/plain/libxml2-2.9.2-catalog-revert.patch?id=47ad62add5888cb5be7b2781b0197d4201b151a0"
         "http://pkgs.fedoraproject.org/cgit/mingw-libxml2.git/plain/mingw32-libxml2-static-build-compile-fix.patch?id=b2ef773d9a92f507605e3fa6bb52c91a0119d16c")
-md5sums=('9e6a9aca9d155737868b3dc5fd82f788'
-         'c5f4a21e64558d01149ce2e2b8147c28'
+md5sums=('daece17e045f1c107610e137ab50c179'
          '0df377025082cd93cccbca547f048011')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
