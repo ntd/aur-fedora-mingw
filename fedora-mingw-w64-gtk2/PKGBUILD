@@ -5,8 +5,8 @@
 
 _realname=gtk+
 pkgname=fedora-mingw-w64-gtk2
-pkgver=2.24.27
-pkgrel=4
+pkgver=2.24.28
+pkgrel=1
 pkgdesc='GTK+2 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -16,7 +16,7 @@ depends=(mingw-w64-crt fedora-mingw-w64-atk fedora-mingw-w64-cairo
          fedora-mingw-w64-gdk-pixbuf fedora-mingw-w64-gettext
          fedora-mingw-w64-glib2 fedora-mingw-w64-win-iconv
          fedora-mingw-w64-pango fedora-mingw-w64-pixman mingw-w64-zlib)
-makedepends=(afm-mingw-w64-makedepends afm-mingw-w64-gobject-introspection wine)
+makedepends=(afm-mingw-w64-makedepends mingw-w64-gobject-introspection wine)
 provides=(mingw-w64-gtk2=$pkgver)
 conflicts=(mingw-w64-gtk2)
 options=(!strip staticlibs !buildflags)
@@ -30,7 +30,7 @@ source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_rea
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/gtk-combo-box-dont-use-invalidated-iter.patch?id=1296c449f78d4ef378541311bb4a4833c6a26fe6"
         "0011-gir-for-gdkwin32.mingw.patch"
         "gtk.immodules")
-md5sums=('b1e890e15602c5bcb40d85b13fe046fd'
+md5sums=('bfacf87b2ea67e4e5c7866a9003e6526'
          '44ca5d1ce91f5364182c6ea2614c7688'
          '396835720e308acaa0372e5a45c463d4'
          '8231dd2b7484574968d5faa57262af2a'
