@@ -1,0 +1,64 @@
+# Maintainer: Nicola Fontana <ntd@entidi.it>
+#
+# Port of the Fedora package found at
+# http://pkgs.fedoraproject.org/cgit/mingw-libepoxy.git/
+
+_realname=libepoxy
+pkgname="fedora-mingw-w64-${_realname}"
+pkgver=1.2
+pkgrel=1
+pkgdesc='A library for handling OpenGL function pointer management for you'
+arch=(any)
+url='https://github.com/anholt/libepoxy'
+license=(MIT)
+groups=(fedora-mingw)
+depends=(mingw-w64-crt)
+makedepends=(afm-mingw-w64-makedepends)
+provides=("mingw-w64-${_realname}=$pkgver")
+conflicts=("mingw-w64-${_realname}")
+options=(!strip staticlibs !buildflags)
+source=("https://github.com/anholt/${_realname}/archive/v$pkgver.tar.gz")
+md5sums=('12d6b7621f086c0c928887c27d90bc30')
+
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
+
+prepare() {
+  cd "$srcdir/${_realname}-$pkgver"
+
+  autoreconf -ivf
+}
+
+build() {
+  local tardir="$srcdir/${_realname}-$pkgver"
+  local builddir
+  local arch
+
+  for arch in ${_architectures[@]}; do
+    builddir="$tardir-build-$arch"
+    mkdir -p "$builddir"
+    cd "$builddir"
+    source $arch-configure "$tardir" \
+      --enable-static \
+      --enable-shared \
+      --disable-silent-rules
+    make
+  done
+}
+
+package() {
+  local arch
+  local prefix
+
+  for arch in ${_architectures[@]}; do
+    prefix="$pkgdir/usr/$arch"
+
+    cd "$srcdir/${_realname}-$pkgver-build-$arch"
+    make DESTDIR="$pkgdir" install
+
+    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
+    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
+    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+  done
+}
+
+# vim:set ts=2 sw=2 et:
