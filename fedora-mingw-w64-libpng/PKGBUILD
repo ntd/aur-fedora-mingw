@@ -6,7 +6,7 @@
 _realname=libpng
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=1.6.21
-pkgrel=1
+pkgrel=2
 pkgdesc='A collection of routines used to create PNG format graphics (mingw-w64)'
 arch=(any)
 url='http://www.libpng.org/pub/png/libpng.html'
