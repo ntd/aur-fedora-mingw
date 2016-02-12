@@ -6,7 +6,7 @@
 _realname=zlib
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=1.2.8
-pkgrel=10
+pkgrel=11
 pkgdesc='A compression/decompression Library (mingw-w64)'
 arch=(any)
 url='http://www.zlib.net/'
