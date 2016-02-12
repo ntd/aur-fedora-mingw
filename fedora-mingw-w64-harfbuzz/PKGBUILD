@@ -5,8 +5,8 @@
 
 _realname=harfbuzz
 pkgname="fedora-mingw-w64-${_realname}"
-pkgver=0.9.40
-pkgrel=6
+pkgver=1.0.1
+pkgrel=1
 pkgdesc='OpenType text shaping engine (mingw-w64)'
 arch=(any)
 url='http://www.harfbuzz.org/'
@@ -14,12 +14,12 @@ license=(MIT)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-glib2 fedora-mingw-w64-freetype
          fedora-mingw-w64-cairo mingw-w64-icu)
-makedepends=(afm-mingw-w64-makedepends afm-mingw-w64-gobject-introspection wine)
+makedepends=(afm-mingw-w64-makedepends mingw-w64-gobject-introspection wine)
 provides=("mingw-w64-${_realname}=$pkgver")
 conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
 source=("http://www.freedesktop.org/software/${_realname}/release/${_realname}-$pkgver.tar.bz2")
-md5sums=('0e27e531f4c4acff601ebff0957755c2')
+md5sums=('b9c144965dfde96672a7c6bdd4f9bf64')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
