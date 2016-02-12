@@ -5,7 +5,7 @@
 
 _realname=gtk+
 pkgname=fedora-mingw-w64-gtk2
-pkgver=2.24.28
+pkgver=2.24.29
 pkgrel=1
 pkgdesc='GTK+2 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
@@ -23,17 +23,17 @@ options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/mingw32-gtk2-2.15.0-xbuttons.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/mingw32-gtk2-enable_static_build.patch?h=f18"
-        "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/gtk-fix-out-of-source-build.patch?h=f18"
+        "http://pkgs.fedoraproject.org/cgit/rpms/mingw-gtk2.git/plain/gtk-fix-out-of-source-build.patch?id=a1c15a29565441dcbf119168eb44b1e20a7069c2"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/icon-padding.patch?id=95be474adc76e60caa692330cf2706b90848146f"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/tooltip-positioning.patch?id=95be474adc76e60caa692330cf2706b90848146f"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/window-dragging.patch?id=95be474adc76e60caa692330cf2706b90848146f"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/gtk-combo-box-dont-use-invalidated-iter.patch?id=1296c449f78d4ef378541311bb4a4833c6a26fe6"
         "0011-gir-for-gdkwin32.mingw.patch"
         "gtk.immodules")
-md5sums=('bfacf87b2ea67e4e5c7866a9003e6526'
+md5sums=('1b7a3689f65617387b5b54520f4439e8'
          '44ca5d1ce91f5364182c6ea2614c7688'
          '396835720e308acaa0372e5a45c463d4'
-         '8231dd2b7484574968d5faa57262af2a'
+         '64a1c29cbda543fdd6d5178417a478c7'
          '5c6d42eb6651106f605c2ac9d92a3951'
          '86159ea0934b25a7bbda9aa436ffc551'
          '147a90540b678b941e7d5d71054b2447'
@@ -73,7 +73,7 @@ prepare() {
   patch -Np0 < '../mingw32-gtk2-enable_static_build.patch?h=f18'
 
   # GTK doesn't support out-of-source builds
-  patch -Np0 < '../gtk-fix-out-of-source-build.patch?h=f18'
+  patch -Np0 < '../gtk-fix-out-of-source-build.patch?id=a1c15a29565441dcbf119168eb44b1e20a7069c2'
 
   # The pre-generated gtk.def file can't be used for MinGW-W64
   # Force a regeneration of this file by removing the bundled copy
