@@ -1,4 +1,4 @@
-From d2a47bd48478ac59bfeea4ce6641f2baedcef082 Mon Sep 17 00:00:00 2001
+From 5e60a0e11e2daedf12c80027b5330fb3efa18037 Mon Sep 17 00:00:00 2001
 From: Nicola Fontana <ntd@entidi.it>
 Date: Tue, 24 Mar 2015 19:23:38 +0100
 Subject: [PATCH 09/11] Allow to skip the check for Python headers

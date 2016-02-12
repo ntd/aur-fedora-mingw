@@ -1,4 +1,4 @@
-From 1a643709b91d290ae478dc5282ece9bfeeecbde7 Mon Sep 17 00:00:00 2001
+From 67f588acfdf736150aa06dd4869727c9b204f9d3 Mon Sep 17 00:00:00 2001
 From: Nicola Fontana <ntd@entidi.it>
 Date: Thu, 11 Feb 2016 19:10:23 +0100
 Subject: [PATCH 11/11] Customize CCompiler on MinGW cross-compilation

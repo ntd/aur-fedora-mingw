@@ -1,4 +1,4 @@
-From ab8a0c788a51e39eaa49515cb469853aefe994bb Mon Sep 17 00:00:00 2001
+From 8ca39485ca6d5e5048a7c693bbf4e7c9e867fa28 Mon Sep 17 00:00:00 2001
 From: Nicola Fontana <ntd@entidi.it>
 Date: Mon, 23 Mar 2015 22:04:32 +0100
 Subject: [PATCH 08/11] Use a launcher to execute g-ir-scanner
@@ -7,37 +7,38 @@ In cross-compilation the build system is unable to execute the compiled
 binary. Give the possibility to use  a launcher, e.g. wine for MinGW or
 qemu for different CPU type.
 ---
- common.mk                | 7 ++++++-
+ common.mk                | 6 +++++-
  giscanner/gdumpparser.py | 6 ++++++
- 2 files changed, 12 insertions(+), 1 deletion(-)
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/common.mk b/common.mk
-index 59753ee..795eae0 100644
+index 59753ee..8187425 100644
 --- a/common.mk
 +++ b/common.mk
-@@ -4,7 +4,11 @@
+@@ -4,7 +4,7 @@
  # This file defines variables that are compatible with
  # Makefile.introspection, but for use within the gobject-introspection
  # module itself.
 -#
 +
-+
-+# The command to use for executing g-ir-compiler. Normally should be
-+# empty but can be defined (e.g. wine or qemu) during cross-compilation
-+INTROSPECTION_LAUNCHER =
  
  INTROSPECTION_SCANNER = \
      env PATH=".libs:$(PATH)" \
-@@ -26,6 +30,7 @@ INTROSPECTION_SCANNER_ARGS = \
+@@ -24,8 +24,12 @@ INTROSPECTION_SCANNER_ARGS = \
+     --add-include-path=$(top_builddir) \
+     --add-include-path=$(top_builddir)/gir
  
++# GI_LAUNCHER is the command to use for executing g-ir-compiler.
++# Normally will be undefined but can be set (e.g. to wine or qemu)
++# when cross-compiling
  INTROSPECTION_COMPILER = \
      env PATH=".libs:$(PATH)" \
-+        $(INTROSPECTION_LAUNCHER) \
++        $(GI_LAUNCHER) \
          $(top_builddir)/g-ir-compiler$(EXEEXT)
  
  INTROSPECTION_COMPILER_ARGS = \
 diff --git a/giscanner/gdumpparser.py b/giscanner/gdumpparser.py
-index 9bdc2bc..d770148 100644
+index 9bdc2bc..6f1ac7a 100644
 --- a/giscanner/gdumpparser.py
 +++ b/giscanner/gdumpparser.py
 @@ -162,6 +162,12 @@ blob containing data gleaned from GObject's primitive introspection."""
@@ -45,10 +46,10 @@ index 9bdc2bc..d770148 100644
  
          args = []
 +
-+        # Prepend the emulator command and arguments, if defined
-+        emulator = os.environ.get('INTROSPECTION_LAUNCHER')
-+        if emulator:
-+            args.extend(emulator.split())
++        # Prepend the launcher command and arguments, if defined
++        launcher = os.environ.get('GI_LAUNCHER')
++        if launcher:
++            args.extend(launcher.split())
 +
          args.extend(self._binary.args)
          args.append('--introspect-dump=%s,%s' % (in_path, out_path))

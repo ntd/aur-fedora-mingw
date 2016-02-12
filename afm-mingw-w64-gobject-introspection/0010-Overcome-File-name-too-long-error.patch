@@ -1,4 +1,4 @@
-From 16eade2d79fd4cbb371650793c32a70b0e563487 Mon Sep 17 00:00:00 2001
+From 01282c19c8dee9d2cacd901cbb282e1fed446058 Mon Sep 17 00:00:00 2001
 From: Nicola Fontana <ntd@entidi.it>
 Date: Thu, 11 Feb 2016 13:11:35 +0100
 Subject: [PATCH 10/11] Overcome "File name too long" error
