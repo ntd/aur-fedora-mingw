@@ -27,8 +27,10 @@ pkgs=(
 
 	# Cross-building tools
 	mingw-w64-gcc
-	mingw-w64-tools
 	afm-mingw-w64-makedepends
+	mingw-w64-tools				# Required by cairo and harfbuzz
+	nasm					# Required by libjpeg-turbo
+	xorg-util-macros			# Required by libepoxy
 
 	# GTK+2/3 toolchain
 	fedora-mingw-w64-zlib
@@ -41,6 +43,7 @@ pkgs=(
 	fedora-mingw-w64-libpng
 	fedora-mingw-w64-libjpeg-turbo
 	fedora-mingw-w64-libffi
+	fedora-mingw-w64-pcre			# Required by glib >= 2.47.5
 	fedora-mingw-w64-glib2
 
 	# Let us compile introspection early in order
@@ -57,9 +60,11 @@ pkgs=(
 	fedora-mingw-w64-harfbuzz
 	fedora-mingw-w64-pango
 	fedora-mingw-w64-gtk2
+	fedora-mingw-w64-libepoxy		# Required by gtk3 >= 3.16.0
+	fedora-mingw-w64-adwaita-icon-theme	# Required by gtk3 >= 3.16.0
 	fedora-mingw-w64-gtk3
 
-	# Cross-compilation of Windows installers
+	# Cross-compilation of Windows installer
 	fedora-mingw-w64-nsis
 
 	# LGI (dynamic Lua bindings) support
@@ -78,7 +83,7 @@ for pkg in ${pkgs[@]}; do
 	found "$pkg" "$@" && continue
 	if [ ! -d "$pkg" ]; then
 	    # No package directory found: try to build from AUR
-	    if ! yaourt -Sa --noconfirm "$pkg"; then exit 1; fi
+	    if ! yaourt -Sa --needed --noconfirm "$pkg"; then exit 1; fi
 	elif [ -z "$(find "$pkg" -maxdepth 1 -name '*.pkg.tar.xz')" ]; then
 	    # The directory exists and does not contain any .pkg.tar.xz
 	    # file: build the package with makepkg
