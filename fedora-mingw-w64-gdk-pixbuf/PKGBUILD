@@ -9,7 +9,7 @@
 
 _realname=gdk-pixbuf
 pkgname="fedora-mingw-w64-${_realname}"
-pkgver=2.32.0
+pkgver=2.32.1
 pkgrel=1
 pkgdesc='An image loading library (mingw-w64)'
 arch=(any)
@@ -24,8 +24,8 @@ conflicts=(mingw-w64-gdk-pixbuf2)
 options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
         "gdk-pixbuf.loaders")
-md5sums=('a5f641caae4ab89d1092dfd150e93239'
-         'ff9e0cc33a8f5b1889b624ab2bae3337')
+md5sums=('b1590189a2e89fab9f871959c168508c'
+         '40e6d1296228da59ad16d507c6c6148a')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -39,6 +39,7 @@ build() {
     mkdir -p "$builddir"
     cd "$builddir"
     source $arch-configure "$tardir" \
+      --enable-relocations \
       --with-included-loaders=png \
       --without-libjasper \
       --disable-silent-rules \
