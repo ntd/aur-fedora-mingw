@@ -5,8 +5,8 @@
 
 _realname=pango
 pkgname="fedora-mingw-w64-${_realname}"
-pkgver=1.36.8
-pkgrel=6
+pkgver=1.37.3
+pkgrel=1
 pkgdesc='A library for layout and rendering of text (mingw-w64)'
 arch=(any)
 url='http://www.pango.org/'
@@ -17,18 +17,16 @@ depends=(mingw-w64-crt fedora-mingw-w64-cairo fedora-mingw-w64-expat
          fedora-mingw-w64-gettext fedora-mingw-w64-glib2
          fedora-mingw-w64-win-iconv mingw-w64-libpng
          fedora-mingw-w64-pixman fedora-mingw-w64-harfbuzz)
-makedepends=(afm-mingw-w64-makedepends afm-mingw-w64-gobject-introspection gtk-doc wine)
+makedepends=(afm-mingw-w64-makedepends mingw-w64-gobject-introspection gtk-doc wine)
 provides=("mingw-w64-${_realname}=$pkgver")
 conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-pango.git/plain/pango-enable-delay-load-of-freetype-and-fontconfig.patch?h=f18"
-        "0002-msvc-is-impotent-but-not.mingw.patch"
-        "pango.modules")
-md5sums=('217a9a753006275215fa9fa127760ece'
+        "0002-msvc-is-impotent-but-not.mingw.patch")
+md5sums=('00bde272fbb89f230b04333381e85c20'
          '757da453d21be895d4fbc31ffd45fb25'
-         'd1bee1980c28ea7be068f030a8c6759e'
-         '967c8dec6087eac30dda63bac3bf58a0')
+         'd1bee1980c28ea7be068f030a8c6759e')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -60,8 +58,7 @@ build() {
       --enable-static \
       --enable-shared \
       --disable-silent-rules \
-      --enable-introspection \
-      --with-included-modules=basic-win32
+      --enable-introspection
     make
   done
 }
@@ -75,17 +72,6 @@ package() {
 
     cd "$srcdir/${_realname}-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
-
-    # Native pango uses a %post script to generate this, but the
-    # pango-querymodules.exe binary is not something we can easily run on
-    # a Linux host. We could use wine but wine isn't happy in a mock
-    # environment. So we just include a pre-generated copy on basis that
-    # it won't ever change much.
-    #
-    # If you want to rebuild this, do a "wine pango-querymodules.exe > pango.modules"
-    # and adjust paths accordingly.
-    mkdir -p "$prefix/etc"
-    cp -f "$srcdir/pango.modules" "$prefix/etc/"
 
     find "$prefix" -regex '.*\.\(bat\|def\|exe\|exp\)' -exec rm -f {} +
     find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
