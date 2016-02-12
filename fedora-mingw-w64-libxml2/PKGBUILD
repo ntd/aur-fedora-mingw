@@ -6,7 +6,7 @@
 _realname=libxml2
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=2.9.3
-pkgrel=1
+pkgrel=2
 pkgdesc='XML parsing library, version 2 (mingw-w64)'
 arch=(any)
 url='http://www.xmlsoft.org/'
@@ -26,10 +26,6 @@ _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 prepare() {
   cd "$srcdir/${_realname}-$pkgver"
-
-  # Avoid corrupting the xml catalogs
-  # https://bugzilla.redhat.com/show_bug.cgi?id=1153753
-  patch -Np1 < '../libxml2-2.9.2-catalog-revert.patch?id=47ad62add5888cb5be7b2781b0197d4201b151a0'
 
   # MinGW-specific patches
   patch -Np0 < '../mingw32-libxml2-static-build-compile-fix.patch?id=b2ef773d9a92f507605e3fa6bb52c91a0119d16c'
