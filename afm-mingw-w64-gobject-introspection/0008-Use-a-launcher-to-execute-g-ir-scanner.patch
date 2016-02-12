@@ -1,7 +1,7 @@
-From 9caf8c430937a3308cffc8ff56766dc3c2512129 Mon Sep 17 00:00:00 2001
+From ab8a0c788a51e39eaa49515cb469853aefe994bb Mon Sep 17 00:00:00 2001
 From: Nicola Fontana <ntd@entidi.it>
 Date: Mon, 23 Mar 2015 22:04:32 +0100
-Subject: [PATCH 10/10] Use a launcher to execute g-ir-scanner
+Subject: [PATCH 08/11] Use a launcher to execute g-ir-scanner
 
 In cross-compilation the build system is unable to execute the compiled
 binary. Give the possibility to use  a launcher, e.g. wine for MinGW or
@@ -12,7 +12,7 @@ qemu for different CPU type.
  2 files changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/common.mk b/common.mk
-index 06d22d4..e54f285 100644
+index 59753ee..795eae0 100644
 --- a/common.mk
 +++ b/common.mk
 @@ -4,7 +4,11 @@
@@ -28,7 +28,7 @@ index 06d22d4..e54f285 100644
  
  INTROSPECTION_SCANNER = \
      env PATH=".libs:$(PATH)" \
-@@ -25,6 +29,7 @@ INTROSPECTION_SCANNER_ARGS = \
+@@ -26,6 +30,7 @@ INTROSPECTION_SCANNER_ARGS = \
  
  INTROSPECTION_COMPILER = \
      env PATH=".libs:$(PATH)" \
@@ -37,10 +37,10 @@ index 06d22d4..e54f285 100644
  
  INTROSPECTION_COMPILER_ARGS = \
 diff --git a/giscanner/gdumpparser.py b/giscanner/gdumpparser.py
-index e1fc935..1ea5981 100644
+index 9bdc2bc..d770148 100644
 --- a/giscanner/gdumpparser.py
 +++ b/giscanner/gdumpparser.py
-@@ -158,6 +158,12 @@ blob containing data gleaned from GObject's primitive introspection."""
+@@ -162,6 +162,12 @@ blob containing data gleaned from GObject's primitive introspection."""
          out_path = os.path.join(self._binary.tmpdir, 'dump.xml')
  
          args = []
@@ -54,5 +54,5 @@ index e1fc935..1ea5981 100644
          args.append('--introspect-dump=%s,%s' % (in_path, out_path))
  
 -- 
-2.3.3
+2.7.0
 

@@ -1,0 +1,48 @@
+From 16eade2d79fd4cbb371650793c32a70b0e563487 Mon Sep 17 00:00:00 2001
+From: Nicola Fontana <ntd@entidi.it>
+Date: Thu, 11 Feb 2016 13:11:35 +0100
+Subject: [PATCH 10/11] Overcome "File name too long" error
+
+During cross-compilation I got the following error while building GLib-2.0.gir:
+
+libtool: link: i686-w64-mingw32-gcc ...
+Traceback (most recent call last):
+  File "./g-ir-scanner", line 66, in <module>
+    sys.exit(scanner_main(sys.argv))
+  File "/home/nicola/workdir/aur-fedora-mingw/aur/afm-mingw-w64-gobject-introspection/src/gobject-introspection/giscanner/scannermain.py", line 544, in scanner_main
+    shlibs = create_binary(transformer, options, args)
+  File "/home/nicola/workdir/aur-fedora-mingw/aur/afm-mingw-w64-gobject-introspection/src/gobject-introspection/giscanner/scannermain.py", line 421, in create_binary
+    shlibs = resolve_shlibs(options, binary, options.libraries)
+  File "/home/nicola/workdir/aur-fedora-mingw/aur/afm-mingw-w64-gobject-introspection/src/gobject-introspection/giscanner/shlibs.py", line 146, in resolve_shlibs
+    _resolve_non_libtool(options, binary, non_libtool))
+  File "/home/nicola/workdir/aur-fedora-mingw/aur/afm-mingw-w64-gobject-introspection/src/gobject-introspection/giscanner/shlibs.py", line 99, in _resolve_non_libtool
+    shlibs = cc.resolve_windows_libs(libraries, options)
+  File "/home/nicola/workdir/aur-fedora-mingw/aur/afm-mingw-w64-gobject-introspection/src/gobject-introspection/giscanner/ccompiler.py", line 284, in resolve_windows_libs
+    stdout=subprocess.PIPE)
+  File "/usr/lib/python2.7/subprocess.py", line 710, in __init__
+    errread, errwrite)
+  File "/usr/lib/python2.7/subprocess.py", line 1335, in _execute_child
+    raise child_exception
+OSError: [Errno 36] File name too long
+---
+ giscanner/ccompiler.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/giscanner/ccompiler.py b/giscanner/ccompiler.py
+index 726cfec..e4bd207 100644
+--- a/giscanner/ccompiler.py
++++ b/giscanner/ccompiler.py
+@@ -280,8 +280,8 @@ class CCompiler(object):
+                 args.extend(libtool)
+                 args.append('--mode=execute')
+             args.extend([os.environ.get('DLLTOOL', 'dlltool.exe'), '--identify'])
+-            proc = subprocess.Popen([self.compiler_cmd, '-print-search-dirs'],
+-                                    stdout=subprocess.PIPE)
++            proc = subprocess.Popen(self.compiler_cmd + ' -print-search-dirs',
++                                    stdout=subprocess.PIPE, shell=True)
+             o, e = proc.communicate()
+             for line in o.decode('ascii').splitlines():
+                 if line.startswith('libraries: '):
+-- 
+2.7.0
+

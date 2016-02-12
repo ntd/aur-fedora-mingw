@@ -1,0 +1,38 @@
+From bed3aad79b362b27817e5f31ebce23d9f9ce9232 Mon Sep 17 00:00:00 2001
+From: Nicola Fontana <ntd@entidi.it>
+Date: Mon, 23 Mar 2015 19:15:11 +0100
+Subject: [PATCH 06/11] Remove leading $SHELL in libtool call
+
+The function looking for libtool already prepend a shell if needed
+(there is an explicit comment there on this topic).
+
+Passing the shell twice results in an error; I think the first one tries
+to parse the second one as a script:
+
+>>> import subprocess
+>>> subprocess.Popen(['/bin/sh', '/bin/sh'])
+/bin/sh: /bin/sh: cannot execute binary file
+
+Why this never popped up before? My guess is on Windows subprocess.Popen
+or "sh.exe" work differently so this issue is only relevant when
+cross-compiling for Windows from a UNIX OS... in other words it never
+happened before.
+---
+ giscanner/ccompiler.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/giscanner/ccompiler.py b/giscanner/ccompiler.py
+index 83fc789..7c80bea 100644
+--- a/giscanner/ccompiler.py
++++ b/giscanner/ccompiler.py
+@@ -277,7 +277,6 @@ class CCompiler(object):
+         else:
+             libtool = utils.get_libtool_command(options)
+             if libtool:
+-                args.append(utils.which(os.environ.get('SHELL', 'sh.exe')))
+                 args.extend(libtool)
+                 args.append('--mode=execute')
+             args.extend([os.environ.get('DLLTOOL', 'dlltool.exe'), '--identify'])
+-- 
+2.7.0
+

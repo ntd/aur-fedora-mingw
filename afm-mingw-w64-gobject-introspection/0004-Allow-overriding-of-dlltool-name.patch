@@ -1,0 +1,44 @@
+From 724678eb21500272e36f14bac95267f02b4276f0 Mon Sep 17 00:00:00 2001
+From: Nicola Fontana <ntd@entidi.it>
+Date: Mon, 23 Mar 2015 15:57:14 +0100
+Subject: [PATCH 04/11] Allow overriding of dlltool name
+
+That program could have a prefix, e.g. i686-w64-mingw32-dlltool while
+cross-compiling with MinGW. Allow to override it with the DLLTOOL
+environment variable, leaving "dlltool" as a fallback when not defined
+so backward compatibility is ensured.
+---
+ Makefile.introspection | 2 +-
+ giscanner/ccompiler.py | 3 +--
+ 2 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile.introspection b/Makefile.introspection
+index 1812df9..57bec20 100644
+--- a/Makefile.introspection
++++ b/Makefile.introspection
+@@ -84,7 +84,7 @@ _gir_silent_compiler = $(_gir_silent_compiler_$(V))
+ _gir_silent_compiler_ = $(_gir_silent_compiler_$(_gir_verbosity))
+ _gir_silent_compiler_0 = @echo "  GICOMP   $(1)";
+ 
+-_gir_default_scanner_env = CPPFLAGS="$(CPPFLAGS)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" CC="$(CC)" PKG_CONFIG="$(PKG_CONFIG)"
++_gir_default_scanner_env = CPPFLAGS="$(CPPFLAGS)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" CC="$(CC)" PKG_CONFIG="$(PKG_CONFIG)" DLLTOOL="$(DLLTOOL)"
+ 
+ #
+ # Creates a GIR by scanning C headers/sources
+diff --git a/giscanner/ccompiler.py b/giscanner/ccompiler.py
+index 9b27f0e..83fc789 100644
+--- a/giscanner/ccompiler.py
++++ b/giscanner/ccompiler.py
+@@ -280,8 +280,7 @@ class CCompiler(object):
+                 args.append(utils.which(os.environ.get('SHELL', 'sh.exe')))
+                 args.extend(libtool)
+                 args.append('--mode=execute')
+-            # FIXME: it could have prefix (i686-w64-mingw32-dlltool.exe)
+-            args.extend(['dlltool.exe', '--identify'])
++            args.extend([os.environ.get('DLLTOOL', 'dlltool.exe'), '--identify'])
+             proc = subprocess.Popen([self.compiler_cmd, '-print-search-dirs'],
+                                     stdout=subprocess.PIPE)
+             o, e = proc.communicate()
+-- 
+2.7.0
+

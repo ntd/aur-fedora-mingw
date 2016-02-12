@@ -1,71 +1,77 @@
 # Maintainer: Nicola Fontana <ntd@entidi.it>
 
 _realname=gobject-introspection
-pkgname="afm-mingw-w64-${_realname}"
-pkgver=1.43.3
-pkgrel=8
+pkgname="afm-mingw-w64-${_realname}-git"
+pkgver=$(pkgver)
+pkgrel=1
 pkgdesc='Introspection system for GObject-based libraries (mingw-w64)'
 arch=(any)
 url='https://live.gnome.org/GObjectIntrospection'
 license=(LGPL GPL)
 groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-glib2 python2)
-makedepends=(afm-mingw-w64-makedepends wine)
-provides=("mingw-w64-${_realname}=$pkgver")
+makedepends=(git afm-mingw-w64-makedepends wine)
+provides=("mingw-w64-${_realname}")
 conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
-source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
-        "0001-Use-pkg-config-to-get-python2-flags.patch"
-        "0002-Pass-to-python-the-proper-path-separator.patch"
-        "0003-Use-PKG_CONFIG-instead-of-pkg-config.patch"
-        "0004-Directly-use-file-descriptor-on-MinGW-platform.patch"
-        "0005-Avoid-hard-coded-programs-in-scanner.patch"
-        "0006-Do-not-hardcode-.exe-extension-for-nt.patch"
-        "0007-Allow-overriding-of-os.name.patch"
-        "0008-Remove-leading-SHELL-in-libtool-call.patch"
-        "0009-Assume-gcc-use-the-same-path-separator-as-python.patch"
-        "0010-Use-a-launcher-to-execute-g-ir-scanner.patch"
-        "0011-Allow-to-skip-the-check-for-Python-headers.patch"
+source=("git+git://git.gnome.org/gobject-introspection"
+        "0001-Use-PKG_CONFIG-when-running-g-ir-scanner.patch"
+        "0002-Use-pkg-config-to-get-python2-flags.patch"
+        "0003-Pass-to-python-the-proper-path-separator.patch"
+        "0004-Allow-overriding-of-dlltool-name.patch"
+        "0005-Allow-overriding-of-the-host-os-name.patch"
+        "0006-Remove-leading-SHELL-in-libtool-call.patch"
+        "0007-Assume-gcc-use-the-same-path-separator-as-python.patch"
+        "0008-Use-a-launcher-to-execute-g-ir-scanner.patch"
+        "0009-Allow-to-skip-the-check-for-Python-headers.patch"
+        "0010-Overcome-File-name-too-long-error.patch"
+        "0011-Customize-CCompiler-on-MinGW-cross-compilation.patch"
         "winewrapper")
-md5sums=('d7828d25068bdef800126da21bc45fc2'
-         '79adec9b998f122e52db5821f4369610'
-         '6f1a6a3b97eb1a356af270d97affc29d'
-         '97c6c3ae8dc35c0730ff388f5f5d0797'
-         'ffd48c1939dde52ccf240d75f4319e6c'
-         'ad83086be0a7037b1ad52df0d943d38e'
-         'cbce1977de9552b49fdfbd69a5035871'
-         'a9c06d8ed389045657db35e55f25c316'
-         '013c08822387b984ce13f33dedb9c175'
-         '51ad3bd5150a5f8128e43117e4a89d26'
-         '974a5364fc5c85689e992bee6fdcc187'
-         '66375f7720185afd6388436e5e186266'
+md5sums=('SKIP'
+         'a616f8733b3fc7d786073ccbe4fc54b1'
+         '59cba33c232bac91c4526895cba0446a'
+         'abed4411076d6a13039d9d6590439357'
+         'efbe35b9168198948cc2a77761252ea6'
+         '4ef8807b57472493fc24c317fc6aea58'
+         'b6184c2b9e6c7ae2b6261b5326a9aee7'
+         '6c1fac36391131416b65fddc2a6d2d45'
+         'e7a39287edd00880da1fe49060a2a6b4'
+         '9b5488e59bb6ab18a001bfd19068ef50'
+         'b48b6178041a9cf5b5cb7186cc5c3128'
+         'ab42a43c09576b9dfdab598702343692'
          'ee07cea6a2f3b351ea5f873c8a569fd6')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
+pkgver() {
+  cd "$srcdir/${_realname}"
+
+  printf "%s" "$(git describe --long | sed 's/\([^-]*-\)g/r\1/;s/-/./g')"
+}
+
 prepare() {
-  cd "$srcdir/${_realname}-$pkgver"
+  cd "$srcdir/${_realname}"
 
-  patch -Np1 < ../0001-Use-pkg-config-to-get-python2-flags.patch
-  patch -Np1 < ../0002-Pass-to-python-the-proper-path-separator.patch
-  patch -Np1 < ../0003-Use-PKG_CONFIG-instead-of-pkg-config.patch
-  patch -Np1 < ../0004-Directly-use-file-descriptor-on-MinGW-platform.patch
-  patch -Np1 < ../0005-Avoid-hard-coded-programs-in-scanner.patch
-  patch -Np1 < ../0006-Do-not-hardcode-.exe-extension-for-nt.patch
-  patch -Np1 < ../0007-Allow-overriding-of-os.name.patch
-  patch -Np1 < ../0008-Remove-leading-SHELL-in-libtool-call.patch
-  patch -Np1 < ../0009-Assume-gcc-use-the-same-path-separator-as-python.patch
-  patch -Np1 < ../0010-Use-a-launcher-to-execute-g-ir-scanner.patch
-  patch -Np1 < ../0011-Allow-to-skip-the-check-for-Python-headers.patch
+  patch -Np1 < '../0001-Use-PKG_CONFIG-when-running-g-ir-scanner.patch'
+  #patch -Np1 < '../0002-Use-pkg-config-to-get-python2-flags.patch'
+  #patch -Np1 < '../0003-Pass-to-python-the-proper-path-separator.patch'
+  patch -Np1 < '../0004-Allow-overriding-of-dlltool-name.patch'
+  patch -Np1 < '../0005-Allow-overriding-of-the-host-os-name.patch'
+  patch -Np1 < '../0006-Remove-leading-SHELL-in-libtool-call.patch'
+  patch -Np1 < '../0007-Assume-gcc-use-the-same-path-separator-as-python.patch'
+  patch -Np1 < '../0008-Use-a-launcher-to-execute-g-ir-scanner.patch'
+  patch -F3 -Np1 < '../0009-Allow-to-skip-the-check-for-Python-headers.patch'
+  patch -Np1 < '../0010-Overcome-File-name-too-long-error.patch'
+  patch -Np1 < '../0011-Customize-CCompiler-on-MinGW-cross-compilation.patch'
 
-  autoreconf -ivf
+  NOCONFIGURE=1 ./autogen.sh
 
   # Clear environment trees created by wine
   rm -fr "$srcdir/win32" "$srcdir/win64"
 }
 
 build() {
-  local tardir="$srcdir/${_realname}-$pkgver"
+  local tardir="$srcdir/${_realname}"
   local builddir
   local arch
   local bits
@@ -90,6 +96,7 @@ build() {
     # The $arch-configure script comes from afm-mingw-w64-makedepends.
     (
       source $arch-configure "$tardir" \
+        CFLAGS=-fno-stack-protector \
         --host="$arch" \
         --disable-silent-rules \
         --enable-shared \
@@ -112,7 +119,7 @@ package() {
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
 
-    cd "$srcdir/${_realname}-$pkgver-build-$arch"
+    cd "$srcdir/${_realname}-build-$arch"
     make DESTDIR="$pkgdir" install
 
     # Wrappers for running g-ir-compiler and g-ir-generate with wine

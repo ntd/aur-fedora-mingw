@@ -1,0 +1,83 @@
+From 5e20bd9dd20df07f8b1338e1ef3b8af705897e40 Mon Sep 17 00:00:00 2001
+From: Nicola Fontana <ntd@entidi.it>
+Date: Fri, 12 Feb 2016 11:04:11 +0100
+Subject: [PATCH 05/11] Allow overriding of the host os name
+
+os.name can be wrong in some context, e.g. when g-ir-scanner is called
+during the cross-compilation of gobject-introspection.
+
+Added the GI_HOST_OS environment variable to eventually specify the host
+OS explicitely.
+---
+ Makefile.introspection | 2 +-
+ giscanner/dumper.py    | 2 +-
+ giscanner/shlibs.py    | 4 ++--
+ giscanner/utils.py     | 4 ++++
+ 4 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile.introspection b/Makefile.introspection
+index 57bec20..32d77af 100644
+--- a/Makefile.introspection
++++ b/Makefile.introspection
+@@ -84,7 +84,7 @@ _gir_silent_compiler = $(_gir_silent_compiler_$(V))
+ _gir_silent_compiler_ = $(_gir_silent_compiler_$(_gir_verbosity))
+ _gir_silent_compiler_0 = @echo "  GICOMP   $(1)";
+ 
+-_gir_default_scanner_env = CPPFLAGS="$(CPPFLAGS)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" CC="$(CC)" PKG_CONFIG="$(PKG_CONFIG)" DLLTOOL="$(DLLTOOL)"
++_gir_default_scanner_env = CPPFLAGS="$(CPPFLAGS)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" CC="$(CC)" PKG_CONFIG="$(PKG_CONFIG)" GI_HOST_OS="$(GI_HOST_OS)" DLLTOOL="$(DLLTOOL)"
+ 
+ #
+ # Creates a GIR by scanning C headers/sources
+diff --git a/giscanner/dumper.py b/giscanner/dumper.py
+index 3f72159..876b632 100644
+--- a/giscanner/dumper.py
++++ b/giscanner/dumper.py
+@@ -222,7 +222,7 @@ class DumpCompiler(object):
+             args.extend(self._linker_cmd)
+ 
+             args.extend(['-o', output])
+-            if os.name == 'nt':
++            if utils.host_os() == 'nt':
+                 args.append('-Wl,--export-all-symbols')
+             else:
+                 args.append('-export-dynamic')
+diff --git a/giscanner/shlibs.py b/giscanner/shlibs.py
+index c93d20c..16cbf2d 100644
+--- a/giscanner/shlibs.py
++++ b/giscanner/shlibs.py
+@@ -29,7 +29,7 @@ import platform
+ import re
+ import subprocess
+ 
+-from .utils import get_libtool_command, extract_libtool_shlib
++from .utils import get_libtool_command, extract_libtool_shlib, host_os
+ from .ccompiler import CCompiler
+ 
+ 
+@@ -94,7 +94,7 @@ def _resolve_non_libtool(options, binary, libraries):
+         else:
+             binary.args[0] = old_argdir
+ 
+-    if os.name == 'nt':
++    if host_os() == 'nt':
+         cc = CCompiler()
+         shlibs = cc.resolve_windows_libs(libraries, options)
+ 
+diff --git a/giscanner/utils.py b/giscanner/utils.py
+index aff5393..9a026a3 100644
+--- a/giscanner/utils.py
++++ b/giscanner/utils.py
+@@ -184,6 +184,10 @@ def cflag_real_include_path(cflag):
+     return "-I" + os.path.realpath(cflag[2:])
+ 
+ 
++def host_os():
++    return os.environ.get("GI_HOST_OS", os.name)
++
++
+ def which(program):
+     def is_exe(fpath):
+         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+-- 
+2.7.0
+

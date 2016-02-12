@@ -1,7 +1,7 @@
-From d9d0d04632d1196ccbd87f670b1f6fc6d48fd6bf Mon Sep 17 00:00:00 2001
+From d2a47bd48478ac59bfeea4ce6641f2baedcef082 Mon Sep 17 00:00:00 2001
 From: Nicola Fontana <ntd@entidi.it>
 Date: Tue, 24 Mar 2015 19:23:38 +0100
-Subject: [PATCH] Allow to skip the check for Python headers
+Subject: [PATCH 09/11] Allow to skip the check for Python headers
 
 When building without _giscanner.la (e.g., during the second step of a
 MinGW cross compilation) there is no need to build the Python module,
@@ -12,10 +12,10 @@ require the installation of the whole python2 toolchain on the host).
  1 file changed, 7 insertions(+), 4 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 12974d1..c4a0a04 100644
+index aeea00d..66050fe 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -259,10 +259,13 @@ case "$host" in
+@@ -272,10 +272,13 @@ case "$host" in
  	pyexecdir=`echo $pyexecdir | tr '\\\\' '/'`
  	;;
  esac
@@ -34,5 +34,5 @@ index 12974d1..c4a0a04 100644
  PYTHONPATHSEP=$($PYTHON -c 'import sys, os; sys.stdout.write(os.pathsep)')
  AC_SUBST(PYTHONPATHSEP)
 -- 
-2.3.3
+2.7.0
 

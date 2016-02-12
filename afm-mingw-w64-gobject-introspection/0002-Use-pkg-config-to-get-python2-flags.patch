@@ -1,7 +1,7 @@
-From 02456ec8202a09a21ebd1b46e24f6171b7ce85df Mon Sep 17 00:00:00 2001
+From 93678f715c4b809d3856957b53d3452be298de3a Mon Sep 17 00:00:00 2001
 From: Nicola Fontana <ntd@entidi.it>
 Date: Sat, 14 Mar 2015 23:28:35 +0100
-Subject: [PATCH 01/10] Use pkg-config to get python2 flags
+Subject: [PATCH 02/11] Use pkg-config to get python2 flags
 
 The old way of using python2-config is cross-unfriendly because runs a
 python program that returns paths suitable for the host platform, not
@@ -33,5 +33,5 @@ index ed5559d..6b4bd08 100644
  AC_SUBST(PYTHON_LIBS)
  dnl check if libpython exist:
 -- 
-2.3.3
+2.7.0
 
