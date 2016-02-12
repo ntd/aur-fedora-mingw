@@ -5,8 +5,8 @@
 
 _realname=gtk+
 pkgname="fedora-mingw-w64-gtk3"
-pkgver=3.14.10
-pkgrel=4
+pkgver=3.16.0
+pkgrel=1
 pkgdesc='GTK+3 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -15,37 +15,18 @@ groups=(fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-atk fedora-mingw-w64-cairo
          fedora-mingw-w64-gdk-pixbuf fedora-mingw-w64-gettext
          fedora-mingw-w64-glib2 fedora-mingw-w64-win-iconv
-         fedora-mingw-w64-pango fedora-mingw-w64-pixman mingw-w64-zlib)
-makedepends=(afm-mingw-w64-makedepends afm-mingw-w64-gobject-introspection wine)
+         fedora-mingw-w64-pango fedora-mingw-w64-pixman mingw-w64-zlib
+         fedora-mingw-w64-libepoxy fedora-mingw-w64-adwaita-icon-theme)
+makedepends=(afm-mingw-w64-makedepends mingw-w64-gobject-introspection wine)
 provides=(mingw-w64-gtk3=$pkgver)
 conflicts=(mingw-w64-gtk3)
 options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
-        "0001-Fix-cross-compilation.patch"
-        "0001-Remove-crash-while-cross-compiling-in-VPATH-mode.patch"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk.immodules?id=3028da05cb7e088b4477a5b30262c7c4ca1e7937")
-md5sums=('5e28574da0c73df8c4417ce351a5051c'
-         '926405b31c6f86ed6775c9d1ccce803e'
-         '95905ce584012180da0b60335fc678bb'
+md5sums=('11c97ce2527956e0ddb5ad5b236e4572'
          'df8ad196a274f9e0d91bfb0078a0f9bd')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
-
-prepare() {
-  cd "$srcdir/${_realname}-$pkgver"
-
-  # Cross-compilation is broken as of gtk+ 3.13.2
-  # Apply a work-in-progress patch to fix compilation
-  # https://bugzilla.gnome.org/show_bug.cgi?id=731013
-  patch -Np1 < ../0001-Fix-cross-compilation.patch
-
-  patch -Np1 < ../0001-Remove-crash-while-cross-compiling-in-VPATH-mode.patch
-
-  autoreconf -ivf
-
-  # Clear environment trees created by wine
-  rm -fr "$srcdir/win32" "$srcdir/win64"
-}
 
 build() {
   local tardir="$srcdir/${_realname}-$pkgver"
