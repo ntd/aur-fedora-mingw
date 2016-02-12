@@ -19,7 +19,7 @@ provides=("mingw-w64-${_realname}=$pkgver")
 conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
 source=("http://www.freedesktop.org/software/${_realname}/release/${_realname}-$pkgver.tar.bz2")
-md5sums=('e74f644045fe42c38a2641fc1e82a800')
+md5sums=('bf459ed21c68d97fbb3313cbdee53268')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
