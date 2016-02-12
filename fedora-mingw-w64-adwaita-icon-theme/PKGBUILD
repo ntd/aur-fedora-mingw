@@ -1,0 +1,48 @@
+# Maintainer: Nicola Fontana <ntd@entidi.it>
+#
+# Port of the Fedora package found at
+# http://pkgs.fedoraproject.org/cgit/mingw-adwaita-icon-theme.git/
+
+_realname=adwaita-icon-theme
+pkgname="fedora-mingw-w64-${_realname}"
+pkgver=3.14.1
+pkgrel=1
+pkgdesc='Adwaita icon theme'
+arch=(any)
+url='http://www.gnome.org'
+license=(GPL)
+groups=(fedora-mingw)
+depends=
+makedepends=(afm-mingw-w64-makedepends intltool)
+provides=("mingw-w64-${_realname}=$pkgver")
+conflicts=("mingw-w64-${_realname}")
+options=(!strip staticlibs !buildflags)
+source=("https://download.gnome.org/sources/${_realname}/${pkgver:0:4}/${_realname}-$pkgver.tar.xz")
+md5sums=('d03913d2d1624a6749a5c032082368fb')
+
+_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
+
+build() {
+  local tardir="$srcdir/${_realname}-$pkgver"
+  local builddir
+
+  # There are no differences between architectures,
+  # so build the package just once
+  builddir="$tardir-build"
+  mkdir -p "$builddir"
+  cd "$builddir"
+  "$tardir/configure"
+  make
+}
+
+package() {
+  local arch
+
+  cd "$srcdir/${_realname-$arche}-$pkgver-build"
+
+  for arch in ${_architectures[@]}; do
+    make DESTDIR="$pkgdir/usr/$arch" install
+  done
+}
+
+# vim:set ts=2 sw=2 et:
