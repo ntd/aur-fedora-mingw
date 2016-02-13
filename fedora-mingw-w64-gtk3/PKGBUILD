@@ -6,12 +6,12 @@
 _realname=gtk+
 pkgname="fedora-mingw-w64-gtk3"
 pkgver=3.18.6
-pkgrel=1
+pkgrel=2
 pkgdesc='GTK+3 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
 license=(LGPL)
-groups=(fedora-mingw)
+groups=(aur-fedora-mingw fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-atk fedora-mingw-w64-cairo
          fedora-mingw-w64-gdk-pixbuf fedora-mingw-w64-gettext
          fedora-mingw-w64-glib2 fedora-mingw-w64-win-iconv
