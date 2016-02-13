@@ -7,11 +7,12 @@
 _realname=lua
 pkgname="afm-mingw-w64-${_realname}"
 pkgver=5.2.4
-pkgrel=7
+pkgrel=8
 pkgdesc='Powerful light-weight programming language designed for extending applications (mingw-w64)'
 arch=(any)
 url='http://www.lua.org/'
 license=(MIT)
+groups=(aur-fedora-mingw)
 depends=(mingw-w64-crt)
 makedepends=(mingw-w64-gcc)
 provides=("mingw-w64-lua=$pkgver")
