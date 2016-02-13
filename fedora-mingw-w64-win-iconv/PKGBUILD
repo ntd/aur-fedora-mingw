@@ -6,12 +6,12 @@
 _realname=win-iconv
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=0.0.6
-pkgrel=7
+pkgrel=8
 pkgdesc='Iconv implementation using Win32 API (mingw-w64)'
 arch=(any)
 url='http://code.google.com/p/win-iconv/'
 license=(BSD)
-groups=(fedora-mingw)
+groups=(aur-fedora-mingw fedora-mingw)
 depends=(mingw-w64-crt)
 makedepends=(afm-mingw-w64-makedepends cmake)
 provides=("mingw-w64-${_realname}=$pkgver")
