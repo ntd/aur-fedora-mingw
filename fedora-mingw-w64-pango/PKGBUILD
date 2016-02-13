@@ -6,12 +6,12 @@
 _realname=pango
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=1.38.1
-pkgrel=1
+pkgrel=2
 pkgdesc='A library for layout and rendering of text (mingw-w64)'
 arch=(any)
 url='http://www.pango.org/'
 license=(LGPL)
-groups=(fedora-mingw)
+groups=(aur-fedora-mingw fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-cairo fedora-mingw-w64-expat
          fedora-mingw-w64-fontconfig fedora-mingw-w64-freetype
          fedora-mingw-w64-gettext fedora-mingw-w64-glib2
