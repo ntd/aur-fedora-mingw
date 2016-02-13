@@ -6,12 +6,12 @@
 _realname=gettext
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=0.19.4
-pkgrel=6
+pkgrel=7
 pkgdesc='GNU internationalization library (mingw-w64)'
 arch=(any)
 url='http://www.gnu.org/software/gettext/'
 license=(GPL)
-groups=(fedora-mingw)
+groups=(aur-fedora-mingw fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-win-iconv fedora-mingw-w64-termcap)
 makedepends=(afm-mingw-w64-makedepends)
 provides=("mingw-w64-${_realname}=$pkgver")
