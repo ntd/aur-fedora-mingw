@@ -6,12 +6,12 @@
 _realname=icu
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=50.1.2
-pkgrel=13
+pkgrel=14
 pkgdesc='International Components for Unicode library (mingw-w64)'
 arch=(any)
 url='http://www.icu-project.org/'
 license=(custom:icu)
-groups=(fedora-mingw)
+groups=(aur-fedora-mingw fedora-mingw)
 depends=(mingw-w64-crt mingw-w64-fontconfig mingw-w64-freetype
          mingw-w64-libxml2 mingw-w64-pixman mingw-w64-libpng
          mingw-w64-win-iconv mingw-w64-zlib mingw-w64-glib2)
