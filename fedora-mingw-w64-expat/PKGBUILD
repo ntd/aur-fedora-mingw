@@ -6,12 +6,12 @@
 _realname=expat
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=2.1.0
-pkgrel=14
+pkgrel=15
 pkgdesc='An XML parser library (mingw-w64)'
 arch=(any)
 url='http://expat.sourceforge.net/'
 license=(custom)
-groups=(fedora-mingw)
+groups=(aur-fedora-mingw fedora-mingw)
 depends=(mingw-w64-crt)
 makedepends=(mingw-w64-gcc)
 makedepends=(afm-mingw-w64-makedepends)
