@@ -6,12 +6,12 @@
 _realname=pixman
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=0.33.2
-pkgrel=1
+pkgrel=2
 pkgdesc='The pixel-manipulation library for X and cairo (mingw-w64)'
 arch=(any)
 url='http://pixman.org/'
 license=(LGPL MPL custom)
-groups=(fedora-mingw)
+groups=(aur-fedora-mingw fedora-mingw)
 depends=(mingw-w64-crt)
 makedepends=(afm-mingw-w64-makedepends)
 provides=("mingw-w64-${_realname}=$pkgver")
