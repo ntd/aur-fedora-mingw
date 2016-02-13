@@ -1,9 +1,9 @@
-From 0054cb4aaec3d6674cf6ff7bfdfd8dd2eb7472a2 Mon Sep 17 00:00:00 2001
+From 31616ab809fcdd147e516c8b634324fa023f2c5b Mon Sep 17 00:00:00 2001
 From: Nicola Fontana <ntd@entidi.it>
 Date: Mon, 23 Mar 2015 19:15:11 +0100
-Subject: [PATCH 4/9] Remove leading $SHELL in libtool call
+Subject: [PATCH 1/6] Remove leading $SHELL in libtool call
 
-Avoid crashes due to double shell in subprocess.Popen(), e.g.:
+Avoid crashes due to double shell in subprocess.Popen() on linux, e.g.:
 
 >>> import subprocess
 >>> subprocess.Popen(['/bin/sh', '/bin/sh'])
@@ -11,18 +11,20 @@ Avoid crashes due to double shell in subprocess.Popen(), e.g.:
 
 https://bugzilla.gnome.org/show_bug.cgi?id=761982
 ---
- giscanner/ccompiler.py | 1 -
- 1 file changed, 1 deletion(-)
+ giscanner/ccompiler.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/giscanner/ccompiler.py b/giscanner/ccompiler.py
-index 83fc789..7c80bea 100644
+index 83fc789..6ddbdfe 100644
 --- a/giscanner/ccompiler.py
 +++ b/giscanner/ccompiler.py
-@@ -277,7 +277,6 @@ class CCompiler(object):
+@@ -277,7 +277,8 @@ class CCompiler(object):
          else:
              libtool = utils.get_libtool_command(options)
              if libtool:
 -                args.append(utils.which(os.environ.get('SHELL', 'sh.exe')))
++                if os.name == 'nt':
++                    args.append(utils.which(os.environ.get('SHELL', 'sh.exe')))
                  args.extend(libtool)
                  args.append('--mode=execute')
              args.extend([os.environ.get('DLLTOOL', 'dlltool.exe'), '--identify'])

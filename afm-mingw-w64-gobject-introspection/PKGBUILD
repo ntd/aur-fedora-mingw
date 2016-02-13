@@ -3,7 +3,7 @@
 _realname=gobject-introspection
 pkgname="afm-mingw-w64-${_realname}-git"
 pkgver=1.46.0.r113.cd355e8
-pkgrel=4
+pkgrel=5
 pkgdesc='Introspection system for GObject-based libraries (mingw-w64)'
 arch=(any)
 url='https://live.gnome.org/GObjectIntrospection'
@@ -18,23 +18,23 @@ source=("git+git://git.gnome.org/gobject-introspection"
         "0001-Use-PKG_CONFIG-when-running-g-ir-scanner.patch"
         "0002-Allow-overriding-of-dlltool-name.patch"
         "0003-Allow-overriding-of-the-host-os-name.patch"
-        "0004-Remove-leading-SHELL-in-libtool-call.patch"
         "0005-Assume-gcc-use-the-same-path-separator-as-python.patch"
         "0006-Use-a-launcher-for-executing-g-ir-scanner.patch"
         "0007-Allow-to-skip-the-check-for-Python-headers.patch"
         "0008-Overcome-File-name-too-long-error.patch"
         "0009-Customize-CCompiler-on-MinGW-cross-compilation.patch"
+        "0001-Remove-leading-SHELL-in-libtool-call.patch"
         "winewrapper")
 md5sums=('SKIP'
          '3484c2c13d837a15262556a29982d51d'
          'dfa5b106891a5b15655615f892b8995a'
          '3183cc3a8a14338f27830f0ebb66d408'
-         '537c75d98f3bf4352d197596a1d0b558'
          'a82fe820433cfe43972b13a02a1928c0'
          '4270a18526585ef48080241f5718ddbb'
          '1420edbbec79268a490b0f781a4dacd9'
          '9fc71145c77b0688c0c28616fbef8d7a'
          '7b4be4221fd52104bc69bee42255742c'
+         '039267df90b681240023bf1d4d775c72'
          'ee07cea6a2f3b351ea5f873c8a569fd6')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
@@ -57,9 +57,6 @@ prepare() {
   # https://bugzilla.gnome.org/show_bug.cgi?id=761985
   patch -Np1 < '../0003-Allow-overriding-of-the-host-os-name.patch'
 
-  # https://bugzilla.gnome.org/show_bug.cgi?id=761982
-  patch -Np1 < '../0004-Remove-leading-SHELL-in-libtool-call.patch'
-
   # https://bugzilla.gnome.org/show_bug.cgi?id=761981
   patch -Np1 < '../0005-Assume-gcc-use-the-same-path-separator-as-python.patch'
 
@@ -69,6 +66,9 @@ prepare() {
   patch -Np1 < '../0007-Allow-to-skip-the-check-for-Python-headers.patch'
   patch -Np1 < '../0008-Overcome-File-name-too-long-error.patch'
   patch -Np1 < '../0009-Customize-CCompiler-on-MinGW-cross-compilation.patch'
+
+  # https://bugzilla.gnome.org/show_bug.cgi?id=761982
+  patch -Np1 < '../0001-Remove-leading-SHELL-in-libtool-call.patch'
 
   NOCONFIGURE=1 ./autogen.sh
 
