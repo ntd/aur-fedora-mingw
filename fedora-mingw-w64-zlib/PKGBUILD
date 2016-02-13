@@ -6,12 +6,12 @@
 _realname=zlib
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=1.2.8
-pkgrel=11
+pkgrel=12
 pkgdesc='A compression/decompression Library (mingw-w64)'
 arch=(any)
 url='http://www.zlib.net/'
 license=(custom)
-groups=(fedora-mingw)
+groups=(aur-fedora-mingw fedora-mingw)
 depends=(mingw-w64-crt)
 makedepends=(afm-mingw-w64-makedepends)
 provides=("mingw-w64-${_realname}=$pkgver")
