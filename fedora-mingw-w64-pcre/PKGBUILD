@@ -6,12 +6,12 @@
 _realname=pcre
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=8.38
-pkgrel=1
+pkgrel=2
 pkgdesc='A library that implements Perl 5-style regular expressions'
 arch=(any)
 license=(BSD)
 url='http://www.pcre.org/'
-groups=(fedora-mingw)
+groups=(aur-fedora-mingw fedora-mingw)
 depends=(mingw-w64-crt)
 makedepends=(mingw-w64-gcc)
 provides=("mingw-w64-${_realname}=$pkgver")
