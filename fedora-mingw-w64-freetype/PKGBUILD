@@ -6,12 +6,12 @@
 _realname=freetype
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=2.6
-pkgrel=1
+pkgrel=2
 pkgdesc='TrueType font rendering library (mingw-w64)'
 arch=(any)
 url='http://freetype.sourceforge.net/'
 license=(GPL)
-groups=(fedora-mingw)
+groups=(aur-fedora-mingw fedora-mingw)
 depends=(mingw-w64-crt mingw-w64-zlib mingw-w64-bzip2)
 makedepends=(afm-mingw-w64-makedepends mingw-w64-libpng)
 provides=("mingw-w64-${_realname}=$pkgver")
