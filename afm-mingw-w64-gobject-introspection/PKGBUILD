@@ -3,12 +3,12 @@
 _realname=gobject-introspection
 pkgname="afm-mingw-w64-${_realname}-git"
 pkgver=1.46.0.r113.cd355e8
-pkgrel=2
+pkgrel=3
 pkgdesc='Introspection system for GObject-based libraries (mingw-w64)'
 arch=(any)
 url='https://live.gnome.org/GObjectIntrospection'
 license=(LGPL GPL)
-groups=(fedora-mingw)
+groups=(aur-fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-glib2 python2)
 makedepends=(git afm-mingw-w64-makedepends wine)
 provides=("mingw-w64-${_realname}")
