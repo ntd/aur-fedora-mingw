@@ -10,12 +10,12 @@
 _realname=gdk-pixbuf
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=2.32.1
-pkgrel=1
+pkgrel=2
 pkgdesc='An image loading library (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
 license=(LGPL)
-groups=(fedora-mingw)
+groups=(aur-fedora-mingw fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-glib2 fedora-mingw-w64-freetype
          mingw-w64-libjpeg mingw-w64-libpng)
 makedepends=(afm-mingw-w64-makedepends mingw-w64-gobject-introspection wine)
