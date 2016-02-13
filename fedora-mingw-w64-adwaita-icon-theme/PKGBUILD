@@ -6,13 +6,13 @@
 _realname=adwaita-icon-theme
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=3.18.0
-pkgrel=1
+pkgrel=2
 pkgdesc='Adwaita icon theme'
 arch=(any)
 url='http://www.gnome.org'
 license=(GPL)
-groups=(fedora-mingw)
-depends=
+groups=(aur-fedora-mingw fedora-mingw)
+depends=()
 makedepends=(afm-mingw-w64-makedepends intltool)
 provides=("mingw-w64-${_realname}=$pkgver")
 conflicts=("mingw-w64-${_realname}")
