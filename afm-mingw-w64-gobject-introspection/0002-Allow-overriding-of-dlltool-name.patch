@@ -1,12 +1,13 @@
-From 724678eb21500272e36f14bac95267f02b4276f0 Mon Sep 17 00:00:00 2001
+From c34741ed8e3d4725bed3d535fc0d6b5cebb295a7 Mon Sep 17 00:00:00 2001
 From: Nicola Fontana <ntd@entidi.it>
 Date: Mon, 23 Mar 2015 15:57:14 +0100
-Subject: [PATCH 04/11] Allow overriding of dlltool name
+Subject: [PATCH 2/9] Allow overriding of dlltool name
 
-That program could have a prefix, e.g. i686-w64-mingw32-dlltool while
-cross-compiling with MinGW. Allow to override it with the DLLTOOL
-environment variable, leaving "dlltool" as a fallback when not defined
-so backward compatibility is ensured.
+Allow to override it with the DLLTOOL environment variable, leaving
+"dlltool" as a fallback when not defined so backward compatibility is
+ensured.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=761984
 ---
  Makefile.introspection | 2 +-
  giscanner/ccompiler.py | 3 +--
@@ -40,5 +41,5 @@ index 9b27f0e..83fc789 100644
                                      stdout=subprocess.PIPE)
              o, e = proc.communicate()
 -- 
-2.7.0
+2.7.1
 

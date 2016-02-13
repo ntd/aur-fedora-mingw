@@ -1,7 +1,7 @@
-From 67f588acfdf736150aa06dd4869727c9b204f9d3 Mon Sep 17 00:00:00 2001
+From 3da29ba0ed225d63bbdbe31e9a280478edb80920 Mon Sep 17 00:00:00 2001
 From: Nicola Fontana <ntd@entidi.it>
 Date: Thu, 11 Feb 2016 19:10:23 +0100
-Subject: [PATCH 11/11] Customize CCompiler on MinGW cross-compilation
+Subject: [PATCH 9/9] Customize CCompiler on MinGW cross-compilation
 
 ---
  giscanner/ccompiler.py | 5 +++++
@@ -24,5 +24,5 @@ index e4bd207..c70ec09 100644
          # for 'unix' compiler type.  Also, avoid linking to msvcrxx.dll
          # for MinGW builds as the dumper binary does not link to the
 -- 
-2.7.0
+2.7.1
 

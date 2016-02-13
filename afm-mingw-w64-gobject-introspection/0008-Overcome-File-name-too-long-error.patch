@@ -1,7 +1,7 @@
-From 01282c19c8dee9d2cacd901cbb282e1fed446058 Mon Sep 17 00:00:00 2001
+From c75f426230aa835c538dc224710568fe12c4275b Mon Sep 17 00:00:00 2001
 From: Nicola Fontana <ntd@entidi.it>
 Date: Thu, 11 Feb 2016 13:11:35 +0100
-Subject: [PATCH 10/11] Overcome "File name too long" error
+Subject: [PATCH 8/9] Overcome "File name too long" error
 
 During cross-compilation I got the following error while building GLib-2.0.gir:
 
@@ -44,5 +44,5 @@ index 726cfec..e4bd207 100644
              for line in o.decode('ascii').splitlines():
                  if line.startswith('libraries: '):
 -- 
-2.7.0
+2.7.1
 

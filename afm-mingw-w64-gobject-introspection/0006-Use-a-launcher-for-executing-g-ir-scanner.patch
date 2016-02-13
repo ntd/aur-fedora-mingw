@@ -1,18 +1,20 @@
-From 8ca39485ca6d5e5048a7c693bbf4e7c9e867fa28 Mon Sep 17 00:00:00 2001
+From 83ef72b8ea0251a1fe9456d736030843c424b914 Mon Sep 17 00:00:00 2001
 From: Nicola Fontana <ntd@entidi.it>
 Date: Mon, 23 Mar 2015 22:04:32 +0100
-Subject: [PATCH 08/11] Use a launcher to execute g-ir-scanner
+Subject: [PATCH 6/9] Use a launcher for executing g-ir-scanner
 
 In cross-compilation the build system is unable to execute the compiled
 binary. Give the possibility to use  a launcher, e.g. wine for MinGW or
 qemu for different CPU type.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=696773
 ---
  common.mk                | 6 +++++-
  giscanner/gdumpparser.py | 6 ++++++
  2 files changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/common.mk b/common.mk
-index 59753ee..8187425 100644
+index e26c637..1fb3905 100644
 --- a/common.mk
 +++ b/common.mk
 @@ -4,7 +4,7 @@
@@ -55,5 +57,5 @@ index 9bdc2bc..6f1ac7a 100644
          args.append('--introspect-dump=%s,%s' % (in_path, out_path))
  
 -- 
-2.7.0
+2.7.1
 

@@ -1,13 +1,13 @@
-From 5e20bd9dd20df07f8b1338e1ef3b8af705897e40 Mon Sep 17 00:00:00 2001
+From 23146802d3e061759eb8a7feb9478bb3eac63d42 Mon Sep 17 00:00:00 2001
 From: Nicola Fontana <ntd@entidi.it>
 Date: Fri, 12 Feb 2016 11:04:11 +0100
-Subject: [PATCH 05/11] Allow overriding of the host os name
-
-os.name can be wrong in some context, e.g. when g-ir-scanner is called
-during the cross-compilation of gobject-introspection.
+Subject: [PATCH 3/9] Allow overriding of the host os name
 
 Added the GI_HOST_OS environment variable to eventually specify the host
-OS explicitely.
+OS explicitely. It fall backs to os.name to retain backward
+compatibility.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=761985
 ---
  Makefile.introspection | 2 +-
  giscanner/dumper.py    | 2 +-
@@ -79,5 +79,5 @@ index aff5393..9a026a3 100644
      def is_exe(fpath):
          return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 -- 
-2.7.0
+2.7.1
 

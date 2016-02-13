@@ -1,13 +1,12 @@
-From e32477fdde5a1ce10e96ac8bea8074edb32edd5c Mon Sep 17 00:00:00 2001
+From 6dc4c8efb164f1f5ed79f5daaa952059d851db34 Mon Sep 17 00:00:00 2001
 From: Nicola Fontana <ntd@entidi.it>
 Date: Thu, 11 Feb 2016 12:58:34 +0100
-Subject: [PATCH 01/11] Use PKG_CONFIG when running g-ir-scanner
+Subject: [PATCH 1/9] Use PKG_CONFIG when running g-ir-scanner
 
 While cross-compiling, "$PKG_CONFIG" is not "pkg-config", so do not
 assume it when calling g-ir-scanner to build up the base gir files.
 
-This patch is intended to be complementary to
-https://bugzilla.gnome.org/show_bug.cgi?id=746669
+https://bugzilla.gnome.org/show_bug.cgi?id=761983
 ---
  Makefile.introspection | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
@@ -26,5 +25,5 @@ index cd7bd1b..1812df9 100644
  #
  # Creates a GIR by scanning C headers/sources
 -- 
-2.7.0
+2.7.1
 

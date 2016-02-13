@@ -1,8 +1,9 @@
-From 1c9923e7f354a6e511edd3e45cf725015fa92ce4 Mon Sep 17 00:00:00 2001
+From 4aec3d7771390cf141ef5f976d9b2b5af0ef3fef Mon Sep 17 00:00:00 2001
 From: Nicola Fontana <ntd@entidi.it>
 Date: Mon, 23 Mar 2015 19:29:56 +0100
-Subject: [PATCH 07/11] Assume gcc use the same path separator as python
+Subject: [PATCH 5/9] Assume gcc use the same path separator as python
 
+https://bugzilla.gnome.org/show_bug.cgi?id=761981
 ---
  giscanner/ccompiler.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
@@ -21,5 +22,5 @@ index 7c80bea..726cfec 100644
          shlibs = []
          not_resolved = []
 -- 
-2.7.0
+2.7.1
 
