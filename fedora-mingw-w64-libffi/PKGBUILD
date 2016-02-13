@@ -6,12 +6,12 @@
 _realname=libffi
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=3.0.13
-pkgrel=10
+pkgrel=11
 pkgdesc='A portable, high level programming interface to various calling conventions (mingw-w64)'
 arch=(any)
 url='http://sourceware.org/libffi/'
 license=(MIT)
-groups=(fedora-mingw)
+groups=(aur-fedora-mingw fedora-mingw)
 depends=(mingw-w64-crt)
 makedepends=(mingw-w64-gcc)
 provides=(mingw-w64-libffi=$pkgver)
