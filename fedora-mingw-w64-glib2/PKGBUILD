@@ -6,12 +6,12 @@
 _realname=glib
 pkgname=fedora-mingw-w64-glib2
 pkgver=2.47.5
-pkgrel=2
+pkgrel=3
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
 license=(LGPL)
-groups=(fedora-mingw)
+groups=(aur-fedora-mingw fedora-mingw)
 depends=('mingw-w64-crt>=4' mingw-w64-libffi mingw-w64-zlib mingw-w64-gettext mingw-w64-pcre)
 makedepends=(afm-mingw-w64-makedepends 'glib2>=2.31.20' 'python2>=2.5.0')
 provides=(mingw-w64-glib2=$pkgver)
