@@ -5,8 +5,8 @@
 
 _realname=gettext
 pkgname="fedora-mingw-w64-${_realname}"
-pkgver=0.19.4
-pkgrel=7
+pkgver=0.19.7
+pkgrel=1
 pkgdesc='GNU internationalization library (mingw-w64)'
 arch=(any)
 url='http://www.gnu.org/software/gettext/'
@@ -18,7 +18,7 @@ provides=("mingw-w64-${_realname}=$pkgver")
 conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnu.org/pub/gnu/${_realname}/${_realname}-$pkgver.tar.gz")
-md5sums=('d3511af1e604a3478900d2c2b4a4a48e')
+md5sums=('87c4ab267c4dce8a75db5d057bb3c92f')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
