@@ -5,8 +5,8 @@
 
 _realname=harfbuzz
 pkgname="fedora-mingw-w64-${_realname}"
-pkgver=1.1.2
-pkgrel=2
+pkgver=1.2.7
+pkgrel=1
 pkgdesc='OpenType text shaping engine (mingw-w64)'
 arch=(any)
 url='http://www.harfbuzz.org/'
@@ -19,9 +19,9 @@ provides=("mingw-w64-${_realname}=$pkgver")
 conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
 source=("http://www.freedesktop.org/software/${_realname}/release/${_realname}-$pkgver.tar.bz2"
-        "http://pkgs.fedoraproject.org/cgit/rpms/mingw-harfbuzz.git/plain/harfbuzz-enable-delayload-freetype.patch?id=9ea7539723fed109acc8a5c7f294bad4129908ab")
-md5sums=('e6210d3cfd4064d95621fc16913268ed'
-         '3f27b43904aaebaf0b7eedae1b715131')
+        "http://pkgs.fedoraproject.org/cgit/rpms/mingw-harfbuzz.git/plain/harfbuzz-enable-delayload-freetype.patch?id=ffe49919d88f9980d197c48066eefd67d3ac072e")
+md5sums=('3ac286c9f9756aa92257c278b2815d34'
+         'fcd307058298447861570ad68415d7e0')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -29,7 +29,7 @@ prepare() {
   cd "$srcdir/${_realname}-$pkgver"
 
   # Make freetype an optional runtime dependency instead of a hard dependency (using delay load)
-  patch -Np1 < '../harfbuzz-enable-delayload-freetype.patch?id=9ea7539723fed109acc8a5c7f294bad4129908ab'
+  patch -Np1 < '../harfbuzz-enable-delayload-freetype.patch?id=ffe49919d88f9980d197c48066eefd67d3ac072e'
 
   autoreconf -ivf
 }
