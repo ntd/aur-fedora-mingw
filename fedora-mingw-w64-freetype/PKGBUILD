@@ -5,8 +5,8 @@
 
 _realname=freetype
 pkgname="fedora-mingw-w64-${_realname}"
-pkgver=2.6
-pkgrel=2
+pkgver=2.6.3
+pkgrel=1
 pkgdesc='TrueType font rendering library (mingw-w64)'
 arch=(any)
 url='http://freetype.sourceforge.net/'
@@ -17,27 +17,10 @@ makedepends=(afm-mingw-w64-makedepends mingw-w64-libpng)
 provides=("mingw-w64-${_realname}=$pkgver")
 conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
-source=("http://downloads.sourceforge.net/sourceforge/${_realname}/${_realname}-$pkgver.tar.bz2"
-        "http://pkgs.fedoraproject.org/cgit/mingw-freetype.git/plain/freetype-2.2.1-enable-valid.patch?h=f18"
-        "http://pkgs.fedoraproject.org/cgit/rpms/mingw-freetype.git/plain/freetype-2.3.0-enable-spr.patch?id=7071176d0b9215570e727b182be2188bfd03293c"
-        "http://pkgs.fedoraproject.org/cgit/rpms/mingw-freetype.git/plain/0001-cff-Don-t-use-hmtx-table-for-LSB-45520.patch?id=7071176d0b9215570e727b182be2188bfd03293c")
-md5sums=('5682890cb0267f6671dd3de6eabd3e69'
-         '214119610444c9b02766ccee5e220680'
-         '5a75a91124e34ad990edf146a46fd3d8'
-         'a8907b1d47890066af2abacbf53cae91')
+source=("http://downloads.sourceforge.net/sourceforge/${_realname}/${_realname}-$pkgver.tar.bz2")
+md5sums=('0037b25a8c090bc8a1218e867b32beb1')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
-
-prepare() {
-  cd "$srcdir/${_realname}-$pkgver"
-
-  patch -Np1 < '../freetype-2.2.1-enable-valid.patch?h=f18'
-
-  # Don't use `hmtx' table for LSB (#45520)
-  patch -Np1 < '../0001-cff-Don-t-use-hmtx-table-for-LSB-45520.patch?id=7071176d0b9215570e727b182be2188bfd03293c'
-
-  patch -Np1 < '../freetype-2.3.0-enable-spr.patch?id=7071176d0b9215570e727b182be2188bfd03293c'
-}
 
 build() {
   local tardir="$srcdir/${_realname}-$pkgver"
