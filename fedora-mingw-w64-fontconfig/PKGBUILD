@@ -5,20 +5,20 @@
 
 _realname=fontconfig
 pkgname="fedora-mingw-w64-${_realname}"
-pkgver=2.11.94
-pkgrel=2
+pkgver=2.11.95
+pkgrel=1
 pkgdesc='A library for configuring and customizing font access (mingw-w64)'
 arch=(any)
 url='http://fontconfig.org/'
 license=(custom)
 groups=(aur-fedora-mingw fedora-mingw)
 depends=(mingw-w64-crt mingw-w64-expat mingw-w64-freetype mingw-w64-win-iconv)
-makedepends=(afm-mingw-w64-makedepends)
+makedepends=(afm-mingw-w64-makedepends python)
 provides=("mingw-w64-${_realname}=$pkgver")
 conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
 source=("http://www.fontconfig.org/release/${_realname}-$pkgver.tar.bz2")
-md5sums=('c988ea12f4117330246e041109152b4a')
+md5sums=('d9ab403942976ddaa031f07edc01ee71')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
