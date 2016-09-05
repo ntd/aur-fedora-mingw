@@ -5,7 +5,7 @@
 
 _realname=fontconfig
 pkgname="fedora-mingw-w64-${_realname}"
-pkgver=2.11.95
+pkgver=2.12.1
 pkgrel=1
 pkgdesc='A library for configuring and customizing font access (mingw-w64)'
 arch=(any)
@@ -18,7 +18,7 @@ provides=("mingw-w64-${_realname}=$pkgver")
 conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
 source=("http://www.fontconfig.org/release/${_realname}-$pkgver.tar.bz2")
-md5sums=('d9ab403942976ddaa031f07edc01ee71')
+md5sums=('b5af5a423ee3b5cfc34846838963c058')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
