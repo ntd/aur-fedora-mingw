@@ -5,7 +5,7 @@
 
 _realname=libjpeg-turbo
 pkgname="fedora-mingw-w64-${_realname}"
-pkgver=1.4.2
+pkgver=1.5.0
 pkgrel=1
 pkgdesc='libjpeg derivative with accelerated baseline JPEG compression and decompression (mingw-w64)'
 arch=(any)
@@ -19,7 +19,7 @@ conflicts=(mingw-w64-libjpeg mingw-w64-libjpeg-turbo)
 options=(!strip staticlibs !buildflags)
 source=("http://downloads.sourceforge.net/project/libjpeg-turbo/$pkgver/libjpeg-turbo-$pkgver.tar.gz"
         "http://pkgs.fedoraproject.org/cgit/mingw-libjpeg-turbo.git/plain/libjpeg-turbo-match-autoconf-behavior.patch?id=e839a929eac6cce6872e3f89647eb02de85871e7")
-md5sums=('86b0d5f7507c2e6c21c00219162c3c44'
+md5sums=('3fc5d9b6a8bce96161659ae7a9939257'
          '5487be46ddbf4540dc60bd63e299dc4d')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
