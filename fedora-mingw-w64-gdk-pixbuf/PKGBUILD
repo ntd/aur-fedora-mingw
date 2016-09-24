@@ -9,8 +9,8 @@
 
 _realname=gdk-pixbuf
 pkgname="fedora-mingw-w64-${_realname}"
-pkgver=2.32.1
-pkgrel=2
+pkgver=2.36.0
+pkgrel=1
 pkgdesc='An image loading library (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -24,7 +24,7 @@ conflicts=(mingw-w64-gdk-pixbuf2)
 options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
         "gdk-pixbuf.loaders")
-md5sums=('b1590189a2e89fab9f871959c168508c'
+md5sums=('1a3baf91956c7923dab49ee3de100ce1'
          '40e6d1296228da59ad16d507c6c6148a')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
