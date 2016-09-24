@@ -5,7 +5,7 @@
 
 _realname=pango
 pkgname="fedora-mingw-w64-${_realname}"
-pkgver=1.40.1
+pkgver=1.40.3
 pkgrel=1
 pkgdesc='A library for layout and rendering of text (mingw-w64)'
 arch=(any)
@@ -22,22 +22,16 @@ provides=("mingw-w64-${_realname}=$pkgver")
 conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
-        "http://pkgs.fedoraproject.org/cgit/mingw-pango.git/plain/pango-enable-delay-load-of-freetype-and-fontconfig.patch?h=f18"
-        "0002-msvc-is-impotent-but-not.mingw.patch")
-md5sums=('6fc88c6529890d6c8e03074d57a3eceb'
-         '757da453d21be895d4fbc31ffd45fb25'
-         'd1bee1980c28ea7be068f030a8c6759e')
+        "http://pkgs.fedoraproject.org/cgit/rpms/mingw-pango.git/plain/pango-enable-delay-load-of-freetype-and-fontconfig.patch?id=d431b89bb797e3ae35231dc31641f31f16f7d1bf")
+md5sums=('17c26720f5a862a12f7e1745e2f1d966'
+         '8c11dd896e36885708dce1aacde48cbf')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 prepare() {
   cd "$srcdir/${_realname}-$pkgver"
 
-  patch -Np0 < '../pango-enable-delay-load-of-freetype-and-fontconfig.patch?h=f18'
-
-  # Avoid build failure because a couple of functions are not exported:
-  # https://github.com/Alexpux/MINGW-packages/blob/master/mingw-w64-pango/0002-msvc-is-impotent-but-not.mingw.patch
-  patch -Np1 < ../0002-msvc-is-impotent-but-not.mingw.patch
+  patch -Np1 < '../pango-enable-delay-load-of-freetype-and-fontconfig.patch?id=d431b89bb797e3ae35231dc31641f31f16f7d1bf'
 
   gtkdocize
   autoreconf -ivf
