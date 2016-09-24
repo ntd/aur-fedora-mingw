@@ -5,8 +5,8 @@
 
 _realname=atk
 pkgname="fedora-mingw-w64-${_realname}"
-pkgver=2.18.0
-pkgrel=2
+pkgver=2.22.0
+pkgrel=1
 pkgdesc='A library providing a set of interfaces for accessibility (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -19,7 +19,7 @@ provides=("mingw-w64-${_realname}=$pkgver")
 conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_realname}-$pkgver.tar.xz")
-md5sums=('fd3678f35004b4c92e3da39356996054')
+md5sums=('c7f2adcf75e4058727174cde970e9129')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
