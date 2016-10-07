@@ -5,7 +5,7 @@
 
 _realname=gtk+
 pkgname=fedora-mingw-w64-gtk2
-pkgver=2.24.30
+pkgver=2.24.31
 pkgrel=1
 pkgdesc='GTK+2 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
@@ -30,7 +30,7 @@ source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_rea
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/gtk-combo-box-dont-use-invalidated-iter.patch?id=1296c449f78d4ef378541311bb4a4833c6a26fe6"
         "0011-gir-for-gdkwin32.mingw.patch"
         "gtk.immodules")
-md5sums=('04568ba5c58b75e3c7543e45628ad789'
+md5sums=('526a1008586094a2cbb4592fd3f9ee10'
          '44ca5d1ce91f5364182c6ea2614c7688'
          '396835720e308acaa0372e5a45c463d4'
          '64a1c29cbda543fdd6d5178417a478c7'
