@@ -5,7 +5,7 @@
 
 _realname=gtk+
 pkgname="fedora-mingw-w64-gtk3"
-pkgver=3.22.0
+pkgver=3.22.1
 pkgrel=1
 pkgdesc='GTK+3 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
@@ -23,7 +23,7 @@ conflicts=(mingw-w64-gtk3)
 options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk.immodules?id=6b3432097a697ae84ceb1f93354f3f54ea104e00")
-md5sums=('9dc50d56cd15121bef25b9fc133f0154'
+md5sums=('ebfa5e52167f2b8a4ec6024d51d86f1f'
          '88818f556feed29b46f6c38d198c75ab')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
