@@ -5,7 +5,7 @@
 
 _realname=harfbuzz
 pkgname="fedora-mingw-w64-${_realname}"
-pkgver=1.3.0
+pkgver=1.3.2
 pkgrel=1
 pkgdesc='OpenType text shaping engine (mingw-w64)'
 arch=(any)
@@ -20,7 +20,7 @@ conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
 source=("http://www.freedesktop.org/software/${_realname}/release/${_realname}-$pkgver.tar.bz2"
         "http://pkgs.fedoraproject.org/cgit/rpms/mingw-harfbuzz.git/plain/harfbuzz-enable-delayload-freetype.patch?id=ffe49919d88f9980d197c48066eefd67d3ac072e")
-md5sums=('a82d49ff67197bc3c96ea34b98880c52'
+md5sums=('5986e1bfcd983d1f6caa53ef64c4abc5'
          'fcd307058298447861570ad68415d7e0')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
