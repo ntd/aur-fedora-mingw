@@ -5,7 +5,7 @@
 
 _realname=libpng
 pkgname="fedora-mingw-w64-${_realname}"
-pkgver=1.6.25
+pkgver=1.6.26
 pkgrel=1
 pkgdesc='A collection of routines used to create PNG format graphics (mingw-w64)'
 arch=(any)
@@ -18,7 +18,7 @@ provides=(mingw-w64-libpng=$pkgver)
 conflicts=(mingw-w64-libpng)
 options=(!strip staticlibs !buildflags)
 source=("http://downloads.sourceforge.net/sourceforge/${_realname}/${_realname}-$pkgver.tar.xz")
-md5sums=('0cb72ef57a576bfed1b6cb4b5a09b554')
+md5sums=('faed9bb495d2e12dd0c9ec561ca60cd8')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
