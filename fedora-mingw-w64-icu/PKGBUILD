@@ -5,8 +5,8 @@
 
 _realname=icu
 pkgname="fedora-mingw-w64-${_realname}"
-pkgver=50.1.2
-pkgrel=14
+pkgver=57.1
+pkgrel=1
 pkgdesc='International Components for Unicode library (mingw-w64)'
 arch=(any)
 url='http://www.icu-project.org/'
@@ -20,29 +20,18 @@ provides=(mingw-w64-icu=$pkgver)
 conflicts=(mingw-w64-icu)
 options=(!strip staticlibs !buildflags)
 source=("http://download.icu-project.org/files/icu4c/$pkgver/icu4c-${pkgver//./_}-src.tgz"
-        "http://pkgs.fedoraproject.org/cgit/mingw-icu.git/plain/icu4c-4_6_1-crossbuild.patch?id=f7a0fef35cf370c8c0add164e72499f05817cc79"
-        "http://pkgs.fedoraproject.org/cgit/mingw-icu.git/plain/icu4c-4_6_1-use-correct-genccode-assembly-on-win32-and-win64.patch?h=f18"
-        "http://pkgs.fedoraproject.org/cgit/mingw-icu.git/plain/icu4c-4_6_1-mingw-w64-mkdir-compatibility.patch?id=b942c392347ba1b68c4aa0603a774cecf5035915"
-        "http://pkgs.fedoraproject.org/cgit/mingw-icu.git/plain/icu.10318.CVE-2013-2924_changeset_34076.patch?id=ecbc40f40b154a47ea82410d86ef580907338ef1")
-md5sums=('beb98aa972219c9fcd9c8a71314943c9'
-         '91358645bc0a6b4d2b502f43cb7293f4'
-         'c480877485438a1f677ca23f7d915692'
-         'c1194c6ac4bc02bd46f127a457ab4e93'
-         'c145037f754572ef88d1a693e86991da')
+        "http://pkgs.fedoraproject.org/cgit/rpms/mingw-icu.git/plain/icu4c-56_1-crossbuild.patch?id=1fcee96b58739f449cbc6fb5eea09391f3160e38")
+md5sums=('976734806026a4ef8bdd17937c8898b9'
+         'b56614627ea08022d9044053c2e70aa2')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 prepare() {
   cd "$srcdir/${_realname}"
 
-  patch -Np1 < '../icu4c-4_6_1-crossbuild.patch?id=f7a0fef35cf370c8c0add164e72499f05817cc79'
-  patch -Np1 < '../icu4c-4_6_1-use-correct-genccode-assembly-on-win32-and-win64.patch?h=f18'
-  patch -Np1 < '../icu4c-4_6_1-mingw-w64-mkdir-compatibility.patch?id=b942c392347ba1b68c4aa0603a774cecf5035915'
-  patch -Np1 < '../icu.10318.CVE-2013-2924_changeset_34076.patch?id=ecbc40f40b154a47ea82410d86ef580907338ef1'
-
-  # Needed by genccode patch
-  cd source
-  autoconf -f
+  # Patch to fix the build from
+  # https://build.opensuse.org/package/show/windows:mingw:win32/mingw32-icu
+  patch -Np1 < '../icu4c-56_1-crossbuild.patch?id=1fcee96b58739f449cbc6fb5eea09391f3160e38'
 }
 
 build() {
@@ -71,8 +60,8 @@ build() {
         --enable-shared \
         --with-cross-build="$builddir-native" \
         --with-data-packaging=library
+      make
     )
-    make
   done
 }
 
@@ -89,9 +78,7 @@ package() {
     cd "$srcdir/${_realname}-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
 
-    find "$pkgdir" -name '*.dll' -type l -delete
-    mv -f "$prefix/lib/libicudata$api.dll" "$prefix/lib/icudata$api.dll"
-    mv "$prefix"/lib/*.dll "$prefix/bin/"
+    mv   "$prefix"/lib/*.dll "$prefix/bin/"
     find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
     find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
     find "$prefix" -name '*.a' -exec $arch-strip -g {} +
