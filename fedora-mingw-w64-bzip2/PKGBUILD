@@ -6,7 +6,7 @@
 _realname=bzip2
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=1.0.6
-pkgrel=15
+pkgrel=16
 pkgdesc='A high-quality data compression program (mingw-w64)'
 arch=(any)
 url='http://www.bzip.org/'
