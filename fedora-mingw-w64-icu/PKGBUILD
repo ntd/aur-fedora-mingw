@@ -6,7 +6,7 @@
 _realname=icu
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=57.1
-pkgrel=1
+pkgrel=2
 pkgdesc='International Components for Unicode library (mingw-w64)'
 arch=(any)
 url='http://www.icu-project.org/'
