@@ -7,7 +7,7 @@
 _realname=lua
 pkgname="afm-mingw-w64-${_realname}"
 pkgver=5.2.4
-pkgrel=8
+pkgrel=9
 pkgdesc='Powerful light-weight programming language designed for extending applications (mingw-w64)'
 arch=(any)
 url='http://www.lua.org/'
