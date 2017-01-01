@@ -52,7 +52,7 @@ call_configure() {
     local path_to_configure=$3
     shift 3
 
-    set_flags $arch bits
+    set_flags $arch $bits
 
     # Prepend arch bin, just in case
     export PATH="/usr/$arch/bin:$PATH"
@@ -85,7 +85,7 @@ call_cmake() {
     local bits=$2
     shift 2
 
-    set_flags $arch bits
+    set_flags $arch $bits
 
     cmake \
 	-DCMAKE_VERBOSE_MAKEFILE=ON \
