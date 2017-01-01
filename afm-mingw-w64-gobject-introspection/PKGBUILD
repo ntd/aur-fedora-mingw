@@ -2,11 +2,11 @@
 
 _realname=gobject-introspection
 pkgname="afm-mingw-w64-${_realname}-git"
-pkgver=1.46.0.r113.cd355e8
-pkgrel=6
+pkgver=1.50.0
+pkgrel=1
 pkgdesc='Introspection system for GObject-based libraries (mingw-w64)'
 arch=(any)
-url='https://live.gnome.org/GObjectIntrospection'
+url='https://wiki.gnome.org/Projects/GObjectIntrospection'
 license=(LGPL GPL)
 groups=(aur-fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-glib2 python2)
@@ -14,61 +14,30 @@ makedepends=(git afm-mingw-w64-makedepends wine)
 provides=("mingw-w64-${_realname}")
 conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
-source=("git+git://git.gnome.org/gobject-introspection"
-        "0001-Use-PKG_CONFIG-when-running-g-ir-scanner.patch"
-        "0002-Allow-overriding-of-dlltool-name.patch"
+source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
         "0003-Allow-overriding-of-the-host-os-name.patch"
-        "0005-Assume-gcc-use-the-same-path-separator-as-python.patch"
-        "0006-Use-a-launcher-for-executing-g-ir-scanner.patch"
         "0007-Allow-to-skip-the-check-for-Python-headers.patch"
         "0008-Overcome-File-name-too-long-error.patch"
         "0009-Customize-CCompiler-on-MinGW-cross-compilation.patch"
-        "0001-Remove-leading-SHELL-in-libtool-call.patch"
         "winewrapper")
-md5sums=('SKIP'
-         '3484c2c13d837a15262556a29982d51d'
-         'dfa5b106891a5b15655615f892b8995a'
+md5sums=('5af8d724f25d0c9cfbe6df41b77e5dc0'
          '3183cc3a8a14338f27830f0ebb66d408'
-         'a82fe820433cfe43972b13a02a1928c0'
-         '4270a18526585ef48080241f5718ddbb'
          '1420edbbec79268a490b0f781a4dacd9'
          '9fc71145c77b0688c0c28616fbef8d7a'
          '7b4be4221fd52104bc69bee42255742c'
-         '039267df90b681240023bf1d4d775c72'
          'ee07cea6a2f3b351ea5f873c8a569fd6')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
-pkgver() {
-  cd "$srcdir/${_realname}"
-
-  printf "%s" "$(git describe --long | sed 's/\([^-]*-\)g/r\1/;s/-/./g')"
-}
-
 prepare() {
-  cd "$srcdir/${_realname}"
-
-  # https://bugzilla.gnome.org/show_bug.cgi?id=761983
-  patch -Np1 < '../0001-Use-PKG_CONFIG-when-running-g-ir-scanner.patch'
-
-  # https://bugzilla.gnome.org/show_bug.cgi?id=761984
-  patch -Np1 < '../0002-Allow-overriding-of-dlltool-name.patch'
+  cd "$srcdir/${_realname}-$pkgver"
 
   # https://bugzilla.gnome.org/show_bug.cgi?id=761985
   patch -Np1 < '../0003-Allow-overriding-of-the-host-os-name.patch'
 
-  # https://bugzilla.gnome.org/show_bug.cgi?id=761981
-  patch -Np1 < '../0005-Assume-gcc-use-the-same-path-separator-as-python.patch'
-
-  # https://bugzilla.gnome.org/show_bug.cgi?id=696773
-  patch -Np1 < '../0006-Use-a-launcher-for-executing-g-ir-scanner.patch'
-
   patch -Np1 < '../0007-Allow-to-skip-the-check-for-Python-headers.patch'
   patch -Np1 < '../0008-Overcome-File-name-too-long-error.patch'
   patch -Np1 < '../0009-Customize-CCompiler-on-MinGW-cross-compilation.patch'
-
-  # https://bugzilla.gnome.org/show_bug.cgi?id=761982
-  patch -Np1 < '../0001-Remove-leading-SHELL-in-libtool-call.patch'
 
   NOCONFIGURE=1 ./autogen.sh
 
@@ -77,7 +46,7 @@ prepare() {
 }
 
 build() {
-  local tardir="$srcdir/${_realname}"
+  local tardir="$srcdir/${_realname}-$pkgver"
   local builddir
   local arch
   local bits
@@ -124,7 +93,7 @@ package() {
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
 
-    cd "$srcdir/${_realname}-build-$arch"
+    cd "$srcdir/${_realname}-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
 
     # Wrappers for running g-ir-compiler and g-ir-generate with wine
