@@ -3,7 +3,7 @@
 _realname=gobject-introspection
 pkgname="afm-mingw-w64-${_realname}"
 pkgver=1.50.0
-pkgrel=2
+pkgrel=3
 pkgdesc='Introspection system for GObject-based libraries (mingw-w64)'
 arch=(any)
 url='https://wiki.gnome.org/Projects/GObjectIntrospection'
