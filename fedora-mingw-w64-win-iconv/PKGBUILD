@@ -6,7 +6,7 @@
 _realname=win-iconv
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=0.0.6
-pkgrel=9
+pkgrel=10
 pkgdesc='Iconv implementation using Win32 API (mingw-w64)'
 arch=(any)
 url='http://code.google.com/p/win-iconv/'
