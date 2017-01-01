@@ -10,7 +10,7 @@
 _realname=gdk-pixbuf
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=2.36.0
-pkgrel=1
+pkgrel=2
 pkgdesc='An image loading library (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
