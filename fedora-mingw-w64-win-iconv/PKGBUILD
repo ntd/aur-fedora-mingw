@@ -6,7 +6,7 @@
 _realname=win-iconv
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=0.0.6
-pkgrel=8
+pkgrel=9
 pkgdesc='Iconv implementation using Win32 API (mingw-w64)'
 arch=(any)
 url='http://code.google.com/p/win-iconv/'
@@ -17,8 +17,8 @@ makedepends=(afm-mingw-w64-makedepends cmake)
 provides=("mingw-w64-${_realname}=$pkgver")
 conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
-source=("http://win-iconv.googlecode.com/files/win-iconv-$pkgver.tar.bz2")
-md5sums=('1e97ed4d9e7379ff0ee22077256e8c58')
+source=("https://github.com/win-iconv/win-iconv/archive/$pkgver.tar.gz")
+md5sums=('0bed0bf66dd3f87416dd7393ee079d01')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
