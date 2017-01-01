@@ -6,7 +6,7 @@
 _realname=nsis
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=2.50
-pkgrel=1
+pkgrel=2
 pkgdesc='A professional open source system to create Windows installers'
 arch=(i686 x86_64)
 url='http://nsis.sourceforge.net/'
@@ -57,8 +57,7 @@ package() {
 
   scons PREFIX_DEST="$pkgdir" "${_sconsopts[@]}" install
 
-  find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
-  find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+  find "$pkgdir/usr" -name '*.dll' -exec i686-w64-mingw32-strip --strip-unneeded {} +
 }
 
 # vim:set ts=2 sw=2 et:
