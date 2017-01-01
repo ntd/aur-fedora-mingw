@@ -16,7 +16,6 @@
 prefix="$TMPDIR"
 [ -z "$prefix" ] && prefix=/tmp
 prefix="$prefix/$(whoami)/gi-wine"
-[ @arch@ = win32 ] && host=i686-w64-mingw32 || host=x86_64-w64-mingw32
 
 mkdir -p "$prefix"
 WINEARCH=@arch@ WINEPREFIX="$prefix/@arch@" DISPLAY= /usr/bin/wine @exe@ "$@"

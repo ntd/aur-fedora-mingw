@@ -1,16 +1,16 @@
 # Maintainer: Nicola Fontana <ntd@entidi.it>
 
 _realname=gobject-introspection
-pkgname="afm-mingw-w64-${_realname}-git"
+pkgname="afm-mingw-w64-${_realname}"
 pkgver=1.50.0
-pkgrel=1
+pkgrel=2
 pkgdesc='Introspection system for GObject-based libraries (mingw-w64)'
 arch=(any)
 url='https://wiki.gnome.org/Projects/GObjectIntrospection'
 license=(LGPL GPL)
 groups=(aur-fedora-mingw)
 depends=(mingw-w64-crt fedora-mingw-w64-glib2 python2)
-makedepends=(git afm-mingw-w64-makedepends wine)
+makedepends=(afm-mingw-w64-makedepends wine)
 provides=("mingw-w64-${_realname}")
 conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
@@ -25,7 +25,7 @@ md5sums=('5af8d724f25d0c9cfbe6df41b77e5dc0'
          '1420edbbec79268a490b0f781a4dacd9'
          '9fc71145c77b0688c0c28616fbef8d7a'
          '7b4be4221fd52104bc69bee42255742c'
-         'ee07cea6a2f3b351ea5f873c8a569fd6')
+         '83cf11e501161eae90df56838c75653f')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
@@ -49,7 +49,6 @@ build() {
   local tardir="$srcdir/${_realname}-$pkgver"
   local builddir
   local arch
-  local bits
 
   # Force the use of the python-2 interpreter
   export PYTHON=/usr/bin/python2
@@ -89,9 +88,22 @@ build() {
 package() {
   local arch
   local prefix
+  local bits
 
   for arch in ${_architectures[@]}; do
     prefix="$pkgdir/usr/$arch"
+
+    case "$arch" in
+      *i686*)
+        bits=32
+        ;;
+      *x86_64*)
+        bits=64
+        ;;
+      *)
+        return 1
+        ;;
+    esac
 
     cd "$srcdir/${_realname}-$pkgver-build-$arch"
     make DESTDIR="$pkgdir" install
