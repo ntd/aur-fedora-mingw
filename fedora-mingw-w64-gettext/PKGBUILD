@@ -6,7 +6,7 @@
 _realname=gettext
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=0.19.7
-pkgrel=1
+pkgrel=2
 pkgdesc='GNU internationalization library (mingw-w64)'
 arch=(any)
 url='http://www.gnu.org/software/gettext/'
