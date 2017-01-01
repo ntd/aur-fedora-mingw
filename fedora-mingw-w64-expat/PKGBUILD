@@ -6,7 +6,7 @@
 _realname=expat
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=2.2.0
-pkgrel=1
+pkgrel=2
 pkgdesc='An XML parser library (mingw-w64)'
 arch=(any)
 url='http://expat.sourceforge.net/'
