@@ -6,9 +6,9 @@
 #
 # A serie of packages to skip can be optionally specified
 # on the command line. For example, the following command
-# will build everything but binutils and cairo:
+# will build everything but cairo:
 #
-# ./build-all fedora-mingw-w64-binutils fedora-mingw-w64-cairo
+# ./build-all fedora-mingw-w64-cairo
 
 root="$(dirname $0)"
 
@@ -23,14 +23,22 @@ function found() {
 }
 
 pkgs=(
+	# Install some non-standard dependencies
 	wine
-
-	# Cross-building tools
-	mingw-w64-gcc
-	afm-mingw-w64-makedepends
-	mingw-w64-tools				# Required by cairo and harfbuzz
+	cmake					# Required by libjpeg and win-iconv
+	scons					# Required by nsis
 	nasm					# Required by libjpeg-turbo
+	python					# Required by glib2 and libepoxy
+	intltool				# Required by adwaita-icon-theme
 	xorg-util-macros			# Required by libepoxy
+	gtk-doc					# Required by pango
+
+	# Cross-building tools from official Archlinux repositories
+	mingw-w64-gcc
+	mingw-w64-binutils			# Required by cairo
+	mingw-w64-tools				# Required by cairo and harfbuzz
+
+	afm-mingw-w64-makedepends
 
 	# GTK+2/3 toolchain
 	fedora-mingw-w64-zlib
