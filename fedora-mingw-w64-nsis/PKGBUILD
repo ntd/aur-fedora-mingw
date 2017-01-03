@@ -5,8 +5,8 @@
 
 _realname=nsis
 pkgname="fedora-mingw-w64-${_realname}"
-pkgver=2.50
-pkgrel=2
+pkgver=3.01
+pkgrel=1
 pkgdesc='A professional open source system to create Windows installers'
 arch=(i686 x86_64)
 url='http://nsis.sourceforge.net/'
@@ -17,34 +17,11 @@ makedepends=(afm-mingw-w64-makedepends mingw-w64-binutils scons)
 provides=("mingw-w64-${_realname}=$pkgver")
 conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
-source=("http://sourceforge.net/projects/nsis/files/NSIS 2/$pkgver/nsis-$pkgver-src.tar.bz2"
-        "http://pkgs.fedoraproject.org/cgit/mingw-nsis.git/plain/nsis-2.43-64bit-fixes.patch?h=f18"
-        "http://pkgs.fedoraproject.org/cgit/mingw-nsis.git/plain/nsis-2.45-static-libgcc.patch?h=f18"
-        "http://pkgs.fedoraproject.org/cgit/mingw-nsis.git/plain/nsis-2.46-static-libstdc++.patch?h=f18"
-        "http://pkgs.fedoraproject.org/cgit/mingw-nsis.git/plain/nsis-2.46-missing-unistd-include.patch?h=f18"
-        "http://pkgs.fedoraproject.org/cgit/mingw-nsis.git/plain/nsis-add-mingw-w64-support.patch?h=f18"
-        "../Avoid-missing-EXTERN_C.patch")
-md5sums=('076850a971589a787d30224bfde936aa'
-         '9eead3b78da54e3afda8f6a5b663aea9'
-         '28f1002dd3c6a57cd3e1f8bb09c81fc5'
-         '3d41bf574cd3bed0c4f14afca9bc4819'
-         'c4f912f0ca7fa455948f9f6a73314d93'
-         'd963ac54cc672887ed973a12e1173146'
-         'cd4ffaf4630524cb56777fcbb0356197')
+source=("http://sourceforge.net/projects/nsis/files/NSIS 3/$pkgver/nsis-$pkgver-src.tar.bz2")
+md5sums=('fc40b977d1ddd9f8a74511147f38ca8c')
 
 # See RHBZ#1090075
-_sconsopts=(VERSION="$pkgver" PREFIX=/usr PREFIX_CONF=/etc SKIPUTILS='NSIS Menu' STRIP_CP=false NSIS_MAX_STRLEN=8192)
-
-prepare() {
-  cd "$srcdir/${_realname}-$pkgver-src"
-
-  patch -Np1 < '../nsis-2.43-64bit-fixes.patch?h=f18'
-  patch -Np1 < '../nsis-2.45-static-libgcc.patch?h=f18'
-  patch -Np1 < '../nsis-2.46-static-libstdc++.patch?h=f18'
-  patch -Np1 < '../nsis-2.46-missing-unistd-include.patch?h=f18'
-  patch -Np0 < '../nsis-add-mingw-w64-support.patch?h=f18'
-  patch -Np1 < ../Avoid-missing-EXTERN_C.patch
-}
+_sconsopts=(VERSION="$pkgver" PREFIX=/usr PREFIX_CONF=/etc ZLIB_W32=/usr/i686-w64-mingw32 SKIPUTILS='NSIS Menu' STRIP_CP=false NSIS_MAX_STRLEN=8192)
 
 build() {
   cd "$srcdir/${_realname}-$pkgver-src"
