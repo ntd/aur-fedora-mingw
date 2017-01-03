@@ -6,7 +6,7 @@
 _realname=glib
 pkgname=fedora-mingw-w64-glib2
 pkgver=2.50.1
-pkgrel=2
+pkgrel=3
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -61,6 +61,7 @@ build() {
       --disable-shared \
       --enable-static \
       --disable-silent-rules \
+      --with-pcre=internal \
       --with-python=/usr/bin/python2
     make
 
@@ -70,6 +71,7 @@ build() {
       --enable-shared \
       --disable-static \
       --disable-silent-rules \
+      --with-pcre=internal \
       --with-python=/usr/bin/python2
     make
   done
