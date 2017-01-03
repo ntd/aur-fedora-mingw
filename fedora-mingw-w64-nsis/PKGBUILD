@@ -6,13 +6,13 @@
 _realname=nsis
 pkgname="fedora-mingw-w64-${_realname}"
 pkgver=3.01
-pkgrel=1
+pkgrel=2
 pkgdesc='A professional open source system to create Windows installers'
 arch=(i686 x86_64)
 url='http://nsis.sourceforge.net/'
 license=(custom:zlib)
 groups=(aur-fedora-mingw fedora-mingw)
-depends=(mingw-w64-crt)
+depends=(mingw-w64-crt mingw-w64-zlib)
 makedepends=(afm-mingw-w64-makedepends mingw-w64-binutils scons)
 provides=("mingw-w64-${_realname}=$pkgver")
 conflicts=("mingw-w64-${_realname}")
