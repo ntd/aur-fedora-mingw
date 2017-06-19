@@ -5,8 +5,8 @@
 
 _realname=cairo
 pkgname="fedora-mingw-w64-${_realname}"
-pkgver=1.14.6
-pkgrel=2
+pkgver=1.14.10
+pkgrel=1
 pkgdesc='Cairo vector graphics library (mingw-w64)'
 arch=(any)
 url='http://cairographics.org/'
@@ -22,7 +22,7 @@ options=(!strip staticlibs !buildflags)
 source=("http://cairographics.org/releases/cairo-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/rpms/mingw-cairo.git/plain/0001-win32-Add-cairo-API-to-set-up-a-Win32-surface-for-an.patch?id=269cfa82082b51ad7f1fa8240df6524943967410"
         "http://pkgs.fedoraproject.org/cgit/rpms/mingw-cairo.git/plain/0002-win32-Add-a-win32-boilerplate-that-uses-a-real-windo.patch?id=928bada85172323977c79de2ec32d782c6845f84")
-md5sums=('23a0b2f0235431d35238df1d3a517fdb'
+md5sums=('146f5f4d0b4439fc3792fd3452b7b12a'
          'cf640dfd981d3ab6aaf7c72768482287'
          '178e1d763cedd7c9e4e3def02800a31e')
 
