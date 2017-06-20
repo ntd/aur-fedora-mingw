@@ -5,8 +5,8 @@
 
 _realname=libffi
 pkgname="fedora-mingw-w64-${_realname}"
-pkgver=3.0.13
-pkgrel=12
+pkgver=3.1
+pkgrel=1
 pkgdesc='A portable, high level programming interface to various calling conventions (mingw-w64)'
 arch=(any)
 url='http://sourceware.org/libffi/'
@@ -18,7 +18,7 @@ provides=(mingw-w64-libffi=$pkgver)
 conflicts=(mingw-w64-libffi)
 options=(!strip staticlibs !buildflags)
 source=("ftp://sourceware.org/pub/libffi/libffi-$pkgver.tar.gz")
-md5sums=('45f3b6dbc9ee7c7dfbbbc5feba571529')
+md5sums=('f5898b29bbfd70502831a212d9249d10')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
