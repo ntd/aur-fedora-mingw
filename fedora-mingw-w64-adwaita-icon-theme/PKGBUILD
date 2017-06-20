@@ -5,8 +5,8 @@
 
 _realname=adwaita-icon-theme
 pkgname="fedora-mingw-w64-${_realname}"
-pkgver=3.22.0
-pkgrel=2
+pkgver=3.24.0
+pkgrel=1
 pkgdesc='Adwaita icon theme'
 arch=(any)
 url='http://www.gnome.org'
@@ -18,7 +18,7 @@ provides=("mingw-w64-${_realname}=$pkgver")
 conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
 source=("https://download.gnome.org/sources/${_realname}/${pkgver:0:4}/${_realname}-$pkgver.tar.xz")
-md5sums=('cde51d7dfcbcfa3b8cdc3e5f0df8c799')
+md5sums=('3ccac0d600ffc936d2adfb80e9245bc5')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
