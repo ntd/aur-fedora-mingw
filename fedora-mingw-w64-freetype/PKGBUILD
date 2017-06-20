@@ -5,8 +5,8 @@
 
 _realname=freetype
 pkgname="fedora-mingw-w64-${_realname}"
-pkgver=2.7
-pkgrel=2
+pkgver=2.7.1
+pkgrel=1
 pkgdesc='TrueType font rendering library (mingw-w64)'
 arch=(any)
 url='http://freetype.sourceforge.net/'
@@ -18,7 +18,7 @@ provides=("mingw-w64-${_realname}=$pkgver")
 conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
 source=("http://downloads.sourceforge.net/sourceforge/${_realname}/${_realname}-$pkgver.tar.bz2")
-md5sums=('be4601619827b7935e1d861745923a68')
+md5sums=('b3230110e0cab777e0df7631837ac36e')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
