@@ -9,7 +9,7 @@
 
 _realname=gdk-pixbuf
 pkgname="fedora-mingw-w64-${_realname}"
-pkgver=2.36.6
+pkgver=2.36.7
 pkgrel=1
 pkgdesc='An image loading library (mingw-w64)'
 arch=(any)
@@ -26,7 +26,7 @@ source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_rea
         # The cache file is generated with the following command:
         # wine src/gdk-pixbuf-*-build-i686-w64-mingw32/gdk-pixbuf/gdk-pixbuf-query-loaders.exe | sed 's|/usr/i686-w64-mingw32/|../|' > gdk-pixbuf.loaders
         "gdk-pixbuf.loaders")
-md5sums=('5dd53760750670d27c194ff6ace7eb51'
+md5sums=('04ca1535f3fab7070db48009ed1e93f6'
          '371fd7546d48f1276687b6bc7b514083')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
