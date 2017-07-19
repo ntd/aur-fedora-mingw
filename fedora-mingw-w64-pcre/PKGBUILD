@@ -18,7 +18,6 @@ provides=("mingw-w64-${_realname}=$pkgver")
 conflicts=("mingw-w64-${_realname}")
 options=(!strip staticlibs !buildflags)
 source=("https://ftp.pcre.org/pub/pcre/pcre-$pkgver.tar.bz2"
-
         "http://pkgs.fedoraproject.org/cgit/rpms/mingw-pcre.git/plain/pcre-8.21-multilib.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec"
         "http://pkgs.fedoraproject.org/cgit/rpms/mingw-pcre.git/plain/pcre-8.32-refused_spelling_terminated.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec"
         "http://pkgs.fedoraproject.org/cgit/rpms/mingw-pcre.git/plain/pcre-8.38-Allow-for-up-to-32-bit-numbers-in-the-ordin-function.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec"
