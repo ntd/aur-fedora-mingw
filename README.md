@@ -7,6 +7,55 @@ The repository is available for cloning on
 is provided for browsing and hot linking purposes (the URLs will likely
 be permanents).
 
+How to use
+==========
+
+These are common PKGBUILD files so you can build them in the usual way, e.g.
+by using [makepkg](https://wiki.archlinux.org/index.php/Makepkg). Some helper
+scripts are provided, just for convenience:
+
+* `build-all`<br>
+  The main script for building the whole toolchain. To minimize the potential
+  problems that can be raised by unattended environment variables, you could
+  call the script by providing only a minimal environment, e.g.:
+
+    ```
+    env -i TERM=xterm-256color PATH=/usr/bin ./build-all
+    ```
+
+  You can optionally specify on the command line the name of one or more
+  packages to skip, e.g. by passing `fedora-mingw-w64-cairo` you will build
+  everything but cairo.
+
+  This script **does not** automatically create the package database! If you
+  want, you need to create it by yourself with:
+
+    ```
+    repo-add /home/nicola/workdir/aur-fedora-mingw/pkg/entidi */*.pkg.tar.xz
+    ```
+
+* `pkg-update`<br>
+  It is intended to be used after `build-all` to upgrade only one package. Just
+  call it with the proper package name:
+
+    ```
+    ./pkg-update fedora-mingw-w64-glib2
+    ```
+
+  This script automatically updates the package database. Actually all that
+  stuff is hardcoded in the sources: fire up an editor for further info.
+* `inc-pkgrel`<br>
+  Increase the [release number](https://wiki.archlinux.org/index.php/PKGBUILD#pkgrel)
+  by one on the `PKGBUILD` files provided as argument, e.g. the following
+  command will increase the release of every package:
+
+    ```
+    ./inc-pkgrel */PKGBUILD
+    ```
+* repo-update
+  Used by `pkg-update` to update the package database.
+
+
 Motivation
 ==========
 
