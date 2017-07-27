@@ -96,7 +96,7 @@ for pkg in ${pkgs[@]}; do
 	    if ! yes | LC_MESSAGES=C yaourt -U *.pkg.tar.xz; then exit 1; fi
 
 	    # The tarball links (*.pkg.tar.xz) are not deleted: it is
-	    # convenient to keep the on place to easily update package
+	    # convenient to keep them on place to easily update package
 	    # databases, i.e. using a command such as
 	    # repo-add <path-to-db> */*.pkg.tar.xz
 	    rm -fr pkg src
