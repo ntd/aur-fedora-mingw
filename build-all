@@ -89,7 +89,7 @@ for pkg in ${pkgs[@]}; do
 	    # The directory exists and does not contain any .pkg.tar.xz
 	    # file: build the package with makepkg
 	    cd "$pkg"
-	    makepkg -f --config ../makepkg.conf
+	    makepkg --config ../makepkg.x86_64.conf
 
 	    # TODO: is there a more elegant way to force the removing
 	    #       of conflicting packages?
