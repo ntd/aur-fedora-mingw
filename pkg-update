@@ -21,7 +21,7 @@ rm -f $repodir/$1-*.pkg.tar.xz
 
 # Build new package
 pushd "$1" > /dev/null
-makepkg
+makepkg --config ../makepkg.conf
 popd > /dev/null
 [ -r "$1"/*.pkg.tar.xz ] || die "Package compilation failed"
 
