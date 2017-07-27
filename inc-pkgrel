@@ -1,0 +1,10 @@
+#! /bin/bash
+# Helper script to increase pkgrel on a PKGBUILD
+
+regex='^pkgrel=.*$'
+
+while [ -n "$1" ]; do
+    newrel="pkgrel=$(echo "$(grep -om1 "$regex" "$1"); pkgrel+1" | bc)"
+    sed -i -e "s/$regex/$newrel/" "$1"
+    shift
+done
