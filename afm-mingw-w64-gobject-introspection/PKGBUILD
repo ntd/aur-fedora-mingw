@@ -1,17 +1,16 @@
 # Maintainer: Nicola Fontana <ntd@entidi.it>
 
-_realname=gobject-introspection
-pkgname="afm-mingw-w64-${_realname}"
+pkgname=$CARCH-mingw-w64-gobject-introspection
 pkgver=1.52.1
-pkgrel=1
+pkgrel=2
 pkgdesc='Introspection system for GObject-based libraries (mingw-w64)'
 arch=(any)
 url='https://wiki.gnome.org/Projects/GObjectIntrospection'
 license=(LGPL GPL)
-groups=(aur-fedora-mingw)
+groups=(afm-$CARCH)
 depends=(
     mingw-w64-crt
-    "fedora-mingw-w64-glib2>=2.52.1"
+    "$CARCH-mingw-w64-glib2>=2.52.1"
     python2
 )
 makedepends=(
@@ -19,9 +18,7 @@ makedepends=(
     "glib2>=2.52.1"     # Host glib2 should match build glib2 version
     wine
 )
-provides=("mingw-w64-${_realname}")
-conflicts=("mingw-w64-${_realname}")
-source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
+source=("http://ftp.gnome.org/pub/GNOME/sources/gobject-introspection/${pkgver%.*}/gobject-introspection-$pkgver.tar.xz"
         "0003-Allow-overriding-of-the-host-os-name.patch"
         "0007-Allow-to-skip-the-check-for-Python-headers.patch"
         "0008-Overcome-File-name-too-long-error.patch"
@@ -34,10 +31,8 @@ md5sums=('34157073991f9eeb0ed953351b65eb61'
          '7b4be4221fd52104bc69bee42255742c'
          '83cf11e501161eae90df56838c75653f')
 
-_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
-
 prepare() {
-  cd "$srcdir/${_realname}-$pkgver"
+  cd "$srcdir/gobject-introspection-$pkgver"
 
   # https://bugzilla.gnome.org/show_bug.cgi?id=761985
   patch -Np1 < '../0003-Allow-overriding-of-the-host-os-name.patch'
@@ -53,96 +48,84 @@ prepare() {
 }
 
 build() {
-  local tardir="$srcdir/${_realname}-$pkgver"
-  local builddir
-  local arch
+  local tardir="$srcdir/gobject-introspection-$pkgver"
+  local builddir="$tardir-build"
 
   # Force the use of the python-2 interpreter
   export PYTHON=/usr/bin/python2
 
-  for arch in ${_architectures[@]}; do
-    builddir="$tardir-build-$arch"
-    mkdir -p "$builddir"
-    cd "$builddir"
+  mkdir -p "$builddir"
+  cd "$builddir"
 
-    # Build the python module with build == host
-    (
-      # Do it in a subshell so the environment can be set accordingly
-      # and it will not be leaked outside
-      source /etc/makepkg.conf
-      "$tardir/configure" \
-        --disable-silent-rules \
-        --enable-shared \
-        --enable-static
-      make scannerparser.c _giscanner.la
-    )
+  # Build the python module with build == host
+  (
+    # Do it in a subshell so the environment can be set accordingly
+    # and it will not be leaked outside
+    source /etc/makepkg.conf
+    "$tardir/configure" \
+      --disable-silent-rules \
+      --enable-shared \
+      --enable-static
+    make scannerparser.c _giscanner.la
+  )
 
-    # Cross-compile the rest of the package
-    (
-      # Again, do it inside a subshell to avoid environment leakings
-      source $arch-configure "$tardir" \
-        --host="$arch" \
-        --disable-silent-rules \
-        --enable-shared \
-        --enable-static \
-        --disable-doctool \
-        --disable-giscanner
+  # Cross-compile the rest of the package
+  (
+    # Again, do it inside a subshell to avoid environment leakings
+    source $CHOST-configure "$tardir" \
+      --disable-silent-rules \
+      --enable-shared \
+      --enable-static \
+      --disable-doctool \
+      --disable-giscanner
 
-      # Avoid overriding what built previously
-      make -t scannerparser.c _giscanner.la
+    # Avoid overriding what built previously
+    make -t scannerparser.c _giscanner.la
 
-      make
-    )
-  done
+    make
+  )
 }
 
 package() {
-  local arch
-  local prefix
+  local prefix="$pkgdir/usr/$CHOST"
   local bits
 
-  for arch in ${_architectures[@]}; do
-    prefix="$pkgdir/usr/$arch"
+  case "$CARCH" in
+  i686)
+    bits=32
+    ;;
+  x86_64)
+    bits=64
+    ;;
+  *)
+    exit 1
+    ;;
+  esac
 
-    case "$arch" in
-      *i686*)
-        bits=32
-        ;;
-      *x86_64*)
-        bits=64
-        ;;
-      *)
-        return 1
-        ;;
-    esac
+  cd "$srcdir/gobject-introspection-$pkgver-build"
+  make DESTDIR="$pkgdir" install
 
-    cd "$srcdir/${_realname}-$pkgver-build-$arch"
-    make DESTDIR="$pkgdir" install
+  # Wrappers for running g-ir-compiler and g-ir-generate with wine
+  sed \
+    -e "s|@arch@|win$bits|g" \
+    -e "s|@exe@|/usr/$CHOST/bin/g-ir-compiler.exe|g" \
+    "$srcdir/winewrapper" > "$prefix/bin/g-ir-compiler"
+  chmod 0755 "$prefix/bin/g-ir-compiler"
+  sed \
+    -e "s|@arch@|win$bits|g" \
+    -e "s|@exe@|/usr/$CHOST/bin/g-ir-compiler.exe|g" \
+    "$srcdir/winewrapper" > "$prefix/bin/g-ir-generate"
+  chmod 0755 "$prefix/bin/g-ir-generate"
 
-    # Wrappers for running g-ir-compiler and g-ir-generate with wine
-    sed \
-      -e "s|@arch@|win$bits|g" \
-      -e "s|@exe@|/usr/$arch/bin/g-ir-compiler.exe|g" \
-      "$srcdir/winewrapper" > "$prefix/bin/g-ir-compiler"
-    chmod 0755 "$prefix/bin/g-ir-compiler"
-    sed \
-      -e "s|@arch@|win$bits|g" \
-      -e "s|@exe@|/usr/$arch/bin/g-ir-compiler.exe|g" \
-      "$srcdir/winewrapper" > "$prefix/bin/g-ir-generate"
-    chmod 0755 "$prefix/bin/g-ir-generate"
+  # Substitute the wrappers to the exe in the pkg-config files
+  sed -i \
+    -e 's|g-ir-compiler.exe|g-ir-compiler|g' \
+    -e 's|g-ir-generate.exe|g-ir-generate|g' \
+    $prefix/lib/pkgconfig/gobject-introspection-1.0.pc
 
-    # Substitute the wrappers to the exe in the pkg-config files
-    sed -i \
-      -e 's|g-ir-compiler.exe|g-ir-compiler|g' \
-      -e 's|g-ir-generate.exe|g-ir-generate|g' \
-      $prefix/lib/pkgconfig/gobject-introspection-1.0.pc
-
-    find "$prefix" -regex '.*\.\(bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
-    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
-    rm -fr "$prefix/share/man"
-    rm -fr "$prefix/share/aclocal"
-  done
+  find "$prefix" -name '*.exe' -exec $CHOST-strip {} +
+  find "$prefix" -name '*.dll' -exec $CHOST-strip --strip-unneeded {} +
+  find "$prefix" -name '*.a'   -exec $CHOST-strip -g {} +
 }
 
 # vim:set ts=2 sw=2 et:
