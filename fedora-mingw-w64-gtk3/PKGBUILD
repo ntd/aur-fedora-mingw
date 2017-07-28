@@ -3,83 +3,77 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/
 
-_realname=gtk+
-pkgname="fedora-mingw-w64-gtk3"
+pkgname=$CARCH-mingw-w64-gtk3
 pkgver=3.22.17
-pkgrel=1
+pkgrel=2
 pkgdesc='GTK+3 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
 license=(LGPL)
-groups=(aur-fedora-mingw fedora-mingw)
-depends=(mingw-w64-crt fedora-mingw-w64-atk fedora-mingw-w64-cairo
-         fedora-mingw-w64-gdk-pixbuf fedora-mingw-w64-gettext
-         fedora-mingw-w64-glib2 fedora-mingw-w64-win-iconv
-         fedora-mingw-w64-pango fedora-mingw-w64-pixman mingw-w64-zlib
-         fedora-mingw-w64-libepoxy fedora-mingw-w64-adwaita-icon-theme)
-makedepends=(afm-mingw-w64-makedepends mingw-w64-gobject-introspection wine)
-provides=(mingw-w64-gtk3=$pkgver)
-conflicts=(mingw-w64-gtk3)
-options=(!strip staticlibs !buildflags)
-source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
+groups=(afm-$CARCH)
+depends=(
+    mingw-w64-crt
+    $CARCH-mingw-w64-atk
+    $CARCH-mingw-w64-cairo
+    $CARCH-mingw-w64-gdk-pixbuf
+    $CARCH-mingw-w64-gettext
+    $CARCH-mingw-w64-glib2
+    $CARCH-mingw-w64-win-iconv
+    $CARCH-mingw-w64-pango
+    $CARCH-mingw-w64-pixman
+    $CARCH-mingw-w64-zlib
+    $CARCH-mingw-w64-libepoxy
+    mingw-w64-adwaita-icon-theme
+)
+makedepends=(
+    afm-mingw-w64-makedepends
+    $CARCH-mingw-w64-gobject-introspection
+    wine
+)
+source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk3.git/plain/gtk.immodules?id=6b3432097a697ae84ceb1f93354f3f54ea104e00")
 md5sums=('29f85430cf7cfa8ca8d0703ba65dbe11'
          '88818f556feed29b46f6c38d198c75ab')
 
-_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
-
 build() {
-  local tardir="$srcdir/${_realname}-$pkgver"
-  local builddir
-  local arch
+  local tardir="$srcdir/gtk+-$pkgver"
+  local builddir="$tardir-build"
 
-  for arch in ${_architectures[@]}; do
-    builddir="$tardir-build-$arch"
-    mkdir -p "$builddir"
-    cd "$builddir"
-    source $arch-configure "$tardir" \
-      --enable-static \
-      --enable-shared \
-      --disable-silent-rules \
-      --enable-introspection \
-      --enable-win32-backend \
-      --disable-gtk2-dependency \
-      --disable-cups \
-      --with-included-immodules
-    make
-  done
+  mkdir -p "$builddir"
+  cd "$builddir"
+  source $CHOST-configure "$tardir" \
+    --enable-static \
+    --enable-shared \
+    --disable-silent-rules \
+    --enable-introspection \
+    --enable-win32-backend \
+    --disable-gtk2-dependency \
+    --disable-cups \
+    --with-included-immodules
+  make
 }
 
 package() {
-  local arch
-  local prefix
+  local prefix="$pkgdir/usr/$CHOST"
 
-  for arch in ${_architectures[@]}; do
-    prefix="$pkgdir/usr/$arch"
+  cd "$srcdir/gtk+-$pkgver-build"
+  make DESTDIR="$pkgdir" install
 
-    cd "$srcdir/${_realname}-$pkgver-build-$arch"
-    make DESTDIR="$pkgdir" install
+  # Install the gtk.immodules file
+  install -m 0644 '../gtk.immodules?id=6b3432097a697ae84ceb1f93354f3f54ea104e00' $prefix/etc/gtk-3.0/gtk.immodules
 
-    # Install the gtk.immodules file
-    install -m 0644 '../gtk.immodules?id=6b3432097a697ae84ceb1f93354f3f54ea104e00' $prefix/etc/gtk-3.0/gtk.immodules
+  find "$prefix" -name '*.exe' -exec $CHOST-strip {} +
+  find "$prefix" -name '*.dll' -exec $CHOST-strip --strip-unneeded {} +
+  find "$prefix" -name '*.a'   -exec $CHOST-strip -g {} +
 
-    # Do not remove exe files (leave gtk3-demo.exe for testing purpose)
-    find "$prefix" -regex '.*\.\(bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
-    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
+  # Compile the basic schemas, a requirement to have working
+  # GtkFileChooser (and possibly GtkColorChooser) widgets.
+  glib-compile-schemas "$prefix/share/glib-2.0/schemas"
 
-    # Compile the basic schemas, a requirement to have working
-    # GtkFileChooser (and possibly GtkColorChooser) widgets.
-    glib-compile-schemas "$prefix/share/glib-2.0/schemas"
-
-    # Remove desktop files and corresponding icons as they aren't
-    # useful for win32
-    rm -f "$prefix"/share/applications/*.desktop
-    rm -f "$prefix"/share/icons/hicolor/*/apps/*.png
-
-    rm -fr "$prefix/share/aclocal"
-    rm -fr "$prefix/share/man"
-  done
+  # Remove desktop files and corresponding icons as they aren't
+  # useful for win32
+  rm -f "$prefix"/share/applications/*.desktop
+  rm -f "$prefix"/share/icons/hicolor/*/apps/*.png
 }
 
 # vim:set ts=2 sw=2 et:
