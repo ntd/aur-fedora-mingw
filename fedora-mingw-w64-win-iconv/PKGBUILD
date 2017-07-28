@@ -3,53 +3,38 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-win-iconv.git/
 
-_realname=win-iconv
-pkgname="fedora-mingw-w64-${_realname}"
+pkgname=$CARCH-mingw-w64-win-iconv
 pkgver=0.0.6
-pkgrel=10
+pkgrel=11
 pkgdesc='Iconv implementation using Win32 API (mingw-w64)'
 arch=(any)
 url='http://code.google.com/p/win-iconv/'
 license=(BSD)
-groups=(aur-fedora-mingw fedora-mingw)
+groups=(afm-$CARCH)
 depends=(mingw-w64-crt)
 makedepends=(afm-mingw-w64-makedepends cmake)
-provides=("mingw-w64-${_realname}=$pkgver")
-conflicts=("mingw-w64-${_realname}")
-options=(!strip staticlibs !buildflags)
 source=("https://github.com/win-iconv/win-iconv/archive/$pkgver.tar.gz")
 md5sums=('0bed0bf66dd3f87416dd7393ee079d01')
 
-_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
-
 build() {
-  local tardir="$srcdir/${_realname}-$pkgver"
-  local builddir
-  local arch
+  local tardir="$srcdir/win-iconv-$pkgver"
+  local builddir="$tardir-build"
 
-  for arch in ${_architectures[@]}; do
-    builddir="$tardir-build-$arch"
-    mkdir -p "$builddir"
-    cd "$builddir"
-    $arch-cmake -DBUILD_STATIC=1 "$tardir"
-    make
-  done
+  mkdir -p "$builddir"
+  cd "$builddir"
+  $CHOST-cmake -DBUILD_STATIC=1 "$tardir"
+  make
 }
 
 package() {
-  local arch
-  local prefix
+  local prefix="$pkgdir/usr/$CHOST"
 
-  for arch in ${_architectures[@]}; do
-    prefix="$pkgdir/usr/$arch"
+  cd "$srcdir/win-iconv-$pkgver-build"
+  make DESTDIR="$pkgdir" install
 
-    cd "$srcdir/${_realname}-$pkgver-build-$arch"
-    make DESTDIR="$pkgdir" install
-
-    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
-    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
-  done
+  find "$prefix" -name '*.exe' -exec $CHOST-strip {} +
+  find "$prefix" -name '*.dll' -exec $CHOST-strip --strip-unneeded {} +
+  find "$prefix" -name '*.a'   -exec $CHOST-strip -g {} +
 }
 
 # vim:set ts=2 sw=2 et:
