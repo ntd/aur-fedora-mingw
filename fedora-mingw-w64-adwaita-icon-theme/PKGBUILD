@@ -3,32 +3,27 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-adwaita-icon-theme.git/
 
-_realname=adwaita-icon-theme
-pkgname="fedora-mingw-w64-${_realname}"
+pkgname=afm-mingw-w64-adwaita-icon-theme
 pkgver=3.24.0
-pkgrel=1
+pkgrel=2
 pkgdesc='Adwaita icon theme'
 arch=(any)
 url='http://www.gnome.org'
 license=(GPL)
-groups=(aur-fedora-mingw fedora-mingw)
-depends=()
-makedepends=(afm-mingw-w64-makedepends intltool)
-provides=("mingw-w64-${_realname}=$pkgver")
-conflicts=("mingw-w64-${_realname}")
-options=(!strip staticlibs !buildflags)
-source=("https://download.gnome.org/sources/${_realname}/${pkgver:0:4}/${_realname}-$pkgver.tar.xz")
+groups=(afm-i686 afm-x86_64)
+conflicts=(mingw-w64-adwaita-icon-theme)
+provides=(mingw-w64-adwaita-icon-theme)
+makedepends=(
+    afm-mingw-w64-makedepends
+    intltool
+)
+source=("https://download.gnome.org/sources/adwaita-icon-theme/${pkgver:0:4}/adwaita-icon-theme-$pkgver.tar.xz")
 md5sums=('3ccac0d600ffc936d2adfb80e9245bc5')
 
-_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
-
 build() {
-  local tardir="$srcdir/${_realname}-$pkgver"
-  local builddir
+  local tardir="$srcdir/adwaita-icon-theme-$pkgver"
+  local builddir="$tardir-build"
 
-  # There are no differences between architectures,
-  # so build the package just once
-  builddir="$tardir-build"
   mkdir -p "$builddir"
   cd "$builddir"
   "$tardir/configure"
@@ -36,13 +31,10 @@ build() {
 }
 
 package() {
-  local arch
+  cd "$srcdir/adwaita-icon-theme-$pkgver-build"
 
-  cd "$srcdir/${_realname-$arche}-$pkgver-build"
-
-  for arch in ${_architectures[@]}; do
-    make DESTDIR="$pkgdir/usr/$arch" install
-  done
+  make DESTDIR="$pkgdir/usr/i686" install
+  make DESTDIR="$pkgdir/usr/x86_64" install
 }
 
 # vim:set ts=2 sw=2 et:
