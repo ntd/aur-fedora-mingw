@@ -3,72 +3,57 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-gettext.git/
 
-_realname=gettext
-pkgname="fedora-mingw-w64-${_realname}"
+pkgname=$CARCH-mingw-w64-gettext
 pkgver=0.19.7
-pkgrel=2
+pkgrel=3
 pkgdesc='GNU internationalization library (mingw-w64)'
 arch=(any)
 url='http://www.gnu.org/software/gettext/'
 license=(GPL)
-groups=(aur-fedora-mingw fedora-mingw)
-depends=(mingw-w64-crt fedora-mingw-w64-win-iconv fedora-mingw-w64-termcap)
+groups=(afm-$CARCH)
+depends=(
+    mingw-w64-crt
+    $CARCH-mingw-w64-win-iconv
+    $CARCH-mingw-w64-termcap
+)
 makedepends=(afm-mingw-w64-makedepends)
-provides=("mingw-w64-${_realname}=$pkgver")
-conflicts=("mingw-w64-${_realname}")
-options=(!strip staticlibs !buildflags)
-source=("http://ftp.gnu.org/pub/gnu/${_realname}/${_realname}-$pkgver.tar.gz")
+source=("http://ftp.gnu.org/pub/gnu/gettext/gettext-$pkgver.tar.gz")
 md5sums=('87c4ab267c4dce8a75db5d057bb3c92f')
 
-_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
-
 build() {
-  local tardir="$srcdir/${_realname}-$pkgver"
-  local builddir
-  local arch
+  local tardir="$srcdir/gettext-$pkgver"
+  local builddir="$tardir-build"
 
-  for arch in ${_architectures[@]}; do
-    builddir="$tardir-build-$arch"
-    mkdir -p "$builddir"
-    cd "$builddir"
-    MINGW_CPPFLAGS=-I../../gettext-runtime/intl \
-    source $arch-configure "$tardir" \
-      --enable-static \
-      --enable-shared \
-      --disable-silent-rules \
-      --disable-java \
-      --disable-native-java \
-      --disable-csharp \
-      --enable-threads=win32 \
-      --without-emacs \
-      --disable-openmp
-    make
-  done
+  mkdir -p "$builddir"
+  cd "$builddir"
+  source $CHOST-configure "$tardir" \
+    CPPFLAGS="$CPPFLAGS -I../../gettext-runtime/intl" \
+    --enable-static \
+    --enable-shared \
+    --disable-silent-rules \
+    --disable-java \
+    --disable-native-java \
+    --disable-csharp \
+    --enable-threads=win32 \
+    --without-emacs \
+    --disable-openmp
+  make
 }
 
 package() {
-  local arch
-  local prefix
+  local prefix="$pkgdir/usr/$CHOST"
 
-  for arch in ${_architectures[@]}; do
-    prefix="$pkgdir/usr/$arch"
+  cd "$srcdir/gettext-$pkgver-build"
+  make DESTDIR="$pkgdir" install
 
-    cd "$srcdir/${_realname}-$pkgver-build-$arch"
-    make DESTDIR="$pkgdir" install
+  find "$prefix" -name '*.exe' -exec $CHOST-strip {} +
+  find "$prefix" -name '*.dll' -exec $CHOST-strip --strip-unneeded {} +
+  find "$prefix" -name '*.a'   -exec $CHOST-strip -g {} +
 
-    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
-    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
-
-    # Remove components selectively
-    rm -fr "$prefix/share/doc"
-    rm -fr "$prefix/share/gettext"
-    rm -fr "$prefix/share/info"
-    rm -fr "$prefix/share/man"
-    rm -fr "$prefix/lib/gettext"
-    rm -fr "$prefix/lib/gettext"
-    rm -f  "$prefix/share/locale/locale.alias"
-  done
+  # Remove components selectively
+  rm -fr "$prefix/lib/gettext"
+  rm -fr "$prefix/lib/gettext"
+  rm -f  "$prefix/share/locale/locale.alias"
 }
 
 # vim:set ts=2 sw=2 et:
