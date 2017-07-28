@@ -3,65 +3,56 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-freetype.git/
 
-_realname=freetype
-pkgname="fedora-mingw-w64-${_realname}"
+pkgname=$CARCH-mingw-w64-freetype
 pkgver=2.7.1
-pkgrel=1
+pkgrel=2
 pkgdesc='TrueType font rendering library (mingw-w64)'
 arch=(any)
 url='http://freetype.sourceforge.net/'
 license=(GPL)
-groups=(aur-fedora-mingw fedora-mingw)
-depends=(mingw-w64-crt mingw-w64-zlib mingw-w64-bzip2)
-makedepends=(afm-mingw-w64-makedepends mingw-w64-libpng)
-provides=("mingw-w64-${_realname}=$pkgver")
-conflicts=("mingw-w64-${_realname}")
-options=(!strip staticlibs !buildflags)
-source=("http://downloads.sourceforge.net/sourceforge/${_realname}/${_realname}-$pkgver.tar.bz2")
+groups=(afm-$CARCH)
+depends=(
+    mingw-w64-crt
+    $CARCH-mingw-w64-zlib
+    $CARCH-mingw-w64-bzip2
+)
+makedepends=(
+    afm-mingw-w64-makedepends
+    $CARCH-mingw-w64-libpng
+)
+source=("http://downloads.sourceforge.net/sourceforge/freetype/freetype-$pkgver.tar.bz2")
 md5sums=('b3230110e0cab777e0df7631837ac36e')
 
-_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
-
 build() {
-  local tardir="$srcdir/${_realname}-$pkgver"
-  local builddir
-  local arch
+  local tardir="$srcdir/freetype-$pkgver"
+  local builddir="$tardir-build"
 
-  for arch in ${_architectures[@]}; do
-    builddir="$tardir-build-$arch"
-    mkdir -p "$builddir"
-    cd "$builddir"
-    # FreeType mimics the typical autotools behavior
-    # but it is *not* autotools based
-    "$tardir/configure" \
-      --build="$CHOST" \
-      --prefix="/usr/$arch" \
-      --host="$arch" \
-      --enable-static \
-      --enable-shared \
-      LIBPNG_CFLAGS="$(/usr/$arch/bin/libpng-config --cflags)" \
-      LIBPNG_LDFLAGS="$(/usr/$arch/bin/libpng-config --ldflags)"
-    make
-  done
+  mkdir -p "$builddir"
+  cd "$builddir"
+  # FreeType mimics the typical autotools behavior
+  # but it is *not* autotools based
+  "$tardir/configure" \
+    --build="$BUILDHOST" \
+    --host="$CHOST" \
+    --prefix="/usr/$CHOST" \
+    --enable-static \
+    --enable-shared \
+    LIBPNG_CFLAGS="$(/usr/$CHOST/bin/libpng-config --cflags)" \
+    LIBPNG_LDFLAGS="$(/usr/$CHOST/bin/libpng-config --ldflags)"
+  make
 }
 
 package() {
-  local arch
-  local prefix
+  local prefix="$pkgdir/usr/$CHOST"
 
-  for arch in ${_architectures[@]}; do
-    prefix="$pkgdir/usr/$arch"
+  cd "$srcdir/freetype-$pkgver-build"
+  make DESTDIR="$pkgdir" install
 
-    cd "$srcdir/${_realname}-$pkgver-build-$arch"
-    make DESTDIR="$pkgdir" install
+  find "$prefix" -name '*.exe' -exec $CHOST-strip {} +
+  find "$prefix" -name '*.dll' -exec $CHOST-strip --strip-unneeded {} +
+  find "$prefix" -name '*.a'   -exec $CHOST-strip -g {} +
 
-    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
-    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
-
-    rm -f  "$prefix/bin/freetype-config"
-    rm -fr "$prefix/share"
-  done
+  rm -f  "$prefix/bin/freetype-config"
 }
 
 # vim:set ts=2 sw=2 et:
