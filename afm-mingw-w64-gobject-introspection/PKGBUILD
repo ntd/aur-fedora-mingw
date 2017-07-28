@@ -2,25 +2,32 @@
 
 _realname=gobject-introspection
 pkgname="afm-mingw-w64-${_realname}"
-pkgver=1.50.0
-pkgrel=3
+pkgver=1.52.1
+pkgrel=1
 pkgdesc='Introspection system for GObject-based libraries (mingw-w64)'
 arch=(any)
 url='https://wiki.gnome.org/Projects/GObjectIntrospection'
 license=(LGPL GPL)
 groups=(aur-fedora-mingw)
-depends=(mingw-w64-crt fedora-mingw-w64-glib2 python2)
-makedepends=(afm-mingw-w64-makedepends wine)
+depends=(
+    mingw-w64-crt
+    "fedora-mingw-w64-glib2>=2.52.1"
+    python2
+)
+makedepends=(
+    afm-mingw-w64-makedepends
+    "glib2>=2.52.1"     # Host glib2 should match build glib2 version
+    wine
+)
 provides=("mingw-w64-${_realname}")
 conflicts=("mingw-w64-${_realname}")
-options=(!strip staticlibs !buildflags)
 source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
         "0003-Allow-overriding-of-the-host-os-name.patch"
         "0007-Allow-to-skip-the-check-for-Python-headers.patch"
         "0008-Overcome-File-name-too-long-error.patch"
         "0009-Customize-CCompiler-on-MinGW-cross-compilation.patch"
         "winewrapper")
-md5sums=('5af8d724f25d0c9cfbe6df41b77e5dc0'
+md5sums=('34157073991f9eeb0ed953351b65eb61'
          '3183cc3a8a14338f27830f0ebb66d408'
          '1420edbbec79268a490b0f781a4dacd9'
          '9fc71145c77b0688c0c28616fbef8d7a'
@@ -59,16 +66,20 @@ build() {
     cd "$builddir"
 
     # Build the python module with build == host
-    "$tardir/configure" \
-      --disable-silent-rules \
-      --enable-shared \
-      --enable-static
-    make scannerparser.c _giscanner.la
-
-    # Cross-compile the rest of the package inside a subshell so
-    # there will not be environment variable leaks from $arch-configure.
-    # The $arch-configure script comes from afm-mingw-w64-makedepends.
     (
+      # Do it in a subshell so the environment can be set accordingly
+      # and it will not be leaked outside
+      source /etc/makepkg.conf
+      "$tardir/configure" \
+        --disable-silent-rules \
+        --enable-shared \
+        --enable-static
+      make scannerparser.c _giscanner.la
+    )
+
+    # Cross-compile the rest of the package
+    (
+      # Again, do it inside a subshell to avoid environment leakings
       source $arch-configure "$tardir" \
         --host="$arch" \
         --disable-silent-rules \
@@ -77,7 +88,7 @@ build() {
         --disable-doctool \
         --disable-giscanner
 
-      # Avoid overriding what built with build == host
+      # Avoid overriding what built previously
       make -t scannerparser.c _giscanner.la
 
       make
