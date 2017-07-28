@@ -4,21 +4,17 @@
 # This is an adaptation of the MinGW package by Alexpux found on GitHub:
 # https://github.com/Alexpux/MINGW-packages/tree/master/mingw-w64-lua
 
-_realname=lua
-pkgname="afm-mingw-w64-${_realname}"
+pkgname=$CARCH-mingw-w64-lua
 pkgver=5.2.4
-pkgrel=9
+pkgrel=10
 pkgdesc='Powerful light-weight programming language designed for extending applications (mingw-w64)'
 arch=(any)
 url='http://www.lua.org/'
 license=(MIT)
-groups=(aur-fedora-mingw)
+groups=(afm-$CARCH)
 depends=(mingw-w64-crt)
 makedepends=(mingw-w64-gcc)
-provides=("mingw-w64-lua=$pkgver")
-conflicts=(mingw-w64-lua)
-options=(!strip staticlibs !buildflags)
-source=("http://www.lua.org/ftp/${_realname}-$pkgver.tar.gz"
+source=("http://www.lua.org/ftp/lua-$pkgver.tar.gz"
         "lua.pc"
         "implib.patch"
         "searchpath.patch"
@@ -29,10 +25,8 @@ md5sums=('913fdb32207046b273fdb17aad70be13'
          '201ee806b08404749770214296be1fa4'
          'dc0e846dc9d237fd31ede6a4be181d2d')
 
-_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
-
 prepare() {
-  cd "$srcdir/${_realname}-$pkgver"
+  cd "$srcdir/lua-$pkgver"
 
   patch -Np0 < ../implib.patch
 
@@ -43,54 +37,45 @@ prepare() {
 }
 
 build() {
-  local tardir="$srcdir/${_realname}-$pkgver"
-  local builddir
-  local arch
-  local prefix
+  local tardir="$srcdir/lua-$pkgver"
+  local builddir="$tardir-build"
 
-  for arch in ${_architectures[@]}; do
-    builddir="$tardir-build-$arch"
-    prefix="$pkgdir/usr/$arch"
+  # Lua does not support VPATH builds
+  cp -fr "$tardir" "$builddir"
+  sed -e "s|%VER%|${pkgver%.*}|g" \
+      -e "s|%REL%|$pkgver|g" \
+      -e "s|/usr|/usr/$CHOST|g" \
+      "$srcdir/lua.pc" > "$builddir/lua.pc"
 
-    # Lua does not support VPATH builds
-    cp -fr "$tardir" "$builddir"
-    sed -e "s|%VER%|${pkgver%.*}|g" \
-        -e "s|%REL%|$pkgver|g" \
-        -e "s|/usr|/usr/$arch|g" \
-        "$srcdir/lua.pc" > "$builddir/lua.pc"
-
-    cd "$builddir"
-    make -j1 \
-      MYCFLAGS='-O2 -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4' \
-      CC="$arch-gcc" \
-      AR="$arch-ar rcu" \
-      RANLIB="$arch-ranlib" \
-      STRIP="$arch-strip" \
-      mingw
-  done
+  cd "$builddir"
+  make -j1 \
+    MYCFLAGS="$CFLAGS" \
+    CC=$CHOST-gcc \
+    AR="$CHOST-ar rcu" \
+    RANLIB=$CHOST-ranlib \
+    STRIP=$CHOST-strip \
+    mingw
 }
 
 package() {
-  local builddir
-  local arch
-  local prefix
+  local builddir="$srcdir/lua-$pkgver-build"
+  local prefix="$pkgdir/usr/$CHOST"
 
-  for arch in ${_architectures[@]}; do
-    builddir="$srcdir/${_realname}-$pkgver-build-$arch"
-    prefix="$pkgdir/usr/$arch"
+  cd "$builddir"
+  make -j1 \
+    INSTALL_TOP="$prefix" \
+    TO_BIN="lua.exe luac.exe lua52.dll" \
+    TO_LIB="liblua.a liblua.dll.a" \
+    install
 
-    cd "$builddir"
-    make \
-      INSTALL_TOP="$prefix" \
-      TO_BIN="lua.exe luac.exe lua52.dll" \
-      TO_LIB="liblua.a liblua.dll.a" \
-      install
+  # Manually install the pkg-config file
+  install -Dm644 "$builddir/lua.pc" "$prefix/lib/pkgconfig/lua${pkgver%.*}.pc"
+  # This symlink should be done only for the current Lua release
+  ln -s "lua${pkgver%.*}.pc" "$prefix/lib/pkgconfig/lua.pc"
 
-    # Manually install the pkg-config file
-    install -Dm644 "$builddir/lua.pc" "$prefix/lib/pkgconfig/lua${pkgver%.*}.pc"
-    # This symlink should be done only for the current Lua release
-    ln -s "lua${pkgver%.*}.pc" "$prefix/lib/pkgconfig/lua.pc"
-  done
+  find "$prefix" -name '*.exe' -exec $CHOST-strip {} +
+  find "$prefix" -name '*.dll' -exec $CHOST-strip --strip-unneeded {} +
+  find "$prefix" -name '*.a'   -exec $CHOST-strip -g {} +
 }
 
 # vim:set ts=2 sw=2 et:
