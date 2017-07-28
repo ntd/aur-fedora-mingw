@@ -3,56 +3,38 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-expat.git/
 
-_realname=expat
-pkgname="fedora-mingw-w64-${_realname}"
+pkgname=$CARCH-mingw-w64-expat
 pkgver=2.2.0
-pkgrel=2
+pkgrel=3
 pkgdesc='An XML parser library (mingw-w64)'
 arch=(any)
 url='http://expat.sourceforge.net/'
 license=(custom)
-groups=(aur-fedora-mingw fedora-mingw)
+groups=(afm-$CARCH)
 depends=(mingw-w64-crt)
-makedepends=(mingw-w64-gcc)
 makedepends=(afm-mingw-w64-makedepends)
-provides=("mingw-w64-${_realname}=$pkgver")
-conflicts=("mingw-w64-${_realname}")
-options=(!strip staticlibs !buildflags)
-source=("http://downloads.sourceforge.net/sourceforge/${_realname}/${_realname}-$pkgver.tar.bz2")
+source=("http://downloads.sourceforge.net/sourceforge/expat/expat-$pkgver.tar.bz2")
 md5sums=('2f47841c829facb346eb6e3fab5212e2')
 
-_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
-
 build() {
-  local tardir="$srcdir/${_realname}-$pkgver"
-  local builddir
-  local arch
+  local tardir="$srcdir/expat-$pkgver"
+  local builddir="$tardir-build"
 
-  for arch in ${_architectures[@]}; do
-    builddir="$tardir-build-$arch"
-    mkdir -p "$builddir"
-    cd "$builddir"
-    source $arch-configure "$tardir"
-    make
-  done
+  mkdir -p "$builddir"
+  cd "$builddir"
+  source $CHOST-configure "$tardir"
+  make
 }
 
 package() {
-  local arch
-  local prefix
+  local prefix="$pkgdir/usr/$CHOST"
 
-  for arch in ${_architectures[@]}; do
-    prefix="$pkgdir/usr/$arch"
+  cd "$srcdir/expat-$pkgver-build"
+  make DESTDIR="$pkgdir" install
 
-    cd "$srcdir/${_realname}-$pkgver-build-$arch"
-    make DESTDIR="$pkgdir" install
-
-    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
-    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
-
-    rm -fr "$prefix/share"
-  done
+  find "$prefix" -name '*.exe' -exec $CHOST-strip {} +
+  find "$prefix" -name '*.dll' -exec $CHOST-strip --strip-unneeded {} +
+  find "$prefix" -name '*.a'   -exec $CHOST-strip -g {} +
 }
 
 # vim:set ts=2 sw=2 et:
