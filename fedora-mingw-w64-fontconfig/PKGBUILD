@@ -3,61 +3,50 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-fontconfig.git/
 
-_realname=fontconfig
-pkgname="fedora-mingw-w64-${_realname}"
+pkgname=$CARCH-mingw-w64-fontconfig
 pkgver=2.12.1
-pkgrel=2
+pkgrel=3
 pkgdesc='A library for configuring and customizing font access (mingw-w64)'
 arch=(any)
 url='http://fontconfig.org/'
 license=(custom)
-groups=(aur-fedora-mingw fedora-mingw)
-depends=(mingw-w64-crt mingw-w64-expat mingw-w64-freetype mingw-w64-win-iconv)
-makedepends=(afm-mingw-w64-makedepends python)
-provides=("mingw-w64-${_realname}=$pkgver")
-conflicts=("mingw-w64-${_realname}")
-options=(!strip staticlibs !buildflags)
-source=("http://www.fontconfig.org/release/${_realname}-$pkgver.tar.bz2")
+groups=(afm-$CARCH)
+depends=(
+    mingw-w64-crt
+    $CARCH-mingw-w64-expat
+    $CARCH-mingw-w64-freetype
+    $CARCH-mingw-w64-win-iconv
+)
+makedepends=(
+    afm-mingw-w64-makedepends
+    python
+)
+source=("http://www.fontconfig.org/release/fontconfig-$pkgver.tar.bz2")
 md5sums=('b5af5a423ee3b5cfc34846838963c058')
 
-_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
-
 build() {
-  local tardir="$srcdir/${_realname}-$pkgver"
-  local builddir
-  local arch
+  local tardir="$srcdir/fontconfig-$pkgver"
+  local builddir="$tardir-build"
 
-  for arch in ${_architectures[@]}; do
-    builddir="$tardir-build-$arch"
-    mkdir -p "$builddir"
-    cd "$builddir"
-    source $arch-configure "$tardir" \
-      --enable-static \
-      --enable-shared \
-      --with-arch="${arch%%-*}" \
-      --disable-docs
-    make
-  done
+  mkdir -p "$builddir"
+  cd "$builddir"
+  source $CHOST-configure "$tardir" \
+    --enable-static \
+    --enable-shared \
+    --with-arch="$CARCH" \
+    --disable-docs
+  make
 }
 
 package() {
-  local arch
-  local prefix
+  local prefix="$pkgdir/usr/$CHOST"
 
-  for arch in ${_architectures[@]}; do
-    prefix="$pkgdir/usr/$arch"
+  cd "$srcdir/fontconfig-$pkgver-build"
+  make DESTDIR="$pkgdir" install
 
-    cd "$srcdir/${_realname}-$pkgver-build-$arch"
-    make DESTDIR="$pkgdir" install
-
-    # Executable files must be preseved for cache management on the host
-    find "$prefix" -regex '.*\.\(bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.exe' -exec $arch-strip {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
-    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
-
-    rm -fr "$prefix/share/man"
-  done
+  find "$prefix" -name '*.exe' -exec $CHOST-strip {} +
+  find "$prefix" -name '*.dll' -exec $CHOST-strip --strip-unneeded {} +
+  find "$prefix" -name '*.a'   -exec $CHOST-strip -g {} +
 
   # The eventual cache dir does not invalidate the final package,
   # so leaving it untouched for debugging purposes.
