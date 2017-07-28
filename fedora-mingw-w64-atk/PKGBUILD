@@ -3,58 +3,51 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-atk.git/
 
-_realname=atk
-pkgname="fedora-mingw-w64-${_realname}"
+pkgname=$CARCH-mingw-w64-atk
 pkgver=2.24.0
-pkgrel=1
+pkgrel=2
 pkgdesc='A library providing a set of interfaces for accessibility (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
 license=(LGPL)
-groups=(aur-fedora-mingw fedora-mingw)
-depends=(mingw-w64-crt fedora-mingw-w64-win-iconv
-         fedora-mingw-w64-gettext fedora-mingw-w64-glib2)
-makedepends=(afm-mingw-w64-makedepends mingw-w64-gobject-introspection wine)
-provides=("mingw-w64-${_realname}=$pkgver")
-conflicts=("mingw-w64-${_realname}")
-options=(!strip staticlibs !buildflags)
-source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_realname}-$pkgver.tar.xz")
+groups=(afm-$CARCH)
+depends=(
+    mingw-w64-crt
+    $CARCH-mingw-w64-win-iconv
+    $CARCH-mingw-w64-gettext
+    $CARCH-mingw-w64-glib2
+)
+makedepends=(
+    afm-mingw-w64-makedepends
+    $CARCH-mingw-w64-gobject-introspection
+    wine
+)
+source=("http://ftp.gnome.org/pub/GNOME/sources/atk/${pkgver%.*}/atk-$pkgver.tar.xz")
 md5sums=('3747a80089dfa3c0bbcf21adfff9968b')
 
-_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
-
 build() {
-  local tardir="$srcdir/${_realname}-$pkgver"
-  local builddir
-  local arch
+  local tardir="$srcdir/atk-$pkgver"
+  local builddir="$tardir-build"
 
-  for arch in ${_architectures[@]}; do
-    builddir="$tardir-build-$arch"
-    mkdir -p "$builddir"
-    cd "$builddir"
-    source $arch-configure "$tardir" \
-      --enable-static \
-      --enable-shared \
-      --disable-silent-rules \
-      --enable-introspection
-    make
-  done
+  mkdir -p "$builddir"
+  cd "$builddir"
+  source $CHOST-configure "$tardir" \
+    --enable-static \
+    --enable-shared \
+    --disable-silent-rules \
+    --enable-introspection
+  make
 }
 
 package() {
-  local arch
-  local prefix
+  local prefix="$pkgdir/usr/$CHOST"
 
-  for arch in ${_architectures[@]}; do
-    prefix="$pkgdir/usr/$arch"
+  cd "$srcdir/atk-$pkgver-build"
+  make DESTDIR="$pkgdir" install
 
-    cd "$srcdir/${_realname}-$pkgver-build-$arch"
-    make DESTDIR="$pkgdir" install
-
-    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
-    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
-  done
+  find "$prefix" -name '*.exe' -exec $CHOST-strip {} +
+  find "$prefix" -name '*.dll' -exec $CHOST-strip --strip-unneeded {} +
+  find "$prefix" -name '*.a'   -exec $CHOST-strip -g {} +
 }
 
 # vim:set ts=2 sw=2 et:
