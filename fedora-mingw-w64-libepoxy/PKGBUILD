@@ -3,62 +3,50 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-libepoxy.git/
 
-_realname=libepoxy
-pkgname="fedora-mingw-w64-${_realname}"
+pkgname=$CARCH-mingw-w64-libepoxy
 pkgver=1.4.1
-pkgrel=1
+pkgrel=2
 pkgdesc='A library for handling OpenGL function pointer management for you'
 arch=(any)
 url='https://github.com/anholt/libepoxy'
 license=(MIT)
-groups=(aur-fedora-mingw fedora-mingw)
+groups=(afm-$CARCH)
 depends=(mingw-w64-crt)
-makedepends=(afm-mingw-w64-makedepends python)
-provides=("mingw-w64-${_realname}=$pkgver")
-conflicts=("mingw-w64-${_realname}")
-options=(!strip staticlibs !buildflags)
+makedepends=(
+    afm-mingw-w64-makedepends
+    python
+)
 source=("https://github.com/anholt/libepoxy/releases/download/$pkgver/libepoxy-$pkgver.tar.xz")
 md5sums=('a0dc66910009a99c47c5def50b042d77')
 
-_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
-
 prepare() {
-  cd "$srcdir/${_realname}-$pkgver"
+  cd "$srcdir/libepoxy-$pkgver"
 
   autoreconf -ivf
 }
 
 build() {
-  local tardir="$srcdir/${_realname}-$pkgver"
-  local builddir
-  local arch
+  local tardir="$srcdir/libepoxy-$pkgver"
+  local builddir="$tardir-build"
 
-  for arch in ${_architectures[@]}; do
-    builddir="$tardir-build-$arch"
-    mkdir -p "$builddir"
-    cd "$builddir"
-    source $arch-configure "$tardir" \
-      --enable-static \
-      --enable-shared \
-      --disable-silent-rules
-    make
-  done
+  mkdir -p "$builddir"
+  cd "$builddir"
+  source $CHOST-configure "$tardir" \
+    --enable-static \
+    --enable-shared \
+    --disable-silent-rules
+  make
 }
 
 package() {
-  local arch
-  local prefix
+  local prefix="$pkgdir/usr/$CHOST"
 
-  for arch in ${_architectures[@]}; do
-    prefix="$pkgdir/usr/$arch"
+  cd "$srcdir/libepoxy-$pkgver-build"
+  make DESTDIR="$pkgdir" install
 
-    cd "$srcdir/${_realname}-$pkgver-build-$arch"
-    make DESTDIR="$pkgdir" install
-
-    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
-    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
-  done
+  find "$prefix" -name '*.exe' -exec $CHOST-strip {} +
+  find "$prefix" -name '*.dll' -exec $CHOST-strip --strip-unneeded {} +
+  find "$prefix" -name '*.a'   -exec $CHOST-strip -g {} +
 }
 
 # vim:set ts=2 sw=2 et:
