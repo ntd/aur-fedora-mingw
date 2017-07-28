@@ -3,58 +3,43 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-pixman.git/
 
-_realname=pixman
-pkgname="fedora-mingw-w64-${_realname}"
+pkgname=$CARCH-mingw-w64-pixman
 pkgver=0.34.0
-pkgrel=2
+pkgrel=3
 pkgdesc='The pixel-manipulation library for X and cairo (mingw-w64)'
 arch=(any)
 url='http://pixman.org/'
 license=(LGPL MPL custom)
-groups=(aur-fedora-mingw fedora-mingw)
+groups=(afm-$CARCH)
 depends=(mingw-w64-crt)
 makedepends=(afm-mingw-w64-makedepends)
-provides=("mingw-w64-${_realname}=$pkgver")
-conflicts=("mingw-w64-${_realname}")
-options=(!strip staticlibs !buildflags)
 source=("http://cairographics.org/releases/pixman-$pkgver.tar.gz")
 md5sums=('e80ebae4da01e77f68744319f01d52a3')
 
-_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
-
 build() {
-  local tardir="$srcdir/${_realname}-$pkgver"
-  local builddir
-  local arch
+  local tardir="$srcdir/pixman-$pkgver"
+  local builddir="$tardir-build"
 
-  for arch in ${_architectures[@]}; do
-    builddir="$tardir-build-$arch"
-    mkdir -p "$builddir"
-    cd "$builddir"
-    source $arch-configure "$tardir" \
-      --enable-static \
-      --enable-shared \
-      --disable-silent-rules \
-      --disable-sse2 \
-      --disable-gtk
-    make
-  done
+  mkdir -p "$builddir"
+  cd "$builddir"
+  source $CHOST-configure "$tardir" \
+    --enable-static \
+    --enable-shared \
+    --disable-silent-rules \
+    --disable-sse2 \
+    --disable-gtk
+  make
 }
 
 package() {
-  local arch
-  local prefix
+  local prefix="$pkgdir/usr/$CHOST"
 
-  for arch in ${_architectures[@]}; do
-    prefix="$pkgdir/usr/$arch"
+  cd "$srcdir/pixman-$pkgver-build"
+  make DESTDIR="$pkgdir" install
 
-    cd "$srcdir/${_realname}-$pkgver-build-$arch"
-    make DESTDIR="$pkgdir" install
-
-    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
-    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
-  done
+  find "$prefix" -name '*.exe' -exec $CHOST-strip {} +
+  find "$prefix" -name '*.dll' -exec $CHOST-strip --strip-unneeded {} +
+  find "$prefix" -name '*.a'   -exec $CHOST-strip -g {} +
 }
 
 # vim:set ts=2 sw=2 et:
