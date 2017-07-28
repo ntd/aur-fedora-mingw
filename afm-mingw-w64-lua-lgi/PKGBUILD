@@ -1,19 +1,23 @@
 # Maintainer: Nicola Fontana <ntd@entidi.it>
 
-_realname=lua-lgi
 _luaver=5.2
-pkgname="afm-mingw-w64-${_realname}"
+
+pkgname=$CARCH-mingw-w64-lua-lgi
 pkgver=0.9.0
-pkgrel=5
+pkgrel=6
 pkgdesc='Lua bindings for gnome/gobject using gobject-introspection library (mingw-w64)'
 arch=(any)
 url='http://www.lua.org/'
 license=(MIT)
-groups=(aur-fedora-mingw)
-depends=(mingw-w64-crt mingw-w64-lua mingw-w64-gobject-introspection)
+groups=(afm-$CARCH)
+depends=(
+    mingw-w64-crt
+    $CARCH-mingw-w64-lua
+    $CARCH-mingw-w64-glib2
+    $CARCH-mingw-w64-gobject-introspection
+)
 makedepends=(afm-mingw-w64-makedepends)
-options=(!strip staticlibs !buildflags)
-source=("${_realname}-$pkgver.tar.gz::https://github.com/pavouk/lgi/archive/$pkgver.tar.gz"
+source=("lua-lgi-$pkgver.tar.gz::https://github.com/pavouk/lgi/archive/$pkgver.tar.gz"
         "0001-Allow-overriding-of-pkg-config-executable.patch"
         "0002-Export-luaopen_lgi_corelgilua51.patch"
         "0003-Extend-platform-support-to-MSYS-and-MinGW.patch"
@@ -28,14 +32,9 @@ md5sums=('cc433a597f23cfabdfc905c6c2cd3d7c'
          '7688457a774d8ca306d4f59655887c9b'
          '3de38470e6238a2b190a9f54c551f74e')
 
-_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
-
 prepare() {
-  local tardir="$srcdir/${_realname}-$pkgver"
+  local tardir="$srcdir/lgi-$pkgver"
 
-  # Use $_realname instead of "lgi"
-  rm -fr "$tardir"
-  cp -fr "$srcdir/lgi-$pkgver" "$tardir"
   cd "$tardir"
 
   # The first patch does not apply cleanly because it is rebased on
@@ -53,47 +52,38 @@ prepare() {
 }
 
 build() {
-  local tardir="$srcdir/${_realname}-$pkgver"
-  local builddir
-  local arch
+  local tardir="$srcdir/lgi-$pkgver"
+  local builddir="$tardir-build"
   local deps="lua${_luaver} gobject-introspection-1.0 gmodule-2.0 libffi"
 
-  for arch in ${_architectures[@]}; do
-    builddir="$tardir-build-$arch"
-    # lua-lgi does not support VPATH builds
-    cp -fr "$tardir" "$builddir"
-    cd "$builddir"
-    # -no-undefined seems to be required for Windows, see e.g.
-    # https://sourceware.org/autobook/autobook/autobook_253.html#SEC253
-    make \
-      HOST_OS=mingw32 \
-      COPTFLAGS="-O2 -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 --param=ssp-buffer-size=4" \
-      LDFLAGS=-Wl,-no-undefined \
-      CFLAGS="$($arch-pkg-config --cflags $deps)" \
-      LIBS="$($arch-pkg-config --libs $deps)" \
-      LUA_VERSION="${_luaver}" \
-      CC="$arch-gcc" \
-      PKG_CONFIG="$arch-pkg-config"
-  done
+  # lua-lgi does not support VPATH builds
+  cp -fr "$tardir" "$builddir"
+  cd "$builddir"
+  make \
+    HOST_OS=mingw32 \
+    COPTFLAGS="$CFLAGS" \
+    LDFLAGS="$LDFLAGS" \
+    CFLAGS="$($CHOST-pkg-config --cflags $deps)" \
+    LIBS="$($CHOST-pkg-config --libs $deps)" \
+    LUA_VERSION="${_luaver}" \
+    CC="$CHOST-gcc" \
+    PKG_CONFIG="$CHOST-pkg-config"
 }
 
 package() {
-  local arch
-  local prefix
+  local prefix="$pkgdir/usr/$CHOST"
 
-  for arch in ${_architectures[@]}; do
-    prefix="$pkgdir/usr/$arch"
+  cd "$srcdir/lgi-$pkgver-build"
+  make \
+    HOST_OS=mingw32 \
+    LUA_VERSION="${_luaver}" \
+    PREFIX="/usr/$CHOST" \
+    DESTDIR="$pkgdir/" \
+    install
 
-    cd "$srcdir/${_realname}-$pkgver-build-$arch"
-    make \
-      HOST_OS=mingw32 \
-      LUA_VERSION="${_luaver}" \
-      PREFIX="/usr/$arch" \
-      DESTDIR="$pkgdir/" \
-      install
-
-    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
-  done
+  find "$prefix" -name '*.exe' -exec $CHOST-strip {} +
+  find "$prefix" -name '*.dll' -exec $CHOST-strip --strip-unneeded {} +
+  find "$prefix" -name '*.a'   -exec $CHOST-strip -g {} +
 }
 
 # vim:set ts=2 sw=2 et:
