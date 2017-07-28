@@ -3,55 +3,43 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-libpng.git/
 
-_realname=libpng
-pkgname="fedora-mingw-w64-${_realname}"
+pkgname=$CARCH-mingw-w64-libpng
 pkgver=1.6.29
-pkgrel=1
+pkgrel=2
 pkgdesc='A collection of routines used to create PNG format graphics (mingw-w64)'
 arch=(any)
 url='http://www.libpng.org/pub/png/libpng.html'
 license=(custom)
-groups=(aur-fedora-mingw fedora-mingw)
-depends=(mingw-w64-crt mingw-w64-zlib)
+groups=(afm-$CARCH)
+depends=(
+    mingw-w64-crt
+    $CARCH-mingw-w64-zlib
+)
 makedepends=(afm-mingw-w64-makedepends)
-provides=(mingw-w64-libpng=$pkgver)
-conflicts=(mingw-w64-libpng)
-options=(!strip staticlibs !buildflags)
-source=("http://downloads.sourceforge.net/sourceforge/${_realname}/${_realname}-$pkgver.tar.xz")
+source=("http://downloads.sourceforge.net/sourceforge/libpng/libpng-$pkgver.tar.xz")
 md5sums=('3245dbd76ea91e1437507357b858ec97')
 
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 build() {
-  local tardir="$srcdir/${_realname}-$pkgver"
-  local builddir
-  local arch
+  local tardir="$srcdir/libpng-$pkgver"
+  local builddir="$tardir-build"
 
-  for arch in ${_architectures[@]}; do
-    builddir="$tardir-build-$arch"
-    mkdir -p "$builddir"
-    cd "$builddir"
-    source $arch-configure "$tardir"
-    make
-  done
+  mkdir -p "$builddir"
+  cd "$builddir"
+  source $CHOST-configure "$tardir"
+  make
 }
 
 package() {
-  local arch
-  local prefix
+  local prefix="$pkgdir/usr/$CHOST"
 
-  for arch in ${_architectures[@]}; do
-    prefix="$pkgdir/usr/$arch"
+  cd "$srcdir/libpng-$pkgver-build"
+  make DESTDIR="$pkgdir" install
 
-    cd "$srcdir/${_realname}-$pkgver-build-$arch"
-    make DESTDIR="$pkgdir" install
-
-    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
-    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
-
-    rm -fr "$prefix/share"
-  done
+  find "$prefix" -name '*.exe' -exec $CHOST-strip {} +
+  find "$prefix" -name '*.dll' -exec $CHOST-strip --strip-unneeded {} +
+  find "$prefix" -name '*.a'   -exec $CHOST-strip -g {} +
 }
 
 # vim:set ts=2 sw=2 et:
