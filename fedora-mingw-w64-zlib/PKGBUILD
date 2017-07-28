@@ -3,9 +3,9 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-zlib.git/
 
-pkgname="$CARCH-mingw-w64-zlib"
+pkgname=$CARCH-mingw-w64-zlib
 pkgver=1.2.8
-pkgrel=15
+pkgrel=16
 pkgdesc='A compression/decompression Library (mingw-w64)'
 arch=(any)
 url='http://www.zlib.net/'
@@ -13,8 +13,8 @@ license=(custom)
 groups=(afm-$CARCH)
 depends=(mingw-w64-crt)
 makedepends=(afm-mingw-w64-makedepends)
-provides=("mingw-w64-zlib=$pkgver")
-conflicts=("mingw-w64-zlib")
+provides=(mingw-w64-zlib=$pkgver)
+conflicts=(mingw-w64-zlib)
 source=("http://downloads.sourceforge.net/sourceforge/libpng/zlib/$pkgver/zlib-$pkgver.tar.gz"
         "http://pkgs.fedoraproject.org/cgit/mingw-zlib.git/plain/mingw32-zlib-1.2.7-autotools.patch?id=2333169c09a99a357b0aaa58e0bd7dfda0932685"
         "http://pkgs.fedoraproject.org/cgit/mingw-zlib.git/plain/zlib-1.2.7-use-correct-def-file.patch?id=2333169c09a99a357b0aaa58e0bd7dfda0932685"
@@ -23,8 +23,6 @@ md5sums=('44d667c142d7cda120332623eab69f40'
          'b553d7d9481d5a5114699e1ee7530977'
          'f03194ede4fb28e58fa9fb5e66bbab55'
          '82e72a91adf994108b21b8acf621a9d0')
-
-_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 prepare() {
   cd "$srcdir/zlib-$pkgver"
