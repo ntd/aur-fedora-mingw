@@ -3,22 +3,29 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-cairo.git/
 
-_realname=cairo
-pkgname="fedora-mingw-w64-${_realname}"
+pkgname=$CARCH-mingw-w64-cairo
 pkgver=1.14.10
-pkgrel=1
+pkgrel=2
 pkgdesc='Cairo vector graphics library (mingw-w64)'
 arch=(any)
 url='http://cairographics.org/'
 license=(LGPL MPL)
-groups=(aur-fedora-mingw fedora-mingw)
-depends=(mingw-w64-crt fedora-mingw-w64-fontconfig fedora-mingw-w64-freetype
-         mingw-w64-libxml2 fedora-mingw-w64-pixman mingw-w64-libpng
-         fedora-mingw-w64-win-iconv mingw-w64-zlib fedora-mingw-w64-glib2)
-makedepends=(afm-mingw-w64-makedepends mingw-w64-tools)
-provides=("mingw-w64-${_realname}=$pkgver")
-conflicts=("mingw-w64-${_realname}")
-options=(!strip staticlibs !buildflags)
+groups=(afm-$CARCH)
+depends=(
+    mingw-w64-crt
+    $CARCH-mingw-w64-fontconfig
+    $CARCH-mingw-w64-freetype
+    $CARCH-mingw-w64-libxml2
+    $CARCH-mingw-w64-pixman
+    $CARCH-mingw-w64-libpng
+    $CARCH-mingw-w64-win-iconv
+    $CARCH-mingw-w64-zlib
+    $CARCH-mingw-w64-glib2
+)
+makedepends=(
+    afm-mingw-w64-makedepends
+    mingw-w64-tools
+)
 source=("http://cairographics.org/releases/cairo-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/rpms/mingw-cairo.git/plain/0001-win32-Add-cairo-API-to-set-up-a-Win32-surface-for-an.patch?id=269cfa82082b51ad7f1fa8240df6524943967410"
         "http://pkgs.fedoraproject.org/cgit/rpms/mingw-cairo.git/plain/0002-win32-Add-a-win32-boilerplate-that-uses-a-real-windo.patch?id=928bada85172323977c79de2ec32d782c6845f84")
@@ -26,10 +33,8 @@ md5sums=('146f5f4d0b4439fc3792fd3452b7b12a'
          'cf640dfd981d3ab6aaf7c72768482287'
          '178e1d763cedd7c9e4e3def02800a31e')
 
-_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
-
 prepare() {
-  cd "$srcdir/${_realname}-$pkgver"
+  cd "$srcdir/cairo-$pkgver"
 
   # Backported upstream patch to add API required by gtk3
   patch -Np1 < '../0001-win32-Add-cairo-API-to-set-up-a-Win32-surface-for-an.patch?id=269cfa82082b51ad7f1fa8240df6524943967410'
@@ -38,9 +43,8 @@ prepare() {
 }
 
 build() {
-  local tardir="$srcdir/${_realname}-$pkgver"
-  local builddir
-  local arch
+  local tardir="$srcdir/cairo-$pkgver"
+  local builddir="$tardir-build"
 
   # Function to generate an import library for delay-loading
   gen_delay_lib() {
@@ -48,55 +52,45 @@ build() {
     local OUT_IMPLIB="$2"
 
     gendef - "$DLL" > delay_load.def
-    $arch-dlltool --def delay_load.def --kill-at --output-delaylib "$OUT_IMPLIB"
+    $CHOST-dlltool --def delay_load.def --kill-at --output-delaylib "$OUT_IMPLIB"
     rm -f delay_load.def
   }
 
-  for arch in ${_architectures[@]}; do
-    builddir="$tardir-build-$arch"
-    mkdir -p "$builddir"
-    cd "$builddir"
+  mkdir -p "$builddir"
+  cd "$builddir"
 
-    # Generate import libs for delay-loading fontconfig and freetype
-    gen_delay_lib "/usr/$arch/bin/libfontconfig-1.dll" libfontconfig-delayed.dll.a
-    gen_delay_lib "/usr/$arch/bin/libfreetype-6.dll" libfreetype-delayed.dll.a
+  # Generate import libs for delay-loading fontconfig and freetype
+  gen_delay_lib "/usr/$CHOST/bin/libfontconfig-1.dll" libfontconfig-delayed.dll.a
+  gen_delay_lib "/usr/$CHOST/bin/libfreetype-6.dll" libfreetype-delayed.dll.a
 
-    ax_cv_c_float_words_bigendian=no \
-    source $arch-configure "$tardir" \
-      --enable-static \
-      --enable-shared \
-      --disable-silent-rules \
-      --disable-pthread \
-      --disable-xlib \
-      --disable-xcb \
-      --enable-win32 \
-      --enable-fc \
-      --enable-ft \
-      --enable-png \
-      --enable-gobject \
-      --enable-tee \
-      FONTCONFIG_LIBS="-L$builddir -lfontconfig-delayed" \
-      FREETYPE_LIBS="-L$builddir -lfreetype-delayed"
-    make
-  done
+  ax_cv_c_float_words_bigendian=no \
+  source $CHOST-configure "$tardir" \
+    --enable-static \
+    --enable-shared \
+    --disable-silent-rules \
+    --disable-pthread \
+    --disable-xlib \
+    --disable-xcb \
+    --enable-win32 \
+    --enable-fc \
+    --enable-ft \
+    --enable-png \
+    --enable-gobject \
+    --enable-tee \
+    FONTCONFIG_LIBS="-L$builddir -lfontconfig-delayed" \
+    FREETYPE_LIBS="-L$builddir -lfreetype-delayed"
+  make
 }
 
 package() {
-  local arch
-  local prefix
+  local prefix="$pkgdir/usr/$CHOST"
 
-  for arch in ${_architectures[@]}; do
-    prefix="$pkgdir/usr/$arch"
+  cd "$srcdir/cairo-$pkgver-build"
+  make DESTDIR="$pkgdir" install
 
-    cd "$srcdir/${_realname}-$pkgver-build-$arch"
-    make DESTDIR="$pkgdir" install
-
-    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
-    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
-
-    rm -fr "$prefix/share"
-  done
+  find "$prefix" -name '*.exe' -exec $CHOST-strip {} +
+  find "$prefix" -name '*.dll' -exec $CHOST-strip --strip-unneeded {} +
+  find "$prefix" -name '*.a'   -exec $CHOST-strip -g {} +
 }
 
 # vim:set ts=2 sw=2 et:
