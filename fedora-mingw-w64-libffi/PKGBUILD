@@ -3,59 +3,39 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-libffi.git/
 
-_realname=libffi
-pkgname="fedora-mingw-w64-${_realname}"
+pkgname=$CARCH-mingw-w64-libffi
 pkgver=3.1
-pkgrel=1
+pkgrel=2
 pkgdesc='A portable, high level programming interface to various calling conventions (mingw-w64)'
 arch=(any)
 url='http://sourceware.org/libffi/'
 license=(MIT)
-groups=(aur-fedora-mingw fedora-mingw)
+groups=(afm-$CARCH)
 depends=(mingw-w64-crt)
 makedepends=(mingw-w64-gcc)
-provides=(mingw-w64-libffi=$pkgver)
-conflicts=(mingw-w64-libffi)
-options=(!strip staticlibs !buildflags)
 source=("ftp://sourceware.org/pub/libffi/libffi-$pkgver.tar.gz")
 md5sums=('f5898b29bbfd70502831a212d9249d10')
 
-_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
-
 build() {
-  local tardir="$srcdir/${_realname}-$pkgver"
-  local builddir
-  local arch
+  local tardir="$srcdir/libffi-$pkgver"
+  local builddir="$tardir-build"
 
-  for arch in ${_architectures[@]}; do
-    builddir="$tardir-build-$arch"
-    mkdir -p "$builddir"
-    cd "$builddir"
-    "$tardir/configure" \
-      --build="$CHOST" \
-      --prefix="/usr/$arch" \
-      --host="$arch" \
-      --enable-shared
-    make
-  done
+  mkdir -p "$builddir"
+  cd "$builddir"
+  source $CHOST-configure "$tardir" \
+    --enable-shared
+  make
 }
 
 package() {
-  local arch
-  local prefix
+  local prefix="$pkgdir/usr/$CHOST"
 
-  for arch in ${_architectures[@]}; do
-    prefix="$pkgdir/usr/$arch"
+  cd "$srcdir/libffi-$pkgver-build"
+  make DESTDIR="$pkgdir" install
 
-    cd "$srcdir/${_realname}-$pkgver-build-$arch"
-    make DESTDIR="$pkgdir" install
-
-    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
-    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
-
-    rm -fr "$prefix/share"
-  done
+  find "$prefix" -name '*.exe' -exec $CHOST-strip {} +
+  find "$prefix" -name '*.dll' -exec $CHOST-strip --strip-unneeded {} +
+  find "$prefix" -name '*.a'   -exec $CHOST-strip -g {} +
 }
 
 # vim:set ts=2 sw=2 et:
