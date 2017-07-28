@@ -1,105 +1,152 @@
 #! /bin/bash
-#
-# Builds all the GTK+ MinGW toolchain skipping the packages that
-# have been previously compiled (that is, the directories still
-# containing a .pkg.tar.xz file).
-#
-# A serie of packages to skip can be optionally specified
-# on the command line. For example, the following command
-# will build everything but cairo:
-#
-# ./build-all fedora-mingw-w64-cairo
 
-root="$(dirname $0)"
+usage() {
+    echo <<EOT
+Usage: $0 ARCH [PACKAGE TO SKIP]...
+
+Builds all the GTK+ MinGW toolchain, skipping the packages that
+have been previously compiled (that is, the directories still
+containing a .pkg.tar.xz file).
+
+You must supply the architecture as first argument, e.g. "i686"
+for the 32 bits toolchain or "x86_64" for the 64 bits one.
+
+A serie of packages to skip can be optionally specified on the
+command line. For example the following command will build
+everything but cairo:
+
+    ./build-all i686 fedora-mingw-w64-cairo
+EOT
+}
+
+case "$1" in
+    i686|x86_64)
+        arch=$1
+        shift
+        ;;
+    *)
+        usage
+esac
+
 
 function found() {
     local needle="$1"
     shift
     while : ; do
-	haystack=$1
-	shift || return 1
-	[[ "$haystack" = "$needle" ]] && return 0
+        haystack=$1
+        shift || return 1
+        [[ "$haystack" = "$needle" ]] && return 0
     done
 }
 
-pkgs=(
-	# Install some non-standard dependencies
-	wine
-	cmake					# Required by libjpeg and win-iconv
-	scons					# Required by nsis
-	nasm					# Required by libjpeg-turbo
-	python					# Required by glib2 and libepoxy
-	intltool				# Required by adwaita-icon-theme
-	xorg-util-macros			# Required by libepoxy
-	gtk-doc					# Required by pango
+function install() {
+    # TODO: is there a more elegant way to force the removing
+    #       of conflicting packages?
+    if ! yes | LC_MESSAGES=C yaourt -U *.pkg.tar.xz; then exit 1; fi
+}
 
-	# Cross-building tools from official Archlinux repositories
-	mingw-w64-gcc
-	mingw-w64-binutils			# Required by cairo
-	mingw-w64-tools				# Required by cairo and harfbuzz
+dependencies=(
+    # From core
+    glib2               # Required by gobject-introspection
 
-	afm-mingw-w64-makedepends
+    # From extra
+    cmake               # Required by libjpeg and win-iconv
+    scons               # Required by nsis
+    nasm                # Required by libjpeg-turbo
+    python              # Required by glib2 and libepoxy
+    python2             # Required by gobject-introspection
+    intltool            # Required by adwaita-icon-theme
+    xorg-util-macros    # Required by libepoxy
+    gtk-doc             # Required by pango
 
-	# GTK+2/3 toolchain
-	fedora-mingw-w64-zlib
-	fedora-mingw-w64-bzip2
-	fedora-mingw-w64-termcap
-	fedora-mingw-w64-win-iconv
-	fedora-mingw-w64-gettext
-	fedora-mingw-w64-expat
-	fedora-mingw-w64-libxml2
-	fedora-mingw-w64-libpng
-	fedora-mingw-w64-libjpeg-turbo
-	fedora-mingw-w64-libffi
-	fedora-mingw-w64-pcre			# Required by glib >= 2.47.5
-	fedora-mingw-w64-glib2
+    # From multilib
+    wine                # Required by gobject-introspection
 
-	# Let us compile introspection early in order
-	# to be able to enable it on other projects
-	afm-mingw-w64-gobject-introspection
+    # From community
+    mingw-w64-gcc
+    mingw-w64-binutils  # Required by cairo
 
-	fedora-mingw-w64-freetype
-	fedora-mingw-w64-fontconfig
-	fedora-mingw-w64-pixman
-	fedora-mingw-w64-icu
-	fedora-mingw-w64-cairo
-	fedora-mingw-w64-gdk-pixbuf
-	fedora-mingw-w64-atk
-	fedora-mingw-w64-harfbuzz
-	fedora-mingw-w64-pango
-	fedora-mingw-w64-gtk2
-	fedora-mingw-w64-libepoxy		# Required by gtk3 >= 3.16.0
-	fedora-mingw-w64-adwaita-icon-theme	# Required by gtk3 >= 3.16.0
-	fedora-mingw-w64-gtk3
-
-	# Cross-compilation of Windows installer
-	fedora-mingw-w64-nsis
-
-	# LGI (dynamic Lua bindings) support
-	afm-mingw-w64-lua
-	afm-mingw-w64-lua-lgi
+    # From AUR
+    mingw-w64-tools     # Required by cairo and harfbuzz
 )
 
-for pkg in ${pkgs[@]}; do
-	found "$pkg" "$@" && continue
-	if [ ! -d "$pkg" ]; then
-	    # No package directory found: try to build from AUR
-	    if ! yaourt -Sa --needed --noconfirm "$pkg"; then exit 1; fi
-	elif [ -z "$(find "$pkg" -maxdepth 1 -name '*.pkg.tar.xz')" ]; then
-	    # The directory exists and does not contain any .pkg.tar.xz
-	    # file: build the package with makepkg
-	    cd "$pkg"
-	    makepkg -f --config ../makepkg.x86_64.conf
+native=(
+    afm-mingw-w64-makedepends
+    fedora-mingw-w64-nsis
+)
 
-	    # TODO: is there a more elegant way to force the removing
-	    #       of conflicting packages?
-	    if ! yes | LC_MESSAGES=C yaourt -U *.pkg.tar.xz; then exit 1; fi
+xbuild=(
+    # GTK+2/3 dependencies
+    fedora-mingw-w64-zlib
+    fedora-mingw-w64-bzip2
+    fedora-mingw-w64-termcap
+    fedora-mingw-w64-win-iconv
+    fedora-mingw-w64-gettext
+    fedora-mingw-w64-expat
+    fedora-mingw-w64-libxml2
+    fedora-mingw-w64-libpng
+    fedora-mingw-w64-libjpeg-turbo
+    fedora-mingw-w64-libffi
+    fedora-mingw-w64-pcre       # Required by glib >= 2.47.5
+    fedora-mingw-w64-glib2
 
-	    # The tarball links (*.pkg.tar.xz) are not deleted: it is
-	    # convenient to keep them on place to easily update package
-	    # databases, i.e. using a command such as
-	    # repo-add <path-to-db> */*.pkg.tar.xz
-	    rm -fr pkg src
-	    cd ..
-	fi
+    # Let us compile introspection early in order
+    # to be able to enable it on other projects
+    afm-mingw-w64-gobject-introspection
+
+    fedora-mingw-w64-freetype
+    fedora-mingw-w64-fontconfig
+    fedora-mingw-w64-pixman
+    fedora-mingw-w64-icu
+    fedora-mingw-w64-cairo
+    fedora-mingw-w64-gdk-pixbuf
+    fedora-mingw-w64-atk
+    fedora-mingw-w64-harfbuzz
+    fedora-mingw-w64-pango
+    fedora-mingw-w64-gtk2
+    fedora-mingw-w64-libepoxy   # Required by gtk3 >= 3.16.0
+                                # Required by gtk3 >= 3.16.0
+    fedora-mingw-w64-adwaita-icon-theme
+    fedora-mingw-w64-gtk3
+
+    # LGI (dynamic Lua bindings) support
+    afm-mingw-w64-lua
+    afm-mingw-w64-lua-lgi
+)
+
+# Install required dependencies
+for pkg in ${dependencies[@]}; do
+    if ! yaourt -Sa --needed --noconfirm "$pkg"; then
+        exit 1
+    fi
 done
+
+# Native compilation of helper packages
+for pkg in ${native[@]}; do
+    # Skip packages passed in as arguments
+    found "$pkg" "$@" && continue
+
+    cd "$pkg"
+    makepkg -f --config /usr/share/mingw/makepkg.native.conf
+    install
+
+    rm -fr pkg src
+    cd ..
+done
+
+# Cross compilation of the toolchain
+for pkg in ${xbuild[@]}; do
+    # Skip packages passed in as arguments
+    found "$pkg" "$@" && continue
+
+    cd "$pkg"
+    makepkg -f --config /usr/share/mingw/makepkg.$arch.conf
+    install
+
+    rm -fr pkg src
+    cd ..
+done
+
+# The tarball links (*.pkg.tar.xz) are not deleted: it is convenient to
+# keep them around to easily update package databases, i.e. by using a
+# command such as `repo-add <path-to-db> */*.pkg.tar.xz`

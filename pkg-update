@@ -1,35 +1,45 @@
 #! /bin/bash
 # Helper script to update *my* repository
 
-repodir=$HOME/workdir/aur-fedora-mingw/pkg
-
 die() {
     echo "$@" >&2
     exit 1
 }
 
-[ -n "$1" -a -z "$2" ] || die "Usage: $0 DIRECTORY"
-[ -e "$1/PKGBUILD" ] || die "'$1' must be a package directory"
+case "$1" in
+    i686|x86_64)
+        arch=$1
+        dir=$2
+        pkg=$arch-$2
+        ;;
+    *)
+        arch=native
+        dir=$1
+        pkg=$1
+        ;;
+esac
 
-repoupdate=./repo-update
-[ -x $repoupdate ] || repoupdate=../repo-update
-[ -x $repoupdate ] || repoupdate=repo-update
-[ -x $repoupdate ] || die "repo-update script not found in PATH, . or .."
+root=$(dirname ${BASH_SOURCE[0]})
+repodir=$HOME/workdir/aur-fedora-mingw/pkg
+repoupdate="$root/repo-update"
+
+[ -n "$dir" ] || die "Usage: $0 [i686|x86_64] DIRECTORY"
+[ -e "$root/$dir/PKGBUILD" ] || die "'$1' must be a package directory"
 
 # Remove old packages
-rm -f $repodir/$1-*.pkg.tar.xz
+rm -f $repodir/$pkg-*.pkg.tar.xz
 
 # Build new package
-pushd "$1" > /dev/null
-makepkg --config ../makepkg.x86_64.conf
+pushd "$root/$dir" > /dev/null
+makepkg --config /usr/share/mingw/makepkg.$arch.conf
 popd > /dev/null
-[ -r "$1"/*.pkg.tar.xz ] || die "Package compilation failed"
+[ -r "$root/$dir"/*.pkg.tar.xz ] || die "Package compilation failed"
 
 # Upgrade installed package
-yes | LC_MESSAGES=C yaourt -U "$1"/*.pkg.tar.xz || die "Package upgrade failed"
+yes | LC_MESSAGES=C yaourt -U "$root/$dir"/*.pkg.tar.xz || die "Package upgrade failed"
 
 # Update repository
-$repoupdate $repodir/entidi "$1"/*.pkg.tar.xz || die "$repoupdate failed"
+$repoupdate $repodir/entidi "$root/$dir"/*.pkg.tar.xz || die "$repoupdate failed"
 
 # Clean up build files
-rm -fr "$1"/pkg "$1"/src "$1"/*.pkg.tar.xz
+rm -fr "$root/$dir/pkg" "$root/$dir/src" "$root/$dir"/*.pkg.tar.xz
