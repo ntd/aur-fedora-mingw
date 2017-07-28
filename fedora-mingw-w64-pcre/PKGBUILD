@@ -4,19 +4,16 @@
 # http://pkgs.fedoraproject.org/cgit/mingw-pcre.git/
 
 _realname=pcre
-pkgname="fedora-mingw-w64-${_realname}"
+pkgname=$CARCH-mingw-w64-pcre
 pkgver=8.38
-pkgrel=4
+pkgrel=5
 pkgdesc='A library that implements Perl 5-style regular expressions'
 arch=(any)
 license=(BSD)
 url='http://www.pcre.org/'
-groups=(aur-fedora-mingw fedora-mingw)
+groups=(afm-$CARCH)
 depends=(mingw-w64-crt)
 makedepends=(mingw-w64-gcc)
-provides=("mingw-w64-${_realname}=$pkgver")
-conflicts=("mingw-w64-${_realname}")
-options=(!strip staticlibs !buildflags)
 source=("https://ftp.pcre.org/pub/pcre/pcre-$pkgver.tar.bz2"
         "http://pkgs.fedoraproject.org/cgit/rpms/mingw-pcre.git/plain/pcre-8.21-multilib.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec"
         "http://pkgs.fedoraproject.org/cgit/rpms/mingw-pcre.git/plain/pcre-8.32-refused_spelling_terminated.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec"
@@ -44,10 +41,8 @@ md5sums=('00aabbfe56d5a48b270f999b508c5ad2'
          'be48618ebdf7c1fef2a73b666cba3f0f'
          '338c0a7604e714b414afe64a354587d9')
 
-_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
-
 prepare() {
-  cd "$srcdir/${_realname}-$pkgver"
+  cd "$srcdir/pcre-$pkgver"
 
   # Refused by upstream, bug #675477
   patch -Np1 < '../pcre-8.32-refused_spelling_terminated.patch?id=376f4451aee8fe1342f5c8a1aa6d50a4b45dbaec'
@@ -100,39 +95,25 @@ prepare() {
 }
 
 build() {
-  local tardir="$srcdir/${_realname}-$pkgver"
-  local builddir
-  local arch
+  local tardir="$srcdir/pcre-$pkgver"
+  local builddir="$tardir-build"
 
-  for arch in ${_architectures[@]}; do
-    builddir="$tardir-build-$arch"
-    mkdir -p "$builddir"
-    cd "$builddir"
-    "$tardir/configure" \
-      --build="$CHOST" \
-      --prefix="/usr/$arch" \
-      --host="$arch" \
-      --enable-shared
-    make
-  done
+  mkdir -p "$builddir"
+  cd "$builddir"
+  source $CHOST-configure "$tardir" \
+    --enable-shared
+  make
 }
 
 package() {
-  local arch
-  local prefix
+  local prefix="$pkgdir/usr/$CHOST"
 
-  for arch in ${_architectures[@]}; do
-    prefix="$pkgdir/usr/$arch"
+  cd "$srcdir/pcre-$pkgver-build"
+  make DESTDIR="$pkgdir" install
 
-    cd "$srcdir/${_realname}-$pkgver-build-$arch"
-    make DESTDIR="$pkgdir" install
-
-    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
-    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
-
-    rm -fr "$prefix/share"
-  done
+  find "$prefix" -name '*.exe' -exec $CHOST-strip {} +
+  find "$prefix" -name '*.dll' -exec $CHOST-strip --strip-unneeded {} +
+  find "$prefix" -name '*.a'   -exec $CHOST-strip -g {} +
 }
 
 # vim:set ts=2 sw=2 et:
