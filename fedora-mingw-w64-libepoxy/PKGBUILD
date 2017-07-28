@@ -5,7 +5,7 @@
 
 pkgname=$CARCH-mingw-w64-libepoxy
 pkgver=1.4.1
-pkgrel=2
+pkgrel=3
 pkgdesc='A library for handling OpenGL function pointer management for you'
 arch=(any)
 url='https://github.com/anholt/libepoxy'
@@ -15,6 +15,7 @@ depends=(mingw-w64-crt)
 makedepends=(
     afm-mingw-w64-makedepends
     python
+    xorg-util-macros
 )
 source=("https://github.com/anholt/libepoxy/releases/download/$pkgver/libepoxy-$pkgver.tar.xz")
 md5sums=('a0dc66910009a99c47c5def50b042d77')
