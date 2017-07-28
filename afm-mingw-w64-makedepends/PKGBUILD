@@ -16,7 +16,7 @@
 
 pkgname=afm-mingw-w64-makedepends
 pkgver=2
-pkgrel=3
+pkgrel=4
 pkgdesc='A collection of stuff needed for MinGW cross-building'
 arch=(any)
 url='http://dev.entidi.com/p/aur-fedora-mingw/'
@@ -37,7 +37,7 @@ source=("i686-w64-mingw32-cmake"
 md5sums=('76d24f33081e428a11e8cb20e6067c25'
          '677ddd6208dfaa02db5d9a1449edf05e'
          '2c2641547debc5d289bb85b0939e4380'
-         'e2de8d3c3bfc23926ce3bd841daaafa5'
+         'ff9c5611dccaedb7b87f92f77ea082f0'
          '5fcedae7d788c4fd9100d139bf80f5aa'
          '4ce073a3b299d6491dc180def6e9fc25'
          '0a879bf20cd82e44b73eb49cf2484eda'
