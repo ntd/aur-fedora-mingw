@@ -3,21 +3,19 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-zlib.git/
 
-_realname=zlib
-pkgname="fedora-mingw-w64-${_realname}"
+pkgname="$CARCH-mingw-w64-zlib"
 pkgver=1.2.8
-pkgrel=14
+pkgrel=15
 pkgdesc='A compression/decompression Library (mingw-w64)'
 arch=(any)
 url='http://www.zlib.net/'
 license=(custom)
-groups=(aur-fedora-mingw fedora-mingw)
+groups=(afm-$CARCH)
 depends=(mingw-w64-crt)
 makedepends=(afm-mingw-w64-makedepends)
-provides=("mingw-w64-${_realname}=$pkgver")
-conflicts=("mingw-w64-${_realname}")
-options=(!strip staticlibs !buildflags)
-source=("http://downloads.sourceforge.net/sourceforge/libpng/zlib/$pkgver/${_realname}-$pkgver.tar.gz"
+provides=("mingw-w64-zlib=$pkgver")
+conflicts=("mingw-w64-zlib")
+source=("http://downloads.sourceforge.net/sourceforge/libpng/zlib/$pkgver/zlib-$pkgver.tar.gz"
         "http://pkgs.fedoraproject.org/cgit/mingw-zlib.git/plain/mingw32-zlib-1.2.7-autotools.patch?id=2333169c09a99a357b0aaa58e0bd7dfda0932685"
         "http://pkgs.fedoraproject.org/cgit/mingw-zlib.git/plain/zlib-1.2.7-use-correct-def-file.patch?id=2333169c09a99a357b0aaa58e0bd7dfda0932685"
         "http://pkgs.fedoraproject.org/cgit/mingw-zlib.git/plain/mingw32-zlib-create-zlib1-dll.patch?id=945b6d9ff9992a5d209a2bdb58aa27701786e423")
@@ -29,7 +27,7 @@ md5sums=('44d667c142d7cda120332623eab69f40'
 _architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
 
 prepare() {
-  cd "$srcdir/${_realname}-$pkgver"
+  cd "$srcdir/zlib-$pkgver"
 
   # Replace the zlib build system with an autotools based one
   patch -Np1 < '../mingw32-zlib-1.2.7-autotools.patch?id=2333169c09a99a357b0aaa58e0bd7dfda0932685'
@@ -48,44 +46,35 @@ prepare() {
 }
 
 build() {
-  local tardir="$srcdir/${_realname}-$pkgver"
-  local builddir
-  local arch
+  local tardir="$srcdir/zlib-$pkgver"
+  local builddir="$tardir-build"
 
-  for arch in ${_architectures[@]}; do
-    builddir="$tardir-build-$arch"
-    mkdir -p "$builddir"
-    cd "$builddir"
-    source $arch-configure "$tardir"
-    make
-  done
+  mkdir -p "$builddir"
+  cd "$builddir"
+  source $CHOST-configure "$tardir"
+  make
 }
 
 package() {
-  local arch
-  local prefix
+  local prefix="$pkgdir/usr/$CHOST"
 
-  for arch in ${_architectures[@]}; do
-    prefix="$pkgdir/usr/$arch"
+  cd "$srcdir/zlib-$pkgver-build"
 
-    cd "$srcdir/${_realname}-$pkgver-build-$arch"
+  # Libtool tries to install a file called libz-1.dll
+  # but this isn't created anymore due to a patch applied in build().
+  # Fool libtool until a proper fix has been found
+  touch .libs/libz-1.dll
 
-    # Libtool tries to install a file called libz-1.dll
-    # but this isn't created anymore due to a patch applied in build().
-    # Fool libtool until a proper fix has been found
-    touch .libs/libz-1.dll
+  make DESTDIR="$pkgdir" install
 
-    make DESTDIR="$pkgdir" install
+  # Manually install the correct zlib1.dll
+  rm -f "$prefix/bin/libz-1.dll"
+  install -m 0644 .libs/zlib1.dll "$prefix/bin"
 
-    # Manually install the correct zlib1.dll
-    rm -f "$prefix/bin/libz-1.dll"
-    install -m 0644 .libs/zlib1.dll "$prefix/bin"
+  find "$prefix" -name '*.dll' -exec $CHOST-strip --strip-unneeded {} +
+  find "$prefix" -name '*.a'   -exec $CHOST-strip -g {} +
 
-    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
-    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
-
-    rm -fr "$prefix/share"
-  done
+  rm -fr "$prefix/share"
 }
 
 # vim:set ts=2 sw=2 et:
