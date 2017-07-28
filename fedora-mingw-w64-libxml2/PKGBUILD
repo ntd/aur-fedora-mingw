@@ -3,93 +3,79 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-libxml2.git/
 
-_realname=libxml2
-pkgname="fedora-mingw-w64-${_realname}"
+pkgname=$CARCH-mingw-w64-libxml2
 pkgver=2.9.3
-pkgrel=4
+pkgrel=5
 pkgdesc='XML parsing library, version 2 (mingw-w64)'
 arch=(any)
 url='http://www.xmlsoft.org/'
 license=(MIT)
-groups=(aur-fedora-mingw fedora-mingw)
+groups=(afm-$CARCH)
 depends=(mingw-w64-crt mingw-w64-zlib)
-makedepends=(mingw-w64-gcc mingw-w64-gettext)
-provides=(mingw-w64-libxml2=$pkgver)
-conflicts=(mingw-w64-libxml2)
-options=(!strip staticlibs !buildflags)
+makedepends=(
+    afm-mingw-w64-makedepends
+    $CARCH-mingw-w64-gettext
+)
 source=("ftp://ftp.xmlsoft.org/libxml2/libxml2-$pkgver.tar.gz"
         "http://pkgs.fedoraproject.org/cgit/mingw-libxml2.git/plain/mingw32-libxml2-static-build-compile-fix.patch?id=b2ef773d9a92f507605e3fa6bb52c91a0119d16c")
 md5sums=('daece17e045f1c107610e137ab50c179'
          '0df377025082cd93cccbca547f048011')
 
-_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
-
 prepare() {
-  cd "$srcdir/${_realname}-$pkgver"
+  cd "$srcdir/libxml2-$pkgver"
 
   # MinGW-specific patches
   patch -Np0 < '../mingw32-libxml2-static-build-compile-fix.patch?id=b2ef773d9a92f507605e3fa6bb52c91a0119d16c'
 }
 
 build() {
-  local tardir="$srcdir/${_realname}-$pkgver"
-  local builddir
-  local arch
+  local tardir="$srcdir/libxml2-$pkgver"
+  local builddir="$tardir-build"
 
   # XXX: disabling zlib for now (--without-zlib) because the
   # compilation fails otherwise with undefined references.
   # Not sure if this is an issue of zlib of libxml2 though.
-  for arch in ${_architectures[@]}; do
-    builddir="$tardir-build-$arch"
 
-    # LibXML2 can't build static and shared libraries in one go, so we
-    # build LibXML2 twice here
-    mkdir -p "$builddir-static"
-    cd "$builddir-static"
-    source $arch-configure "$tardir" \
-      --enable-static \
-      --disable-shared \
-      CPPFLAGS='-DLIBXML_STATIC_FOR_DLL' \
-      --without-python \
-      --with-modules \
-      --with-threads=win32 \
-      --without-zlib
-    make
+  # LibXML2 can't build static and shared libraries in one go, so we
+  # build LibXML2 twice here
+  mkdir -p "$builddir-static"
+  cd "$builddir-static"
+  source $CHOST-configure "$tardir" \
+    --enable-static \
+    --disable-shared \
+    CPPFLAGS='-DLIBXML_STATIC_FOR_DLL' \
+    --without-python \
+    --with-modules \
+    --with-threads=win32 \
+    --without-zlib
+  make
 
-    mkdir -p "$builddir-shared"
-    cd "$builddir-shared"
-    source $arch-configure "$tardir" \
-      --disable-static \
-      --enable-shared \
-      --without-python \
-      --with-modules \
-      --with-threads=win32 \
-      --without-zlib
-    make
-  done
+  mkdir -p "$builddir-shared"
+  cd "$builddir-shared"
+  source $CHOST-configure "$tardir" \
+    --disable-static \
+    --enable-shared \
+    --without-python \
+    --with-modules \
+    --with-threads=win32 \
+    --without-zlib
+  make
 }
 
 package() {
-  local arch
-  local prefix
-  local builddir
+  local prefix="$pkgdir/usr/$CHOST"
+  local builddir="$srcdir/libxml2-$pkgver-build"
 
-  for arch in ${_architectures[@]}; do
-    prefix="$pkgdir/usr/$arch"
-    builddir="$srcdir/${_realname}-$pkgver-build-$arch"
+  # First install all the files belonging to the shared build
+  cd "$builddir-shared"
+  make DESTDIR="$pkgdir" install
 
-    # First install all the files belonging to the shared build
-    cd "$builddir-shared"
-    make DESTDIR="$pkgdir" install
+  # Then manually install the static library
+  install -t "$prefix/lib" "$builddir-static/.libs/libxml2.a"
 
-    # Then manually install the static library
-    install -t "$prefix/lib" "$builddir-static/.libs/libxml2.a"
-
-    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
-    find "$prefix" -name '*.a'   -exec $arch-strip -g {} +
-
-    rm -fr "$prefix/share"
-  done
+  find "$prefix" -name '*.exe' -exec $CHOST-strip {} +
+  find "$prefix" -name '*.dll' -exec $CHOST-strip --strip-unneeded {} +
+  find "$prefix" -name '*.a'   -exec $CHOST-strip -g {} +
 }
 
 # vim:set ts=2 sw=2 et:
