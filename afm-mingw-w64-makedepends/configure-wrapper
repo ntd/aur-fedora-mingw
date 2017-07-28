@@ -27,8 +27,15 @@ call_configure() {
     export GI_TYPELIB_PATH="/usr/$arch/lib/girepository-1.0:$GI_TYPELIB_PATH"
     export XDG_DATA_DIRS="/usr/$arch/share:$XDG_DATA_DIRS"
 
+    # BUILDHOST is likely set by /usr/share/mingw/makepkg.common.conf.
+    # If it is not set (likely because you called the configure wrapper
+    # outside of the AFM environment) try to guess it
+    if [ -z "$BUILDHOST" ]; then
+        BUILDHOST=$(source /etc/makepkg.conf; echo $CHOST)
+    fi
+
     "$path_to_configure/configure" \
-	--build="$CHOST" \
+	--build="$BUILDHOST" \
 	--host="$arch" \
 	--prefix="/usr/$arch" \
 	"$@"

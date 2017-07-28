@@ -15,55 +15,61 @@
 # [3] https://aur.archlinux.org/packages/mingw-w64-cmake/
 
 pkgname=afm-mingw-w64-makedepends
-pkgver=2
-pkgrel=4
+pkgver=3
+pkgrel=1
 pkgdesc='A collection of stuff needed for MinGW cross-building'
 arch=(any)
 url='http://dev.entidi.com/p/aur-fedora-mingw/'
 license=(mit)
-groups=(aur-fedora-mingw)
+groups=(afm-i686 afm-x86_64)
 depends=(mingw-w64-gcc)
 conflicts=(mingw-w64-pkg-config mingw-w64-cmake)
 provides=(mingw-w64-pkg-config mingw-w64-cmake)
-source=("i686-w64-mingw32-cmake"
+source=("configure-wrapper"
+        "i686-w64-mingw32-cmake"
         "i686-w64-mingw32-configure"
         "i686-w64-mingw32-pkg-config"
-        "mingw-configure"
+        "makepkg.common.conf"
+        "makepkg.i686.conf"
+        "makepkg.native.conf"
+        "makepkg.x86_64.conf"
         "x86_64-w64-mingw32-cmake"
         "x86_64-w64-mingw32-configure"
         "x86_64-w64-mingw32-pkg-config"
         "Toolchain-i686-w64-mingw32.cmake"
         "Toolchain-x86_64-w64-mingw32.cmake")
-md5sums=('76d24f33081e428a11e8cb20e6067c25'
-         '677ddd6208dfaa02db5d9a1449edf05e'
+md5sums=('282c76d280b002dabf017e01101bc103'
+         '4abb097f8387f364a9877e28c7c880a3'
+         '2fe711bc73b89cff50baa5b785e35b4c'
          '2c2641547debc5d289bb85b0939e4380'
-         'ff9c5611dccaedb7b87f92f77ea082f0'
-         '5fcedae7d788c4fd9100d139bf80f5aa'
-         '4ce073a3b299d6491dc180def6e9fc25'
+         'd3b61b148a645260023f785cde063e5a'
+         'a38a29dd8f512e71a657490c9c82004c'
+         'e708123ca735e0eef4c317b1aa06c078'
+         '80969e92a600cec8de480b64bcefaa98'
+         '23961cda7ebd6a35aeff3345c780c6b5'
+         'e08642fb0279dd280b85ad1fb1b6215e'
          '0a879bf20cd82e44b73eb49cf2484eda'
          '4704995815374af7b3b853b139d04ad5'
          'cdb9f76c5ab95038df1c03755e9119e7')
 
-_architectures="i686-w64-mingw32 x86_64-w64-mingw32"
-
 package() {
-  local arch
-
   install -d "$pkgdir/usr/bin"
   install -d "$pkgdir/usr/share/mingw"
 
-  # This should be bound to the configure wrappers
-  install -m 644 "mingw-configure" "$pkgdir/usr/bin"
+  install -m 755 i686-w64-mingw32-cmake             "$pkgdir/usr/bin"
+  install -m 755 x86_64-w64-mingw32-cmake           "$pkgdir/usr/bin"
+  install -m 755 i686-w64-mingw32-configure         "$pkgdir/usr/bin"
+  install -m 755 x86_64-w64-mingw32-configure       "$pkgdir/usr/bin"
+  install -m 755 i686-w64-mingw32-pkg-config        "$pkgdir/usr/bin"
+  install -m 755 x86_64-w64-mingw32-pkg-config      "$pkgdir/usr/bin"
 
-  for arch in ${_architectures}; do
-    # configure wrappers
-    install -m 755 $arch-configure "$pkgdir/usr/bin"
-
-    # pkg-config
-    install -m 755 $arch-pkg-config "$pkgdir/usr/bin"
-
-    # CMake
-    install -m 644 Toolchain-$arch.cmake "$pkgdir/usr/share/mingw/"
-    install -m 755 $arch-cmake "$pkgdir/usr/bin/"
-  done
+  install -m 644 configure-wrapper                  "$pkgdir/usr/share/mingw/"
+  install -m 644 makepkg.common.conf                "$pkgdir/usr/share/mingw/"
+  install -m 644 makepkg.i686.conf                  "$pkgdir/usr/share/mingw/"
+  install -m 644 makepkg.native.conf                "$pkgdir/usr/share/mingw/"
+  install -m 644 makepkg.x86_64.conf                "$pkgdir/usr/share/mingw/"
+  install -m 644 Toolchain-i686-w64-mingw32.cmake   "$pkgdir/usr/share/mingw/"
+  install -m 644 Toolchain-x86_64-w64-mingw32.cmake "$pkgdir/usr/share/mingw/"
 }
+
+# vim:set ts=2 sw=2 et:

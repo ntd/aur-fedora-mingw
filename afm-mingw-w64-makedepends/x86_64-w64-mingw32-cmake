@@ -1,4 +1,3 @@
 #!/bin/bash
-
-source "$(dirname ${BASH_SOURCE[0]})/mingw-configure"
+source /usr/share/mingw/configure-wrapper
 call_cmake x86_64-w64-mingw32 64 "$@"
