@@ -3,24 +3,34 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/
 
-_realname=gtk+
-pkgname=fedora-mingw-w64-gtk2
+pkgname=$CARCH-mingw-w64-gtk2
 pkgver=2.24.31
-pkgrel=2
+pkgrel=3
 pkgdesc='GTK+2 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
 license=(LGPL)
-groups=(aur-fedora-mingw fedora-mingw)
-depends=(mingw-w64-crt fedora-mingw-w64-atk fedora-mingw-w64-cairo
-         fedora-mingw-w64-gdk-pixbuf fedora-mingw-w64-gettext
-         fedora-mingw-w64-glib2 fedora-mingw-w64-win-iconv
-         fedora-mingw-w64-pango fedora-mingw-w64-pixman mingw-w64-zlib)
-makedepends=(afm-mingw-w64-makedepends mingw-w64-gobject-introspection wine)
-provides=(mingw-w64-gtk2=$pkgver)
-conflicts=(mingw-w64-gtk2)
-options=(!strip staticlibs !buildflags)
-source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
+groups=(afm-$CARCH)
+depends=(
+    mingw-w64-crt
+    $CARCH-mingw-w64-atk
+    $CARCH-mingw-w64-cairo
+    $CARCH-mingw-w64-gdk-pixbuf
+    $CARCH-mingw-w64-gettext
+    $CARCH-mingw-w64-glib2
+    $CARCH-mingw-w64-win-iconv
+    $CARCH-mingw-w64-pango
+    $CARCH-mingw-w64-pixman
+    $CARCH-mingw-w64-zlib
+)
+makedepends=(
+    afm-mingw-w64-makedepends
+    $CARCH-mingw-w64-gobject-introspection
+    glib2
+    gdk-pixbuf2
+    wine
+)
+source=("http://ftp.gnome.org/pub/GNOME/sources/gtk+/${pkgver%.*}/gtk+-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/mingw32-gtk2-2.15.0-xbuttons.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-gtk2.git/plain/mingw32-gtk2-enable_static_build.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/rpms/mingw-gtk2.git/plain/gtk-fix-out-of-source-build.patch?id=a1c15a29565441dcbf119168eb44b1e20a7069c2"
@@ -41,10 +51,8 @@ md5sums=('526a1008586094a2cbb4592fd3f9ee10'
          '91d12fc6da9026deb0f94f38ab22a3ec'
          '9967ded27c0eb3b615acae7539621607')
 
-_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
-
 prepare() {
-  cd "$srcdir/${_realname}-$pkgver"
+  cd "$srcdir/gtk+-$pkgver"
 
   # Fix use of extended buttons in gtkstatusicon.
   patch -Np1 < '../mingw32-gtk2-2.15.0-xbuttons.patch?h=f18'
@@ -81,46 +89,34 @@ prepare() {
 }
 
 build() {
-  local tardir="$srcdir/${_realname}-$pkgver"
-  local builddir
-  local arch
+  local tardir="$srcdir/gtk+-$pkgver"
+  local builddir="$tardir-build"
 
-  for arch in ${_architectures[@]}; do
-    builddir="$tardir-build-$arch"
-    mkdir -p "$builddir"
-    cd "$builddir"
-    source $arch-configure "$tardir" \
-      --enable-static \
-      --enable-shared \
-      --disable-silent-rules \
-      --enable-introspection \
-      --disable-cups \
-      --disable-gtk-doc
-    make
-  done
+  mkdir -p "$builddir"
+  cd "$builddir"
+  source $CHOST-configure "$tardir" \
+    --enable-static \
+    --enable-shared \
+    --disable-silent-rules \
+    --enable-introspection \
+    --disable-cups \
+    --disable-gtk-doc
+  make
 }
 
 package() {
-  local arch
-  local prefix
+  local prefix="$pkgdir/usr/$CHOST"
 
-  for arch in ${_architectures[@]}; do
-    prefix="$pkgdir/usr/$arch"
+  cd "$srcdir/gtk+-$pkgver-build"
+  make DESTDIR="$pkgdir" install
 
-    cd "$srcdir/${_realname}-$pkgver-build-$arch"
-    make DESTDIR="$pkgdir" install
+  # Remove all the exe files that do not have gtk2 or 2.0 inside their
+  # names, hence possibly conflicting with GTK+3
+  find "$prefix" -name '*.exe' -a ! -name '*gtk2*' -a ! -name '*2.0*' -exec rm -f {} +
 
-    # Remove all the exe files that do not have gtk2 or 2.0 inside their
-    # names, hence possibly conflicting with GTK+3
-    find "$prefix" -name '*.exe' -a ! -name '*gtk2*' -a ! -name '*2.0*' -exec rm -f {} +
-
-    find "$prefix" -regex '.*\.\(bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
-    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
-
-    rm -fr "$prefix/share/aclocal"
-    rm -fr "$prefix/share/man"
-  done
+  find "$prefix" -name '*.exe' -exec $CHOST-strip {} +
+  find "$prefix" -name '*.dll' -exec $CHOST-strip --strip-unneeded {} +
+  find "$prefix" -name '*.a'   -exec $CHOST-strip -g {} +
 }
 
 # vim:set ts=2 sw=2 et:
