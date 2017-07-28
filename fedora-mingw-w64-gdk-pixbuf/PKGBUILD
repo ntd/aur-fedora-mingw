@@ -7,68 +7,60 @@
 # jasper (JPEG2000 image support) dependencies are dropped
 # and gdiplus support is not enabled.
 
-_realname=gdk-pixbuf
-pkgname="fedora-mingw-w64-${_realname}"
+pkgname=$CARCH-mingw-w64-gdk-pixbuf
 pkgver=2.36.7
-pkgrel=1
+pkgrel=2
 pkgdesc='An image loading library (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
 license=(LGPL)
-groups=(aur-fedora-mingw fedora-mingw)
-depends=(mingw-w64-crt fedora-mingw-w64-glib2 fedora-mingw-w64-freetype
-         mingw-w64-libjpeg mingw-w64-libpng)
-makedepends=(afm-mingw-w64-makedepends mingw-w64-gobject-introspection wine)
-provides=(mingw-w64-gdk-pixbuf2=$pkgver)
-conflicts=(mingw-w64-gdk-pixbuf2)
-options=(!strip staticlibs !buildflags)
-source=("http://ftp.gnome.org/pub/GNOME/sources/${_realname}/${pkgver%.*}/${_realname}-$pkgver.tar.xz"
+groups=(afm-$CARCH)
+depends=(
+    mingw-w64-crt
+    $CARCH-mingw-w64-glib2
+    $CARCH-mingw-w64-freetype
+    $CARCH-mingw-w64-libjpeg-turbo
+    $CARCH-mingw-w64-libpng
+)
+makedepends=(
+    afm-mingw-w64-makedepends
+    $CARCH-mingw-w64-gobject-introspection
+    wine
+)
+source=("http://ftp.gnome.org/pub/GNOME/sources/gdk-pixbuf/${pkgver%.*}/gdk-pixbuf-$pkgver.tar.xz"
         # The cache file is generated with the following command:
         # wine src/gdk-pixbuf-*-build-i686-w64-mingw32/gdk-pixbuf/gdk-pixbuf-query-loaders.exe | sed 's|/usr/i686-w64-mingw32/|../|' > gdk-pixbuf.loaders
         "gdk-pixbuf.loaders")
 md5sums=('04ca1535f3fab7070db48009ed1e93f6'
          '371fd7546d48f1276687b6bc7b514083')
 
-_architectures=(i686-w64-mingw32 x86_64-w64-mingw32)
-
 build() {
-  local tardir="$srcdir/${_realname}-$pkgver"
-  local builddir
-  local arch
+  local tardir="$srcdir/gdk-pixbuf-$pkgver"
+  local builddir="$tardir-build"
 
-  for arch in ${_architectures[@]}; do
-    builddir="$tardir-build-$arch"
-    mkdir -p "$builddir"
-    cd "$builddir"
-    source $arch-configure "$tardir" \
-      --enable-relocations \
-      --with-included-loaders=png \
-      --without-libjasper \
-      --enable-introspection
+  mkdir -p "$builddir"
+  cd "$builddir"
+  source $CHOST-configure "$tardir" \
+    --enable-relocations \
+    --with-included-loaders=png \
+    --without-libjasper \
+    --enable-introspection
 
-    # Copy the cache file into the source tree
-    install -m 0644 "$srcdir/gdk-pixbuf.loaders" gdk-pixbuf/loaders.cache
+  # Copy the cache file into the source tree
+  install -m 0644 "$srcdir/gdk-pixbuf.loaders" gdk-pixbuf/loaders.cache
 
-    make
-  done
+  make
 }
 
 package() {
-  local arch
-  local prefix
+  local prefix="$pkgdir/usr/$CHOST"
 
-  for arch in ${_architectures[@]}; do
-    prefix="$pkgdir/usr/$arch"
+  cd "$srcdir/gdk-pixbuf-$pkgver-build"
+  make DESTDIR="$pkgdir" install
 
-    cd "$srcdir/${_realname}-$pkgver-build-$arch"
-    make DESTDIR="$pkgdir" install
-
-    find "$prefix" -regex '.*\.\(exe\|bat\|def\|exp\)' -exec rm -f {} +
-    find "$prefix" -name '*.dll' -exec $arch-strip --strip-unneeded {} +
-    find "$prefix" -name '*.a' -exec $arch-strip -g {} +
-
-    rm -fr "$prefix/share/man"
-  done
+  find "$prefix" -name '*.exe' -exec $CHOST-strip {} +
+  find "$prefix" -name '*.dll' -exec $CHOST-strip --strip-unneeded {} +
+  find "$prefix" -name '*.a'   -exec $CHOST-strip -g {} +
 }
 
 # vim:set ts=2 sw=2 et:
