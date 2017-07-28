@@ -3,20 +3,22 @@
 # Port of the Fedora package found at
 # http://pkgs.fedoraproject.org/cgit/mingw-nsis.git/
 
-_realname=nsis
-pkgname="fedora-mingw-w64-${_realname}"
+pkgname=afm-mingw-w64-nsis
 pkgver=3.01
-pkgrel=2
+pkgrel=3
 pkgdesc='A professional open source system to create Windows installers'
 arch=(i686 x86_64)
 url='http://nsis.sourceforge.net/'
 license=(custom:zlib)
-groups=(aur-fedora-mingw fedora-mingw)
-depends=(mingw-w64-crt mingw-w64-zlib)
-makedepends=(afm-mingw-w64-makedepends mingw-w64-binutils scons)
-provides=("mingw-w64-${_realname}=$pkgver")
-conflicts=("mingw-w64-${_realname}")
-options=(!strip staticlibs !buildflags)
+groups=(afm-i686 afm-x86_64)
+conflicts=(mingw-w64-nsis)
+provides=(mingw-w64-nsis)
+optdepends=($arch-mingw-w64-zlib)
+makedepends=(
+    afm-mingw-w64-makedepends
+    $arch-mingw-w64-zlib
+    scons
+)
 source=("http://sourceforge.net/projects/nsis/files/NSIS 3/$pkgver/nsis-$pkgver-src.tar.bz2")
 md5sums=('fc40b977d1ddd9f8a74511147f38ca8c')
 
@@ -24,17 +26,13 @@ md5sums=('fc40b977d1ddd9f8a74511147f38ca8c')
 _sconsopts=(VERSION="$pkgver" PREFIX=/usr PREFIX_CONF=/etc ZLIB_W32=/usr/i686-w64-mingw32 SKIPUTILS='NSIS Menu' STRIP_CP=false NSIS_MAX_STRLEN=8192)
 
 build() {
-  cd "$srcdir/${_realname}-$pkgver-src"
-
+  cd "$srcdir/nsis-$pkgver-src"
   scons "${_sconsopts[@]}"
 }
 
 package() {
-  cd "$srcdir/${_realname}-$pkgver-src"
-
+  cd "$srcdir/nsis-$pkgver-src"
   scons PREFIX_DEST="$pkgdir" "${_sconsopts[@]}" install
-
-  find "$pkgdir/usr" -name '*.dll' -exec i686-w64-mingw32-strip --strip-unneeded {} +
 }
 
 # vim:set ts=2 sw=2 et:
