@@ -5,7 +5,7 @@
 
 pkgname=$CARCH-mingw-w64-bzip2
 pkgver=1.0.6
-pkgrel=17
+pkgrel=18
 pkgdesc='A high-quality data compression program (mingw-w64)'
 arch=(any)
 url='http://www.bzip.org/'
@@ -13,8 +13,6 @@ license=(custom)
 groups=(afm-$CARCH)
 depends=(mingw-w64-crt)
 makedepends=(afm-mingw-w64-makedepends)
-provides=("mingw-w64-bzip2=$pkgver")
-conflicts=(mingw-w64-bzip2)
 source=("http://www.bzip.org/$pkgver/bzip2-$pkgver.tar.gz"
         "http://pkgs.fedoraproject.org/cgit/mingw-bzip2.git/plain/bzip2-1.0.4-bzip2recover.patch?h=f18"
         "http://pkgs.fedoraproject.org/cgit/mingw-bzip2.git/plain/mingw32-bzip2-1.0.5-slash.patch?h=f18"
