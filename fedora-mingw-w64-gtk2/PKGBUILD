@@ -5,7 +5,7 @@
 
 pkgname=$CARCH-mingw-w64-gtk2
 pkgver=2.24.31
-pkgrel=4
+pkgrel=5
 pkgdesc='GTK+2 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
