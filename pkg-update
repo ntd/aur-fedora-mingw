@@ -20,7 +20,7 @@ case "$1" in
 esac
 
 root=$(dirname ${BASH_SOURCE[0]})
-repodir=$HOME/workdir/aur-fedora-mingw/pkg
+repodir=$(source /usr/share/mingw/makepkg.common.conf; echo $PKGDEST)
 repoupdate="$root/repo-update"
 
 [ -n "$dir" ] || die "Usage: $0 [i686|x86_64] DIRECTORY"
