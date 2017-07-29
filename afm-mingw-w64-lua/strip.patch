@@ -1,6 +1,5 @@
-diff -Naur lua-5.2.4.orig/src/Makefile lua-5.2.4/src/Makefile
---- lua-5.2.4.orig/src/Makefile	2015-04-02 17:49:31.122346611 +0200
-+++ lua-5.2.4/src/Makefile	2015-04-02 17:50:29.548740508 +0200
+--- lua-5.3.4.orig/src/Makefile	2017-07-29 11:13:33.143342024 +0200
++++ lua-5.3.4/src/Makefile	2017-07-29 11:14:37.675406819 +0200
 @@ -13,6 +13,7 @@
  
  AR= ar rcu
@@ -9,10 +8,10 @@ diff -Naur lua-5.2.4.orig/src/Makefile lua-5.2.4/src/Makefile
  RM= rm -f
  
  SYSCFLAGS=
-@@ -110,7 +111,7 @@
+@@ -114,7 +115,7 @@
  
  mingw:
- 	$(MAKE) "LUA_A=lua52.dll" "LUA_T=lua.exe" \
+ 	$(MAKE) "LUA_A=lua53.dll" "LUA_T=lua.exe" \
 -	"AR=$(CC) -shared -Wl,--out-implib,liblua.dll.a -o" "RANLIB=strip --strip-unneeded" \
 +	"AR=$(CC) -shared -Wl,--out-implib,liblua.dll.a -o" "RANLIB=$(STRIP) --strip-unneeded" \
  	"SYSCFLAGS=-DLUA_BUILD_AS_DLL" "SYSLIBS=" "SYSLDFLAGS=-s" lua.exe
