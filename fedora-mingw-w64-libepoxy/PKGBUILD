@@ -5,7 +5,7 @@
 
 pkgname=$CARCH-mingw-w64-libepoxy
 pkgver=1.4.1
-pkgrel=3
+pkgrel=4
 pkgdesc='A library for handling OpenGL function pointer management for you'
 arch=(any)
 url='https://github.com/anholt/libepoxy'
