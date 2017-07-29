@@ -4,7 +4,7 @@ _luaver=5.3
 
 pkgname=$CARCH-mingw-w64-lua-lgi
 pkgver=0.9.1
-pkgrel=1
+pkgrel=2
 pkgdesc='Lua bindings for gnome/gobject using gobject-introspection library (mingw-w64)'
 arch=(any)
 url='http://www.lua.org/'
@@ -18,11 +18,9 @@ depends=(
 )
 makedepends=(afm-mingw-w64-makedepends)
 source=("lua-lgi-$pkgver.tar.gz::https://github.com/pavouk/lgi/archive/$pkgver.tar.gz"
-        "22374789ed5ee9621a7fb7042462bf6a51ff0a8b.patch"
-        "0001-Disable-the-GDK-thread-locking.patch")
+        "22374789ed5ee9621a7fb7042462bf6a51ff0a8b.patch")
 md5sums=('0c85f177e4b8192bd849b4e508c8bdf0'
-         '49781a1a7ef6a5c99a5c1ce75e3966ec'
-         '15c5577744bdd5e5e52e4968c06c36b3')
+         '49781a1a7ef6a5c99a5c1ce75e3966ec')
 
 prepare() {
   local tardir="$srcdir/lgi-$pkgver"
@@ -31,10 +29,6 @@ prepare() {
 
   # Don't hard-code the pkg-config executable
   patch -Np1 < ../22374789ed5ee9621a7fb7042462bf6a51ff0a8b.patch
-
-  # Temporary disable the GDK lock automatically operated by lgi:
-  # https://github.com/pavouk/lgi/issues/98
-  patch -Np1 < ../0001-Disable-the-GDK-thread-locking.patch
 }
 
 build() {
