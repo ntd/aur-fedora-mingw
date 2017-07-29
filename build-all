@@ -11,11 +11,9 @@ containing a .pkg.tar.xz file).
 You must supply the architecture as first argument, e.g. "i686"
 for the 32 bits toolchain or "x86_64" for the 64 bits one.
 
-A serie of packages to skip can be optionally specified on the
-command line. For example the following command will build
-everything but cairo:
-
-    ./build-all i686 fedora-mingw-w64-cairo
+A list of packages to skip can be optionally specified on the
+command line. This feature is intended to be used when you want
+to build by yourself one ore more packages.
 EOT
 }
 
@@ -28,6 +26,9 @@ case "$1" in
         usage
 esac
 
+function exists() {
+    [[ -f $1 ]]
+}
 
 function found() {
     local needle="$1"
@@ -39,10 +40,39 @@ function found() {
     done
 }
 
+function pacman_frontend() {
+    LC_MESSAGES=C yaourt "$@" > /dev/null 2>&1
+    return $?
+}
+
 function install() {
     # TODO: is there a more elegant way to force the removing
     #       of conflicting packages?
-    if ! yes | LC_MESSAGES=C yaourt -U *.pkg.tar.xz; then exit 1; fi
+    if ! yes | pacman_frontend -U --needed *.pkg.tar.xz; then
+        exit 1
+    fi
+}
+
+function upgrade() {
+    local pkg=$1
+    local dir=$2
+    shift 2
+
+    echo "Upgrading $pkg..."
+    # Skip the building if the package has already been built
+    if ! exists "$dir"/$pkg-*.pkg.tar.xz; then
+        cd "$dir"
+        LC_MESSAGES=C makepkg "$@"
+        install
+
+        # The tarball links (*.pkg.tar.xz) are not deleted: it is
+        # convenient to keep them around to avoid rebuilding the same
+        # package and to easily update the repo database, i.e. by using
+        # a command such as `repo-add <path-to-db> */*.pkg.tar.xz`
+        rm -fr pkg src
+
+        cd ..
+    fi
 }
 
 dependencies=(
@@ -54,7 +84,7 @@ dependencies=(
     scons               # Required by nsis
     nasm                # Required by libjpeg-turbo
     python              # Required by glib2 and libepoxy
-    python2             # Required by gobject-introspection
+    python2             # Required by glib2 and gobject-introspection
     intltool            # Required by adwaita-icon-theme
     xorg-util-macros    # Required by libepoxy
     gtk-doc             # Required by pango
@@ -68,11 +98,6 @@ dependencies=(
 
     # From AUR
     mingw-w64-tools     # Required by cairo and harfbuzz
-)
-
-native=(
-    afm-mingw-w64-makedepends
-    fedora-mingw-w64-nsis
 )
 
 xbuild=(
@@ -106,7 +131,6 @@ xbuild=(
     fedora-mingw-w64-gtk2
     fedora-mingw-w64-libepoxy   # Required by gtk3 >= 3.16.0
                                 # Required by gtk3 >= 3.16.0
-    fedora-mingw-w64-adwaita-icon-theme
     fedora-mingw-w64-gtk3
 
     # LGI (dynamic Lua bindings) support
@@ -116,37 +140,27 @@ xbuild=(
 
 # Install required dependencies
 for pkg in ${dependencies[@]}; do
-    if ! yaourt -Sa --needed --noconfirm "$pkg"; then
+    echo "Upgrading $pkg..."
+    if ! pacman_frontend -Sa --needed --noconfirm "$pkg"; then
         exit 1
     fi
 done
 
-# Native compilation of helper packages
-for pkg in ${native[@]}; do
-    # Skip packages passed in as arguments
-    found "$pkg" "$@" && continue
+# Base system: must be installed now because everything depends on it
+upgrade afm-mingw-w64-makedepends afm-mingw-w64-makedepends --config ./makepkg.native.conf
 
-    cd "$pkg"
-    makepkg -f --config /usr/share/mingw/makepkg.native.conf
-    install
-
-    rm -fr pkg src
-    cd ..
-done
+# Adwaita icon theme is architecture independent
+upgrade afm-mingw-w64-adwaita-icon-theme fedora-mingw-w64-adwaita-icon-theme --config /usr/share/mingw/makepkg.native.conf
 
 # Cross compilation of the toolchain
-for pkg in ${xbuild[@]}; do
-    # Skip packages passed in as arguments
-    found "$pkg" "$@" && continue
-
-    cd "$pkg"
-    makepkg -f --config /usr/share/mingw/makepkg.$arch.conf
-    install
-
-    rm -fr pkg src
-    cd ..
+for dir in ${xbuild[@]}; do
+    # Install only packages *not* passed in as arguments
+    if ! found "$dir" "$@"; then
+        pkg=${dir#afm-}
+        pkg="$arch-${pkg#fedora-}"
+        upgrade "$pkg" "$dir" --config /usr/share/mingw/makepkg.$arch.conf
+    fi
 done
 
-# The tarball links (*.pkg.tar.xz) are not deleted: it is convenient to
-# keep them around to easily update package databases, i.e. by using a
-# command such as `repo-add <path-to-db> */*.pkg.tar.xz`
+# The nsis installer must be compiled natively
+upgrade afm-mingw-w64-nsis fedora-mingw-w64-nsis --config /usr/share/mingw/makepkg.native.conf
