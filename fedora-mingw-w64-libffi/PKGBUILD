@@ -5,7 +5,7 @@
 
 pkgname=$CARCH-mingw-w64-libffi
 pkgver=3.1
-pkgrel=2
+pkgrel=3
 pkgdesc='A portable, high level programming interface to various calling conventions (mingw-w64)'
 arch=(any)
 url='http://sourceware.org/libffi/'
