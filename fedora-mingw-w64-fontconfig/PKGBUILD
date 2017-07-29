@@ -5,7 +5,7 @@
 
 pkgname=$CARCH-mingw-w64-fontconfig
 pkgver=2.12.1
-pkgrel=3
+pkgrel=4
 pkgdesc='A library for configuring and customizing font access (mingw-w64)'
 arch=(any)
 url='http://fontconfig.org/'
