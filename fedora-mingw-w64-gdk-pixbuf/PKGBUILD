@@ -9,7 +9,7 @@
 
 pkgname=$CARCH-mingw-w64-gdk-pixbuf
 pkgver=2.36.7
-pkgrel=3
+pkgrel=4
 pkgdesc='An image loading library (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
