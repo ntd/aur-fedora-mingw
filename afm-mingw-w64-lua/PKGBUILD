@@ -6,7 +6,7 @@
 
 pkgname=$CARCH-mingw-w64-lua
 pkgver=5.3.4
-pkgrel=1
+pkgrel=2
 pkgdesc='Powerful light-weight programming language designed for extending applications (mingw-w64)'
 arch=(any)
 url='http://www.lua.org/'
