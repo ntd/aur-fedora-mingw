@@ -6,7 +6,7 @@
 _realname=pcre
 pkgname=$CARCH-mingw-w64-pcre
 pkgver=8.38
-pkgrel=5
+pkgrel=6
 pkgdesc='A library that implements Perl 5-style regular expressions'
 arch=(any)
 license=(BSD)
