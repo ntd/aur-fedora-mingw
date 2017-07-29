@@ -5,7 +5,7 @@
 
 pkgname=$CARCH-mingw-w64-expat
 pkgver=2.2.0
-pkgrel=3
+pkgrel=4
 pkgdesc='An XML parser library (mingw-w64)'
 arch=(any)
 url='http://expat.sourceforge.net/'
