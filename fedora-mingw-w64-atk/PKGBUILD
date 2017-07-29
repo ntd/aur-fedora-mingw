@@ -5,7 +5,7 @@
 
 pkgname=$CARCH-mingw-w64-atk
 pkgver=2.24.0
-pkgrel=2
+pkgrel=3
 pkgdesc='A library providing a set of interfaces for accessibility (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
