@@ -5,7 +5,7 @@
 
 pkgname=$CARCH-mingw-w64-icu
 pkgver=57.1
-pkgrel=3
+pkgrel=4
 pkgdesc='International Components for Unicode library (mingw-w64)'
 arch=(any)
 url='http://www.icu-project.org/'
