@@ -5,7 +5,7 @@
 
 pkgname=$CARCH-mingw-w64-gtk2
 pkgver=2.24.31
-pkgrel=3
+pkgrel=4
 pkgdesc='GTK+2 is a multi-platform toolkit (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -101,7 +101,10 @@ build() {
     --enable-introspection \
     --disable-cups \
     --disable-gtk-doc
-  make
+  # Call host gdk-pixbuf-csource with clear environment to fix failure
+  # when cross-compiling for 64 bits
+  make \
+    GDK_PIXBUF_CSOURCE='/usr/bin/env - PATH=/usr/bin /usr/bin/gdk-pixbuf-csource'
 }
 
 package() {
