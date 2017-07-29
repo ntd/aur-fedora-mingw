@@ -9,7 +9,7 @@
 
 pkgname=$CARCH-mingw-w64-gdk-pixbuf
 pkgver=2.36.7
-pkgrel=2
+pkgrel=3
 pkgdesc='An image loading library (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -46,7 +46,7 @@ build() {
     --without-libjasper \
     --enable-introspection
 
-  # Copy the cache file into the source tree
+  # Copy the loaders.cache file to the source tree
   install -m 0644 "$srcdir/gdk-pixbuf.loaders" gdk-pixbuf/loaders.cache
 
   make
@@ -57,6 +57,9 @@ package() {
 
   cd "$srcdir/gdk-pixbuf-$pkgver-build"
   make DESTDIR="$pkgdir" install
+
+  # Install the loaders.cache file
+  install -m 0644 "$srcdir/gdk-pixbuf.loaders" "$prefix/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache"
 
   find "$prefix" -name '*.exe' -exec $CHOST-strip {} +
   find "$prefix" -name '*.dll' -exec $CHOST-strip --strip-unneeded {} +
