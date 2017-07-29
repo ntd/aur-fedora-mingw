@@ -4,7 +4,7 @@ _luaver=5.3
 
 pkgname=$CARCH-mingw-w64-lua-lgi
 pkgver=0.9.1
-pkgrel=2
+pkgrel=3
 pkgdesc='Lua bindings for gnome/gobject using gobject-introspection library (mingw-w64)'
 arch=(any)
 url='http://www.lua.org/'
