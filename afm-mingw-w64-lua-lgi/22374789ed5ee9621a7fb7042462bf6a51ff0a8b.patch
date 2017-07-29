@@ -1,0 +1,22 @@
+From 22374789ed5ee9621a7fb7042462bf6a51ff0a8b Mon Sep 17 00:00:00 2001
+From: Heiko Becker <heirecka@exherbo.org>
+Date: Sun, 29 May 2016 15:24:31 +0200
+Subject: [PATCH] Don't hard-code the pkg-config executable
+
+---
+ lgi/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lgi/Makefile b/lgi/Makefile
+index 6fc6a48..08419bd 100644
+--- a/lgi/Makefile
++++ b/lgi/Makefile
+@@ -25,7 +25,7 @@ ifeq ($(HOST_OS),darwin)
+ CORE = corelgilua51.so
+ LIBFLAG = -bundle -undefined dynamic_lookup
+ CCSHARED = -fno-common
+-GOBJECT_INTROSPECTION_LIBDIR = $(shell pkg-config --variable=libdir $(GINAME))
++GOBJECT_INTROSPECTION_LIBDIR = $(shell $(PKG_CONFIG) --variable=libdir $(GINAME))
+ else
+ CORE = corelgilua51.so
+ LIBFLAG = -shared
