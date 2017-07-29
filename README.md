@@ -10,17 +10,40 @@ be permanents).
 How to use
 ==========
 
-These are common PKGBUILD files so you can build them in the usual way, e.g.
+These are common PKGBUILD files so you can build them in the way you like, e.g.
 by using [makepkg](https://wiki.archlinux.org/index.php/Makepkg). Some helper
-scripts are provided, just for convenience:
+scripts are provided though, just for my own convenience. They are based on
+`yaourt` but you are free to adapt them to other solutions (patches welcome).
 
-* `build-all`<br>
-  The main script for building the whole toolchain. To minimize the potential
-  problems that can be raised by unattended environment variables, you could
-  call the script by providing only a minimal environment, e.g.:
+Actually I have the following directory structure, so if you will retain it the
+project will just work out of the box:
+
+* `/home/nicola/workdir/aur-fedora-mingw`
+  * `aur`, containing the git repository
+  * `src`, where the source packages will be downloaded
+  * `pkg`, where the built packages will be created
+
+Otherwise you should adjust the settings in
+`afm-mingw-w64-makedepends/makepkg.common.conf` to fit your environment and
+update `afm-mingw-w64-makedepends/PKGBUILD` accordingly.
+
+The following commands should build and install both the 32 and 64 bits
+toolchains:
+
+```bash
+cd /home/nicola/workdir/aur-fedora-mingw/aur
+rm */*.pkg.tar.xz # Just to be sure to rebuild everything
+env - TERM=$TERM PATH=/usr/bin ./build-all i686
+env - TERM=$TERM PATH=/usr/bin ./build-all x86_64
+```
+
+* `build-all ARCH [PACKAGE]...`<br>
+  The main script for building the whole toolchain. To minimize potential
+  problems raised by unattended environment variables, you could call the
+  script by providing only a minimal environment, e.g.:
 
     ```
-    env -i TERM=xterm-256color PATH=/usr/bin ./build-all
+    env - TERM=$TERM PATH=/usr/bin ./build-all i686
     ```
 
   You can optionally specify on the command line the name of one or more
@@ -31,20 +54,20 @@ scripts are provided, just for convenience:
   want, you need to create it by yourself with:
 
     ```
-    repo-add /home/nicola/workdir/aur-fedora-mingw/pkg/entidi */*.pkg.tar.xz
+    repo-add PACKAGE-DATABASE */*.pkg.tar.xz
     ```
 
-* `pkg-update`<br>
+* `pkg-update ARCH PACKAGE`<br>
   It is intended to be used after `build-all` to upgrade only one package. Just
-  call it with the proper package name:
+  call it with the proper package name, e.g.:
 
     ```
-    ./pkg-update fedora-mingw-w64-glib2
+    ./pkg-update i686 fedora-mingw-w64-glib2
     ```
 
-  This script automatically updates the package database. Actually all that
-  stuff is hardcoded in the sources: fire up an editor for further info.
-* `inc-pkgrel`<br>
+  This script automatically updates the package database. Actually the name of
+  that database is hardcoded in the sources: fire up an editor for details.
+* `inc-pkgrel PKGBUILD [...]`<br>
   Increase the [release number](https://wiki.archlinux.org/index.php/PKGBUILD#pkgrel)
   by one on the `PKGBUILD` files provided as argument, e.g. the following
   command will increase the release of every package:
@@ -128,15 +151,9 @@ some image format I do not use, most notably **SVG** and **tiff**.
 External dependencies
 =====================
 
-The following dependencies need to be pulled in directly from the Archlinux
-community repository:
-
-* mingw-w64-gcc
-* wine
-
-The following dependencies need to be compiled from AUR:
-
-* mingw-w64-tools (required for building cairo)
+Check the source of `build-all` for knowing the exact dependencies needed. They
+are pulled in from core, extra, multilib and community. One dependency
+(`mingw-w64-tools`) must be compiled from AUR.
 
 License
 =======
