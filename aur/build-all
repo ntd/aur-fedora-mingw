@@ -90,6 +90,7 @@ dependencies=(
     intltool            # Required by adwaita-icon-theme
     xorg-util-macros    # Required by libepoxy
     gtk-doc             # Required by pango
+    indent              # Required by indent
                         # Required by adwaita-icon-theme
     gtk-update-icon-cache
 

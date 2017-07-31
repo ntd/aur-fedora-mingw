@@ -5,7 +5,7 @@
 
 pkgname=$CARCH-mingw-w64-glib2
 pkgver=2.52.3
-pkgrel=3
+pkgrel=4
 pkgdesc='Common C routines used by GTK+ and other libs (mingw-w64)'
 arch=(any)
 url='http://www.gtk.org/'
@@ -22,6 +22,7 @@ makedepends=(
     afm-mingw-w64-makedepends
     'glib2>=2.31.20'
     'python2>=2.5.0'
+    indent
 )
 source=("http://ftp.gnome.org/pub/GNOME/sources/glib/${pkgver%.*}/glib-$pkgver.tar.xz"
         "http://pkgs.fedoraproject.org/cgit/mingw-glib2.git/plain/0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch?h=f18"
