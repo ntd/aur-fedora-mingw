@@ -2,7 +2,7 @@
 
 pkgname=$CARCH-mingw-w64-gobject-introspection
 pkgver=1.52.1
-pkgrel=3
+pkgrel=4
 pkgdesc='Introspection system for GObject-based libraries (mingw-w64)'
 arch=(any)
 url='https://wiki.gnome.org/Projects/GObjectIntrospection'
@@ -65,7 +65,8 @@ build() {
     "$tardir/configure" \
       --disable-silent-rules \
       --enable-shared \
-      --enable-static
+      --disable-static \
+      --disable-doctool
     make scannerparser.c _giscanner.la
   )
 
