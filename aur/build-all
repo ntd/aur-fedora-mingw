@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 usage() {
     echo <<EOT
@@ -90,7 +90,7 @@ dependencies=(
     intltool            # Required by adwaita-icon-theme
     xorg-util-macros    # Required by libepoxy
     gtk-doc             # Required by pango
-    indent              # Required by indent
+    indent              # Required by glib2
                         # Required by adwaita-icon-theme
     gtk-update-icon-cache
 
