@@ -11,7 +11,7 @@ containing a .pkg.tar.xz file).
 You must supply the architecture as first argument, e.g. "i686"
 for the 32 bits toolchain or "x86_64" for the 64 bits one.
 
-A list of packages to skip can be optionally specified on the
+A list of directories to skip can be optionally specified on the
 command line. This feature is intended to be used when you want
 to build by yourself one ore more packages.
 EOT
@@ -25,6 +25,8 @@ case "$1" in
     *)
         usage
 esac
+
+root=$(dirname ${BASH_SOURCE[0]})
 
 function exists() {
     [[ -f $1 ]]
@@ -60,8 +62,8 @@ function upgrade() {
 
     echo "Upgrading $pkg..."
     # Skip the building if the package has already been built
-    if ! exists "$dir"/$pkg-*.pkg.tar.xz; then
-        cd "$dir"
+    if ! exists "$root/$dir"/$pkg-*.pkg.tar.xz; then
+        pushd "$root/$dir"
         LC_MESSAGES=C makepkg "$@"
         install
 
@@ -71,7 +73,7 @@ function upgrade() {
         # a command such as `repo-add <path-to-db> */*.pkg.tar.xz`
         rm -fr pkg src
 
-        cd ..
+        popd
     fi
 }
 
