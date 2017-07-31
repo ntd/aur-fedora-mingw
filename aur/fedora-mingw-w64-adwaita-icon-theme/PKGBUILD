@@ -5,7 +5,7 @@
 
 pkgname=afm-mingw-w64-adwaita-icon-theme
 pkgver=3.24.0
-pkgrel=5
+pkgrel=6
 pkgdesc='Adwaita icon theme'
 arch=(any)
 url='http://www.gnome.org'
@@ -15,6 +15,7 @@ conflicts=(mingw-w64-adwaita-icon-theme)
 provides=(mingw-w64-adwaita-icon-theme)
 makedepends=(
     afm-mingw-w64-makedepends
+    gtk-update-icon-cache
     intltool
 )
 source=("https://download.gnome.org/sources/adwaita-icon-theme/${pkgver:0:4}/adwaita-icon-theme-$pkgver.tar.xz")
