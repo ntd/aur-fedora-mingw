@@ -15,23 +15,22 @@ by using [makepkg](https://wiki.archlinux.org/index.php/Makepkg). Some helper
 scripts are provided though, just for my own convenience. They are based on
 `yaourt` but you are free to adapt them to other solutions (patches welcome).
 
-Actually I have the following directory structure, so if you will retain it the
-project will just work out of the box:
+This is the actual directory structure of the project:
 
-* `/home/nicola/workdir/aur-fedora-mingw`
-  * `aur`, containing the git repository
+* `aur-fedora-mingw`, the repository root
+  * `aur`, containing the PKGBUILDs the helper scripts
   * `src`, where the source packages will be downloaded
   * `pkg`, where the built packages will be created
 
-Otherwise you should adjust the settings in
-`afm-mingw-w64-makedepends/makepkg.common.conf` to fit your environment and
-update `afm-mingw-w64-makedepends/PKGBUILD` accordingly.
+If you want you can customise `afm-mingw-w64-makedepends/makepkg.common.conf`
+to fit your environment and update `afm-mingw-w64-makedepends/PKGBUILD`
+accordingly.
 
 The following commands should build and install both the 32 and 64 bits
 toolchains:
 
 ```bash
-cd /home/nicola/workdir/aur-fedora-mingw/aur
+cd path/to/aur-fedora-mingw/aur
 rm */*.pkg.tar.xz # Just to be sure to rebuild everything
 env - TERM=$TERM PATH=/usr/bin ./build-all i686
 env - TERM=$TERM PATH=/usr/bin ./build-all x86_64
