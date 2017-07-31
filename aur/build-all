@@ -90,6 +90,8 @@ dependencies=(
     intltool            # Required by adwaita-icon-theme
     xorg-util-macros    # Required by libepoxy
     gtk-doc             # Required by pango
+                        # Required by adwaita-icon-theme
+    gtk-update-icon-cache
 
     # From multilib
     wine                # Required by gobject-introspection
