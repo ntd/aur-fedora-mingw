@@ -16,7 +16,7 @@
 
 pkgname=afm-mingw-w64-makedepends
 pkgver=3
-pkgrel=5
+pkgrel=6
 pkgdesc='A collection of stuff needed for MinGW cross-building'
 arch=(any)
 url='http://dev.entidi.com/p/aur-fedora-mingw/'
@@ -42,9 +42,9 @@ md5sums=('282c76d280b002dabf017e01101bc103'
          '4abb097f8387f364a9877e28c7c880a3'
          '2fe711bc73b89cff50baa5b785e35b4c'
          '2c2641547debc5d289bb85b0939e4380'
-         '8a7530d0f414e6a5f02915645158c6e4'
+         '9bf6ea428f78d5f163c4b23d48eba9e1'
          'a38a29dd8f512e71a657490c9c82004c'
-         'bc6d1ed3c44d5e87507056d9696fc1d7'
+         'f8123a57a0d15de814c23668334e3dca'
          '80969e92a600cec8de480b64bcefaa98'
          '23961cda7ebd6a35aeff3345c780c6b5'
          'e08642fb0279dd280b85ad1fb1b6215e'
@@ -53,23 +53,32 @@ md5sums=('282c76d280b002dabf017e01101bc103'
          'cdb9f76c5ab95038df1c03755e9119e7')
 
 package() {
-  install -d "$pkgdir/usr/bin"
-  install -d "$pkgdir/usr/share/mingw"
+  local bindir="$pkgdir/usr/bin"
+  local sharedir="$pkgdir/usr/share/mingw"
 
-  install -m 755 i686-w64-mingw32-cmake             "$pkgdir/usr/bin"
-  install -m 755 x86_64-w64-mingw32-cmake           "$pkgdir/usr/bin"
-  install -m 755 i686-w64-mingw32-configure         "$pkgdir/usr/bin"
-  install -m 755 x86_64-w64-mingw32-configure       "$pkgdir/usr/bin"
-  install -m 755 i686-w64-mingw32-pkg-config        "$pkgdir/usr/bin"
-  install -m 755 x86_64-w64-mingw32-pkg-config      "$pkgdir/usr/bin"
+  install -d "$bindir"
+  install -d "$sharedir"
 
-  install -m 644 configure-wrapper                  "$pkgdir/usr/share/mingw/"
-  install -m 644 makepkg.common.conf                "$pkgdir/usr/share/mingw/"
-  install -m 644 makepkg.i686.conf                  "$pkgdir/usr/share/mingw/"
-  install -m 644 makepkg.native.conf                "$pkgdir/usr/share/mingw/"
-  install -m 644 makepkg.x86_64.conf                "$pkgdir/usr/share/mingw/"
-  install -m 644 Toolchain-i686-w64-mingw32.cmake   "$pkgdir/usr/share/mingw/"
-  install -m 644 Toolchain-x86_64-w64-mingw32.cmake "$pkgdir/usr/share/mingw/"
+  # Find the root directory and substitute it in makepkg.common.conf
+  local root=$(cd "$startdir/../.." && echo $PWD)
+  sed \
+    -e "s|@root@|$root|g" \
+    "$srcdir/makepkg.common.conf" > "$sharedir/makepkg.common.conf"
+  chmod 0644 "$sharedir/makepkg.common.conf"
+
+  install -m 755 i686-w64-mingw32-cmake             "$bindir/"
+  install -m 755 x86_64-w64-mingw32-cmake           "$bindir/"
+  install -m 755 i686-w64-mingw32-configure         "$bindir/"
+  install -m 755 x86_64-w64-mingw32-configure       "$bindir/"
+  install -m 755 i686-w64-mingw32-pkg-config        "$bindir/"
+  install -m 755 x86_64-w64-mingw32-pkg-config      "$bindir/"
+
+  install -m 644 configure-wrapper                  "$sharedir/"
+  install -m 644 makepkg.i686.conf                  "$sharedir/"
+  install -m 644 makepkg.native.conf                "$sharedir/"
+  install -m 644 makepkg.x86_64.conf                "$sharedir/"
+  install -m 644 Toolchain-i686-w64-mingw32.cmake   "$sharedir/"
+  install -m 644 Toolchain-x86_64-w64-mingw32.cmake "$sharedir/"
 }
 
 # vim:set ts=2 sw=2 et:
