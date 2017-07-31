@@ -5,7 +5,7 @@
 
 pkgname=$CARCH-mingw-w64-gettext
 pkgver=0.19.7
-pkgrel=4
+pkgrel=5
 pkgdesc='GNU internationalization library (mingw-w64)'
 arch=(any)
 url='http://www.gnu.org/software/gettext/'
@@ -27,7 +27,6 @@ build() {
   mkdir -p "$builddir"
   cd "$builddir"
   source $CHOST-configure "$tardir" \
-    CPPFLAGS="$CPPFLAGS -I../../gettext-runtime/intl" \
     --enable-static \
     --enable-shared \
     --disable-silent-rules \
@@ -36,6 +35,7 @@ build() {
     --disable-csharp \
     --enable-threads=win32 \
     --without-emacs \
+    --with-included-libxml \
     --disable-openmp
   make
 }
