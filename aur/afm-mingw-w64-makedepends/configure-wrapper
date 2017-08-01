@@ -18,12 +18,19 @@ call_configure() {
     # The following variables are already defined in the Makefile
     # but they need to be exported for gobject-introspection
     export CC=$arch-gcc
+    export LD=$arch-ld
     export PKG_CONFIG=$arch-pkg-config
     export DLLTOOL=$arch-dlltool
 
+    # Create root directory for storing wine environments
+    local root="$srcdir"
+    [ -z "$root" ] && root=/tmp
+    [ -n "$USER" ] && root="$root/$USER"
+    mkdir -p "$root"
+
     # Other gobject-introspection specific variables
     export GI_HOST_OS=nt
-    export GI_CROSS_LAUNCHER="env WINEARCH=win$bits WINEPREFIX=$srcdir/win$bits DISPLAY= /usr/bin/wine"
+    export GI_CROSS_LAUNCHER="env WINEARCH=win$bits WINEPREFIX=$root/win$bits DISPLAY= /usr/bin/wine"
     export GI_TYPELIB_PATH="/usr/$arch/lib/girepository-1.0:$GI_TYPELIB_PATH"
     export XDG_DATA_DIRS="/usr/$arch/share:$XDG_DATA_DIRS"
 
