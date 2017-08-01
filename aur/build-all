@@ -43,16 +43,8 @@ function found() {
 }
 
 function pacman_frontend() {
-    LC_MESSAGES=C yaourt "$@" > /dev/null 2>&1
+    LC_MESSAGES=C yaourt "$@"
     return $?
-}
-
-function install() {
-    # TODO: is there a more elegant way to force the removing
-    #       of conflicting packages?
-    if ! yes | pacman_frontend -U --needed *.pkg.tar.xz; then
-        exit 1
-    fi
 }
 
 function upgrade() {
@@ -61,20 +53,19 @@ function upgrade() {
     shift 2
 
     echo "Upgrading $pkg..."
-    # Skip the building if the package has already been built
-    if ! exists "$root/$dir"/$pkg-*.pkg.tar.xz; then
-        pushd "$root/$dir"
-        LC_MESSAGES=C makepkg "$@"
-        install
 
-        # The tarball links (*.pkg.tar.xz) are not deleted: it is
-        # convenient to keep them around to avoid rebuilding the same
-        # package and to easily update the repo database, i.e. by using
-        # a command such as `repo-add <path-to-db> */*.pkg.tar.xz`
-        rm -fr pkg src
-
-        popd
+    pushd "$root/$dir"
+    if ! LC_MESSAGES=C makepkg -i --needed --noconfirm --noprogressbar "$@"; then
+        exit 1
     fi
+
+    # The tarball links (*.pkg.tar.xz) are not deleted: it is
+    # convenient to keep them around to avoid rebuilding the same
+    # package and to easily update the repo database, i.e. by using
+    # a command such as `repo-add <path-to-db> */*.pkg.tar.xz`
+    rm -fr pkg src
+
+    popd
 }
 
 dependencies=(
