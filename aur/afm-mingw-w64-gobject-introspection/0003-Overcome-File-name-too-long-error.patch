@@ -1,7 +1,7 @@
-From c75f426230aa835c538dc224710568fe12c4275b Mon Sep 17 00:00:00 2001
+From d90e99bc3f663aa09d8445cc630e82b8c6034b65 Mon Sep 17 00:00:00 2001
 From: Nicola Fontana <ntd@entidi.it>
 Date: Thu, 11 Feb 2016 13:11:35 +0100
-Subject: [PATCH 8/9] Overcome "File name too long" error
+Subject: [PATCH 3/4] Overcome "File name too long" error
 
 During cross-compilation I got the following error while building GLib-2.0.gir:
 
@@ -29,10 +29,10 @@ OSError: [Errno 36] File name too long
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/giscanner/ccompiler.py b/giscanner/ccompiler.py
-index 726cfec..e4bd207 100644
+index 29de0ee5..05c171e7 100644
 --- a/giscanner/ccompiler.py
 +++ b/giscanner/ccompiler.py
-@@ -280,8 +280,8 @@ class CCompiler(object):
+@@ -285,8 +285,8 @@ class CCompiler(object):
                  args.extend(libtool)
                  args.append('--mode=execute')
              args.extend([os.environ.get('DLLTOOL', 'dlltool.exe'), '--identify'])
@@ -44,5 +44,5 @@ index 726cfec..e4bd207 100644
              for line in o.decode('ascii').splitlines():
                  if line.startswith('libraries: '):
 -- 
-2.7.1
+2.13.3
 

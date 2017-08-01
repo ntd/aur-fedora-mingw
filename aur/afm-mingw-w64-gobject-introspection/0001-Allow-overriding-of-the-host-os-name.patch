@@ -1,7 +1,7 @@
-From 23146802d3e061759eb8a7feb9478bb3eac63d42 Mon Sep 17 00:00:00 2001
+From 3423be1ce94431f2b314333c16ab35d0586d68c6 Mon Sep 17 00:00:00 2001
 From: Nicola Fontana <ntd@entidi.it>
 Date: Fri, 12 Feb 2016 11:04:11 +0100
-Subject: [PATCH 3/9] Allow overriding of the host os name
+Subject: [PATCH 1/4] Allow overriding of the host os name
 
 Added the GI_HOST_OS environment variable to eventually specify the host
 OS explicitely. It fall backs to os.name to retain backward
@@ -10,16 +10,15 @@ compatibility.
 https://bugzilla.gnome.org/show_bug.cgi?id=761985
 ---
  Makefile.introspection | 2 +-
- giscanner/dumper.py    | 2 +-
  giscanner/shlibs.py    | 4 ++--
  giscanner/utils.py     | 4 ++++
- 4 files changed, 8 insertions(+), 4 deletions(-)
+ 3 files changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/Makefile.introspection b/Makefile.introspection
-index 57bec20..32d77af 100644
+index 042cc65e..5b38e355 100644
 --- a/Makefile.introspection
 +++ b/Makefile.introspection
-@@ -84,7 +84,7 @@ _gir_silent_compiler = $(_gir_silent_compiler_$(V))
+@@ -85,7 +85,7 @@ _gir_silent_compiler = $(_gir_silent_compiler_$(V))
  _gir_silent_compiler_ = $(_gir_silent_compiler_$(_gir_verbosity))
  _gir_silent_compiler_0 = @echo "  GICOMP   $(1)";
  
@@ -28,21 +27,8 @@ index 57bec20..32d77af 100644
  
  #
  # Creates a GIR by scanning C headers/sources
-diff --git a/giscanner/dumper.py b/giscanner/dumper.py
-index 3f72159..876b632 100644
---- a/giscanner/dumper.py
-+++ b/giscanner/dumper.py
-@@ -222,7 +222,7 @@ class DumpCompiler(object):
-             args.extend(self._linker_cmd)
- 
-             args.extend(['-o', output])
--            if os.name == 'nt':
-+            if utils.host_os() == 'nt':
-                 args.append('-Wl,--export-all-symbols')
-             else:
-                 args.append('-export-dynamic')
 diff --git a/giscanner/shlibs.py b/giscanner/shlibs.py
-index c93d20c..16cbf2d 100644
+index c93d20cf..16cbf2d2 100644
 --- a/giscanner/shlibs.py
 +++ b/giscanner/shlibs.py
 @@ -29,7 +29,7 @@ import platform
@@ -64,7 +50,7 @@ index c93d20c..16cbf2d 100644
          shlibs = cc.resolve_windows_libs(libraries, options)
  
 diff --git a/giscanner/utils.py b/giscanner/utils.py
-index aff5393..9a026a3 100644
+index 4865ca8c..09132b2d 100644
 --- a/giscanner/utils.py
 +++ b/giscanner/utils.py
 @@ -184,6 +184,10 @@ def cflag_real_include_path(cflag):
@@ -79,5 +65,5 @@ index aff5393..9a026a3 100644
      def is_exe(fpath):
          return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 -- 
-2.7.1
+2.13.3
 

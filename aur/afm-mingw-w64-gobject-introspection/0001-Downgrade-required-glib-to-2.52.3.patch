@@ -1,0 +1,25 @@
+From 63afc3463e08331442cf5f3fe4d9a25969b655f5 Mon Sep 17 00:00:00 2001
+From: Nicola Fontana <ntd@entidi.it>
+Date: Tue, 1 Aug 2017 18:00:02 +0200
+Subject: [PATCH] Downgrade required glib to 2.52.3
+
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index c310f4b4..e0ff4212 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -128,7 +128,7 @@ GIR_DIR="$EXPANDED_DATADIR/$GIR_SUFFIX"
+ AC_SUBST(GIR_DIR)
+ AC_DEFINE_UNQUOTED(GIR_DIR, "$GIR_DIR", [Director prefix for gir installation])
+ 
+-PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.53.4])
++PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.52.3])
+ PKG_CHECK_MODULES(GOBJECT, [gobject-2.0])
+ PKG_CHECK_MODULES(GMODULE, [gmodule-2.0])
+ PKG_CHECK_MODULES(GIO, [gio-2.0])
+-- 
+2.13.3
+

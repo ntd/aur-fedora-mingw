@@ -1,7 +1,7 @@
-From e3128dee26346969d3ff99844b7f04affdd5ab62 Mon Sep 17 00:00:00 2001
+From 30369f178af20fbdc1afe044eb163fa235925a00 Mon Sep 17 00:00:00 2001
 From: Nicola Fontana <ntd@entidi.it>
 Date: Tue, 24 Mar 2015 19:23:38 +0100
-Subject: [PATCH 7/9] Allow to skip the check for Python headers
+Subject: [PATCH 2/4] Allow to skip the check for Python headers
 
 When building without _giscanner.la (e.g., during the second step of a
 MinGW cross compilation) there is no need to build the Python module,
@@ -12,7 +12,7 @@ require the installation of the whole python2 toolchain on the host).
  1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index a6a272d..2c6cf94 100644
+index a29de2f1..c310f4b4 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -272,9 +272,12 @@ case "$host" in
@@ -32,5 +32,5 @@ index a6a272d..2c6cf94 100644
  
  dnl Not enabled by default until 3.6 cycle when we can propose mako as
 -- 
-2.7.1
+2.13.3
 

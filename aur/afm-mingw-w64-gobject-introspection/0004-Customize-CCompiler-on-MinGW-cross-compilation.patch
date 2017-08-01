@@ -1,17 +1,17 @@
-From 3da29ba0ed225d63bbdbe31e9a280478edb80920 Mon Sep 17 00:00:00 2001
+From a0605131645aad36ec0c6578ba8cfd1e94cb1fcd Mon Sep 17 00:00:00 2001
 From: Nicola Fontana <ntd@entidi.it>
 Date: Thu, 11 Feb 2016 19:10:23 +0100
-Subject: [PATCH 9/9] Customize CCompiler on MinGW cross-compilation
+Subject: [PATCH 4/4] Customize CCompiler on MinGW cross-compilation
 
 ---
  giscanner/ccompiler.py | 5 +++++
  1 file changed, 5 insertions(+)
 
 diff --git a/giscanner/ccompiler.py b/giscanner/ccompiler.py
-index e4bd207..c70ec09 100644
+index 05c171e7..2a621f29 100644
 --- a/giscanner/ccompiler.py
 +++ b/giscanner/ccompiler.py
-@@ -73,6 +73,11 @@ class CCompiler(object):
+@@ -75,6 +75,11 @@ class CCompiler(object):
              self.compiler = distutils.ccompiler.new_compiler(compiler=compiler_name)
          customize_compiler(self.compiler)
  
@@ -24,5 +24,5 @@ index e4bd207..c70ec09 100644
          # for 'unix' compiler type.  Also, avoid linking to msvcrxx.dll
          # for MinGW builds as the dumper binary does not link to the
 -- 
-2.7.1
+2.13.3
 

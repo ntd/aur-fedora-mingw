@@ -1,8 +1,8 @@
 # Maintainer: Nicola Fontana <ntd@entidi.it>
 
 pkgname=$CARCH-mingw-w64-gobject-introspection
-pkgver=1.52.1
-pkgrel=4
+pkgver=1.53.4
+pkgrel=1
 pkgdesc='Introspection system for GObject-based libraries (mingw-w64)'
 arch=(any)
 url='https://wiki.gnome.org/Projects/GObjectIntrospection'
@@ -10,41 +10,49 @@ license=(LGPL GPL)
 groups=(afm-$CARCH)
 depends=(
     mingw-w64-crt
-    "$CARCH-mingw-w64-glib2>=2.52.1"
+    "$CARCH-mingw-w64-glib2>=${pkgver/1/2}"
     python2
 )
 makedepends=(
     afm-mingw-w64-makedepends
-    "glib2>=2.52.1"     # Host glib2 should match build glib2 version
+    "glib2>=2.52.3"     # Host glib2 should match build glib2 AMAP
     wine
 )
 source=("http://ftp.gnome.org/pub/GNOME/sources/gobject-introspection/${pkgver%.*}/gobject-introspection-$pkgver.tar.xz"
-        "0003-Allow-overriding-of-the-host-os-name.patch"
-        "0007-Allow-to-skip-the-check-for-Python-headers.patch"
-        "0008-Overcome-File-name-too-long-error.patch"
-        "0009-Customize-CCompiler-on-MinGW-cross-compilation.patch"
+        "0001-Allow-overriding-of-the-host-os-name.patch"
+        "0002-Allow-to-skip-the-check-for-Python-headers.patch"
+        "0003-Overcome-File-name-too-long-error.patch"
+        "0004-Customize-CCompiler-on-MinGW-cross-compilation.patch"
+        "0001-Downgrade-required-glib-to-2.52.3.patch"
         "winewrapper")
-md5sums=('34157073991f9eeb0ed953351b65eb61'
-         '3183cc3a8a14338f27830f0ebb66d408'
-         '1420edbbec79268a490b0f781a4dacd9'
-         '9fc71145c77b0688c0c28616fbef8d7a'
-         '7b4be4221fd52104bc69bee42255742c'
+md5sums=('0db09f139adf5e072c31f9664413c18d'
+         '33faa3a76bc9c786720bb64bd9e4c0c1'
+         'b396f1682424bdc509853edba4fdc5b4'
+         'dacccfc8376349594844f377a147505e'
+         'e0396108950dccfda542a20ac1c6bc21'
+         'c2ebceab91f7ddf56ba52facdcc0e832'
          '83cf11e501161eae90df56838c75653f')
 
 prepare() {
   cd "$srcdir/gobject-introspection-$pkgver"
 
   # https://bugzilla.gnome.org/show_bug.cgi?id=761985
-  patch -Np1 < '../0003-Allow-overriding-of-the-host-os-name.patch'
+  patch -Np1 < '../0001-Allow-overriding-of-the-host-os-name.patch'
 
-  patch -Np1 < '../0007-Allow-to-skip-the-check-for-Python-headers.patch'
-  patch -Np1 < '../0008-Overcome-File-name-too-long-error.patch'
-  patch -Np1 < '../0009-Customize-CCompiler-on-MinGW-cross-compilation.patch'
+  # https://bugzilla.gnome.org/show_bug.cgi?id=658126
+  patch -Np1 < '../0002-Allow-to-skip-the-check-for-Python-headers.patch'
+  patch -Np1 < '../0003-Overcome-File-name-too-long-error.patch'
+  patch -Np1 < '../0004-Customize-CCompiler-on-MinGW-cross-compilation.patch'
+
+  # Downgrade glib requirement to be able to build on archlinux current.
+  # This is required only for building with the python module natively:
+  # the host glib will hopefully be in sync.
+  patch -Np1 < '../0001-Downgrade-required-glib-to-2.52.3.patch'
 
   NOCONFIGURE=1 ./autogen.sh
 
   # Clear environment trees created by wine
-  rm -fr "$srcdir/win32" "$srcdir/win64"
+  rm -fr "$srcdir/$USER/win32" "$srcdir/$USER/win64"
 }
 
 build() {
