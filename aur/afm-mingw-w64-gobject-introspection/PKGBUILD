@@ -2,7 +2,7 @@
 
 pkgname=$CARCH-mingw-w64-gobject-introspection
 pkgver=1.53.4
-pkgrel=1
+pkgrel=2
 pkgdesc='Introspection system for GObject-based libraries (mingw-w64)'
 arch=(any)
 url='https://wiki.gnome.org/Projects/GObjectIntrospection'
@@ -90,6 +90,10 @@ build() {
 
     # Avoid overriding what built previously
     make -t scannerparser.c _giscanner.la
+
+    # Enable some useful debugging options
+    export GI_SCANNER_DISABLE_CACHE=1
+    export GI_SCANNER_DEBUG=save-temps
 
     make
   )
