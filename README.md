@@ -7,20 +7,21 @@ The repository is available for cloning on
 is provided for browsing and hot linking purposes (the URLs will likely
 be permanents).
 
-How to use
-==========
-
-These are common PKGBUILD files so you can build them in the way you like, e.g.
-by using [makepkg](https://wiki.archlinux.org/index.php/Makepkg). Some helper
-scripts are provided though, just for my own convenience. They are based on
-`yaourt` but you are free to adapt them to other solutions (patches welcome).
-
-This is the actual directory structure of the project:
+This is how the project is structured:
 
 * `aur-fedora-mingw`, the repository root
   * `aur`, containing the PKGBUILDs the helper scripts
   * `src`, where the source packages will be downloaded
   * `pkg`, where the built packages will be created
+  * `docker`, support files needed by docker
+
+How to use
+==========
+
+These are common PKGBUILD files so you can build them in the way you like, e.g.
+by using [makepkg](https://wiki.archlinux.org/index.php/Makepkg). Some helper
+scripts are provided though, just for convenience. They are based on `yaourt`
+but you are free to adapt them to other solutions (patches welcome).
 
 If you want you can customise `afm-mingw-w64-makedepends/makepkg.common.conf`
 to fit your environment and update `afm-mingw-w64-makedepends/PKGBUILD`
@@ -36,50 +37,60 @@ env - TERM=$TERM PATH=/usr/bin ./build-all i686
 env - TERM=$TERM PATH=/usr/bin ./build-all x86_64
 ```
 
+Alternatively you can leverage [docker](http://www.docker.com) for running
+the building inside an isolated container. This will only create the packages
+without installing them. Here is how to do it:
+
+```bash
+cd path/to/aur-fedora-mingw
+docker build -t afm .
+docker run -v $(pwd)/src:/home/user/src -v $(pwd)/pkg:/home/user/pkg afm
+```
+
+In both case, if everything goes smoothly, at the end you will have `pkg/`
+populated with the binary packages.
+
+Helper scripts
+==============
+
 * `build-all ARCH [PACKAGE]...`<br>
   The main script for building the whole toolchain. To minimize potential
   problems raised by unattended environment variables, you could call the
   script by providing only a minimal environment, e.g.:
 
-    ```
-    env - TERM=$TERM PATH=/usr/bin ./build-all i686
-    ```
+  ```bash
+  env - TERM=$TERM PATH=/usr/bin ./build-all i686
+  ```
 
   You can optionally specify on the command line the name of one or more
   packages to skip, e.g. by passing `fedora-mingw-w64-cairo` you will build
   everything but cairo.
 
   This script **does not** automatically create the package database! If you
-  want, you need to create it by yourself with:
+  want to, you need to create it by yourself with:
 
-    ```
-    repo-add PACKAGE-DATABASE */*.pkg.tar.xz
-    ```
+  ```bash
+  repo-add PACKAGE-DATABASE */*.pkg.tar.xz
+  ```
 
 * `pkg-update ARCH PACKAGE`<br>
   It is intended to be used after `build-all` to upgrade only one package. Just
   call it with the proper package name, e.g.:
 
-    ```
-    ./pkg-update i686 fedora-mingw-w64-glib2
-    ```
+  ```bash
+  ./pkg-update i686 fedora-mingw-w64-glib2
+  ```
 
   This script automatically updates the package database. Actually the name of
   that database is hardcoded in the sources: fire up an editor for details.
 * `inc-pkgrel PKGBUILD [...]`<br>
   Increase the [release number](https://wiki.archlinux.org/index.php/PKGBUILD#pkgrel)
-  by one on the `PKGBUILD` files provided as argument, e.g. the following
-  command will increase the release of every package:
-
-    ```
-    ./inc-pkgrel */PKGBUILD
-    ```
-* repo-update
+  by one on the `PKGBUILD` files provided as argument.
+* `repo-update`<br>
   Used by `pkg-update` to update the package database.
 
-
-Motivation
-==========
+History
+=======
 
 I badly needed a MinGW environment for cross-compiling my GTK+ applications on
 Windows platforms but the PKGBUILDs found in [AUR](http://aur.archlinux.org/)
