@@ -2,7 +2,7 @@
 
 pkgname=$CARCH-mingw-w64-gobject-introspection
 pkgver=1.53.4
-pkgrel=2
+pkgrel=3
 pkgdesc='Introspection system for GObject-based libraries (mingw-w64)'
 arch=(any)
 url='https://wiki.gnome.org/Projects/GObjectIntrospection'
@@ -24,6 +24,7 @@ source=("http://ftp.gnome.org/pub/GNOME/sources/gobject-introspection/${pkgver%.
         "0003-Overcome-File-name-too-long-error.patch"
         "0004-Customize-CCompiler-on-MinGW-cross-compilation.patch"
         "0001-Downgrade-required-glib-to-2.52.3.patch"
+        "0001-Revert-Windows-port-Work-arount-MSYS-weirdness-where.patch"
         "winewrapper")
 md5sums=('0db09f139adf5e072c31f9664413c18d'
          '33faa3a76bc9c786720bb64bd9e4c0c1'
@@ -31,7 +32,8 @@ md5sums=('0db09f139adf5e072c31f9664413c18d'
          'dacccfc8376349594844f377a147505e'
          'e0396108950dccfda542a20ac1c6bc21'
          'c2ebceab91f7ddf56ba52facdcc0e832'
-         '83cf11e501161eae90df56838c75653f')
+         'ab380e817525e48c51059411dc2e9c1c'
+         '29f0131cb25c719386102c37085e8d8a')
 
 prepare() {
   cd "$srcdir/gobject-introspection-$pkgver"
@@ -48,6 +50,9 @@ prepare() {
   # This is required only for building with the python module natively:
   # the host glib will hopefully be in sync.
   patch -Np1 < '../0001-Downgrade-required-glib-to-2.52.3.patch'
+
+  # Patch from MSYS
+  patch -Np1 < '../0001-Revert-Windows-port-Work-arount-MSYS-weirdness-where.patch'
 
   NOCONFIGURE=1 ./autogen.sh
 
@@ -97,6 +102,7 @@ build() {
 
     make
   )
+  exit 1
 }
 
 package() {

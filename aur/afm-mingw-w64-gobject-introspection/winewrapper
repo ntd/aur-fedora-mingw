@@ -18,4 +18,4 @@ prefix="$TMPDIR"
 prefix="$prefix/$(whoami)/gi-wine"
 
 mkdir -p "$prefix"
-WINEARCH=@arch@ WINEPREFIX="$prefix/@arch@" DISPLAY= /usr/bin/wine @exe@ "$@"
+env WINEARCH=@arch@ WINEPREFIX="$prefix/@arch@" WINEPATH="/usr/@arch@/bin" DISPLAY= /usr/bin/wine @exe@ "$@"
