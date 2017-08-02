@@ -2,7 +2,7 @@
 
 pkgname=$CARCH-mingw-w64-gobject-introspection
 pkgver=1.53.4
-pkgrel=3
+pkgrel=4
 pkgdesc='Introspection system for GObject-based libraries (mingw-w64)'
 arch=(any)
 url='https://wiki.gnome.org/Projects/GObjectIntrospection'
@@ -102,7 +102,6 @@ build() {
 
     make
   )
-  exit 1
 }
 
 package() {
