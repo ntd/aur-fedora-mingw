@@ -12,9 +12,6 @@ call_configure() {
     local path_to_configure=$3
     shift 3
 
-    # Prepend arch bin, just in case
-    export PATH="/usr/$arch/bin:$PATH"
-
     # The following variables are already defined in the Makefile
     # but they need to be exported for gobject-introspection
     export CC=$arch-gcc
@@ -30,7 +27,7 @@ call_configure() {
 
     # Other gobject-introspection specific variables
     export GI_HOST_OS=nt
-    export GI_CROSS_LAUNCHER="env WINEARCH=win$bits WINEPREFIX=$root/win$bits DISPLAY= /usr/bin/wine"
+    export GI_CROSS_LAUNCHER="env WINEARCH=win$bits WINEPREFIX=$root/win$bits WINEPATH=/usr/$arch/bin DISPLAY= /usr/bin/wine"
     export GI_TYPELIB_PATH="/usr/$arch/lib/girepository-1.0:$GI_TYPELIB_PATH"
     export XDG_DATA_DIRS="/usr/$arch/share:$XDG_DATA_DIRS"
 
