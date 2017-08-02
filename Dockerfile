@@ -28,5 +28,5 @@ RUN mkdir src/ pkg/
 VOLUME /home/user/src /home/user/pkg
 
 # The last command leaves the container running so you can inspect it
-# later with `docker exec -i -t afm /bin/bash`
+# later with `docker exec -i -t CONTAINER-ID /bin/bash`
 CMD aur/build-all i686 && aur/build-all x86_64; tail -f /dev/null
