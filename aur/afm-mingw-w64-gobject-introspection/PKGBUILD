@@ -2,7 +2,7 @@
 
 pkgname=$CARCH-mingw-w64-gobject-introspection
 pkgver=1.53.4
-pkgrel=4
+pkgrel=5
 pkgdesc='Introspection system for GObject-based libraries (mingw-w64)'
 arch=(any)
 url='https://wiki.gnome.org/Projects/GObjectIntrospection'
@@ -19,6 +19,7 @@ makedepends=(
     wine
 )
 source=("http://ftp.gnome.org/pub/GNOME/sources/gobject-introspection/${pkgver%.*}/gobject-introspection-$pkgver.tar.xz"
+        "0001-giscanner-fix-EOF-check-with-flex-2.6.1.patch"
         "0001-Allow-overriding-of-the-host-os-name.patch"
         "0002-Allow-to-skip-the-check-for-Python-headers.patch"
         "0003-Overcome-File-name-too-long-error.patch"
@@ -27,6 +28,7 @@ source=("http://ftp.gnome.org/pub/GNOME/sources/gobject-introspection/${pkgver%.
         "0001-Revert-Windows-port-Work-arount-MSYS-weirdness-where.patch"
         "winewrapper")
 md5sums=('0db09f139adf5e072c31f9664413c18d'
+         '1906e33a2ac922cb440a18c8f1eaaddc'
          '33faa3a76bc9c786720bb64bd9e4c0c1'
          'b396f1682424bdc509853edba4fdc5b4'
          'dacccfc8376349594844f377a147505e'
@@ -37,6 +39,9 @@ md5sums=('0db09f139adf5e072c31f9664413c18d'
 
 prepare() {
   cd "$srcdir/gobject-introspection-$pkgver"
+
+  # Patch from upstream Archlinux
+  patch -Np1 < '../0001-giscanner-fix-EOF-check-with-flex-2.6.1.patch'
 
   # https://bugzilla.gnome.org/show_bug.cgi?id=761985
   patch -Np1 < '../0001-Allow-overriding-of-the-host-os-name.patch'
@@ -99,6 +104,9 @@ build() {
     # Enable some useful debugging options
     export GI_SCANNER_DISABLE_CACHE=1
     export GI_SCANNER_DEBUG=save-temps
+
+    # From upstream Archlinux
+    sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
 
     make
   )
