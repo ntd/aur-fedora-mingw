@@ -47,7 +47,7 @@ docker build -t afm .
 docker run -v $(pwd)/src:/home/user/src -v $(pwd)/pkg:/home/user/pkg afm
 ```
 
-In both case, if everything goes smoothly, at the end you will have `pkg/`
+In both cases, and if everything goes smoothly, at the end you will have `pkg/`
 populated with the binary packages.
 
 Helper scripts
