@@ -2,10 +2,7 @@ Collection of PKGBUILDs for cross-building GTK+2 and GTK+3 applications on
 ArchLinux using a mingw-w64 system. Think of it as a spur of AUR.
 
 The repository is available for cloning on
-[github](http://github.com/ntd/aur-fedora-mingw). The one hosted on
-[entidi](http://dev.entidi.com/p/aur-fedora-mingw/source/tree/master/)
-is provided for browsing and hot linking purposes (the URLs will likely
-be permanents).
+[github](http://github.com/ntd/aur-fedora-mingw).
 
 This is how the project is structured:
 
